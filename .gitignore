@@ -1,0 +1,4 @@
+KIE-KEY.env
+.env
+*.wav
+__pycache__/
