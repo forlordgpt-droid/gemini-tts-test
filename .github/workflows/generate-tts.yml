@@ -1,0 +1,41 @@
+name: Generate Gemini 3.8 Flash-Lite TTS
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: Text to speak
+        required: true
+        default: "Yes this is working"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate speech with Kie.ai
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+          TTS_TEXT: ${{ inputs.text }}
+        shell: bash
+        run: |
+          if [ -z "$KIE_API_KEY" ]; then
+            echo "Missing Actions secret KIE_API_KEY. Set it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          python gemini38_tts_kie.py --text "$TTS_TEXT" --output yes_this_is_working.wav
+      - name: Upload generated WAV
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemini-tts-wav
+          path: yes_this_is_working.wav
+          if-no-files-found: error
+          retention-days: 7
