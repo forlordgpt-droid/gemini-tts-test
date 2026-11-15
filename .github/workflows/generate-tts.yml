@@ -1,5 +1,9 @@
 name: Generate Gemini 3.8 Flash-Lite TTS
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/tts-run-once.trigger
   workflow_dispatch:
     inputs:
       text:
@@ -24,7 +28,7 @@ jobs:
       - name: Generate speech with Kie.ai
         env:
           KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
-          TTS_TEXT: ${{ inputs.text }}
+          TTS_TEXT: ${{ inputs.text || 'Yes this is working' }}
         shell: bash
         run: |
           if [ -z "$KIE_API_KEY" ]; then
