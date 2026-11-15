@@ -1,9 +1,5 @@
 name: Generate Gemini 3.8 Flash-Lite TTS
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/tts-run-once.trigger
   workflow_dispatch:
     inputs:
       text:
