@@ -1,0 +1,63 @@
+{
+  "model": "google/gemini-3-8-flash-lite-tts",
+  "voice": "Fola",
+  "provider": "kie.ai",
+  "run": 43974639785,
+  "duration_seconds": 120,
+  "original_total_seconds": 129,
+  "sample_rate_hz": 24000,
+  "channels": 1,
+  "stages": [
+    "6 parallel KIE audio jobs",
+    "trim qualifying low-energy silence to maximum 300 ms",
+    "preserve voiced audio samples",
+    "insert 180 ms natural inter-segment pauses",
+    "pad tail to exactly 120 seconds",
+    "AAC encode FFmpeg verification"
+  ],
+  "speech_ends_at": 119.75,
+  "segments": [
+    {
+      "i": 0,
+      "start": 0,
+      "end": 19.73,
+      "original": 22.24
+    },
+    {
+      "i": 1,
+      "start": 19.91,
+      "end": 38.88,
+      "original": 20.24
+    },
+    {
+      "i": 2,
+      "start": 39.06,
+      "end": 57.93,
+      "original": 19.92
+    },
+    {
+      "i": 3,
+      "start": 58.11,
+      "end": 77.84,
+      "original": 20.8
+    },
+    {
+      "i": 4,
+      "start": 78.02,
+      "end": 101.57,
+      "original": 25.24
+    },
+    {
+      "i": 5,
+      "start": 101.75,
+      "end": 119.75,
+      "original": 20.56
+    }
+  ],
+  "verification": {
+    "codec": "AAC",
+    "sample_rate": 24000,
+    "channels": 1,
+    "ffprobe_duration_seconds": 120
+  }
+}
