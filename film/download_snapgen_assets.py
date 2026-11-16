@@ -50,6 +50,20 @@ def history_with_retries(uuid: str) -> dict:
     raise RuntimeError("Unreachable")
 
 
+def wait_for_completion(uuid: str, max_wait_seconds: int = 720) -> dict:
+    """Wait for a submitted video to complete without resubmitting or spending credits."""
+    deadline = time.monotonic() + max_wait_seconds
+    while True:
+        history = history_with_retries(uuid)
+        if history.get("status") == 3 or history.get("error_code"):
+            raise RuntimeError("Snapgen job failed")
+        if history.get("status") == 2 or str(history.get("status_desc", "")).upper() == "COMPLETED":
+            return history
+        if time.monotonic() > deadline:
+            raise TimeoutError("Snapgen generation not completed before timeout")
+        time.sleep(12)
+
+
 def assert_completed(history: dict, uuid: str) -> None:
     actual = history.get("uuid")
     if actual and actual != uuid:
@@ -123,7 +137,7 @@ def one_asset(asset: dict) -> dict:
         raise ValueError("Invalid asset manifest entry")
     if not re.fullmatch(r"[a-f0-9-]{36}", uuid):
         raise ValueError("Invalid generation UUID")
-    response = history_with_retries(uuid)
+    response = wait_for_completion(uuid)
     assert_completed(response, uuid)
     url = selected_url(response, kind)
     ext = ".png" if kind == "image" else ".mp4"
