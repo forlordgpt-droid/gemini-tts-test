@@ -1,0 +1,43 @@
+{
+  "model": "google/gemini-3-8-flash-lite-tts",
+  "voice": "Fola",
+  "scope": "first 120 seconds",
+  "segments": [
+    {
+      "index": 0,
+      "source_start": 0,
+      "source_end": 20,
+      "text": "You are asleep. It's 6:41 on a Tuesday morning. Your alarm is set for 7:00. There's a half-finished cup of coffee on the desk, a work meeting at 9:00, and absolutely no idea that this is the last normal morning of your life. Then you hear it. A low, rising wail. Not your alarm, not a car, a siren."
+    },
+    {
+      "index": 1,
+      "source_start": 20,
+      "source_end": 40,
+      "text": "The kind you've only ever heard in movies. You tell yourself it's a test. Cities test sirens all the time, right? But your phone is vibrating and the screen isn't showing a normal notification. It's showing a full-screen emergency alert. Red background, black letters, seven words. Missile threat inbound. Seek shelter immediately."
+    },
+    {
+      "index": 2,
+      "source_start": 40,
+      "source_end": 60,
+      "text": "Your brain refuses to process it. You read it once, twice, a third time, as if the words might change. They don't. Here's the first thing you need to understand about survival. You will not be the version of yourself you imagine. Research on disasters shows that most people freeze for the first few minutes, a state called normalcy bias."
+    },
+    {
+      "index": 3,
+      "source_start": 60,
+      "source_end": 80,
+      "text": "The brain keeps insisting everything is fine because it has never seen anything else. The people who live are the ones who break that spell fast. You have at most fifteen minutes. You don't pack, you don't think. You grab the orange cap off the nightstand because it's the only thing your hand touches, and you run. Outside, the street is chaos."
+    },
+    {
+      "index": 4,
+      "source_start": 80,
+      "source_end": 100,
+      "text": "Car horns, people screaming, a man standing on his lawn staring at the sky with his phone raised, filming. Don't be that man. You know one thing the others don't. Two years ago, your uncle bought land outside the city and buried a shelter under a rusted manhole cover in the field behind the old farmhouse. Everyone laughed at him. He used to say, 'It's not paranoia, it's insurance.'"
+    },
+    {
+      "index": 5,
+      "source_start": 100,
+      "source_end": 120,
+      "text": "You sprint toward that field. Your lungs burn. Your bare feet are bleeding on the gravel. You don't feel any of it. Then, the sky changes. Behind you, the horizon turns white. Not bright, white. A light so intense it throws your shadow ten meters ahead of you, sharp as a blade."
+    }
+  ]
+}
