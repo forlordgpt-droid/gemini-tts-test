@@ -73,5 +73,6 @@
       "kind": "video",
       "uuid": "017f677e-e1e2-11f1-804f-8e79aa0665ce"
     }
-  ]
+  ],
+  "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations"
 }
