@@ -44,8 +44,8 @@ SHOTS=[
 ("S22",4.6,"MUSE_BROLL_D",5),("S23",8.8,"GROK_S23",0),
 ("S24A",5.5,"GROK_S24A",0),
 ("S24B",3.5,"GROK_S24B",4.55),
-("S25",3.4,None,0),("S26",7.5,"GROK_S26",0),
-("S27",6.8,"GROK_S27",0),("S28",5.5,None,0)]
+("S25",2.0,None,0),("S26",7.5,"GROK_S26",0),
+("S27",6.8,"GROK_S27",0),("S28",6.0,None,0)]
 TOTAL_SECONDS=sum(x[1] for x in SHOTS)
 assert 168<TOTAL_SECONDS<181, TOTAL_SECONDS
 
@@ -174,7 +174,7 @@ def render_one(s):
     dst=CLIPS/f"{name}.mp4"
     if src is None:
         if name=="S25": return ffmpeg_card("S25",duration,dst)
-        subs=[("S28A",2.1),("S28B",2.1),("S28C",1.3)]
+        subs=[("S28A",2.0),("S28B",2.0),("S28C",2.0)]
         parts=[]
         for sn,seconds in subs:
             p=CLIPS/f"{sn}.mp4"
@@ -230,7 +230,7 @@ def render_one(s):
     af=f"aresample=48000,highpass=f=65,afade=t=in:st=0:d=0.025,afade=t=out:st={max(0,duration-0.06):.3f}:d=0.05"
     if name in ("S01","S06","S20","S23"):
         cmd+=["-loop","1","-i",str(GFX/f"{name}.png"),"-t",str(duration),
-              "-filter_complex",f"[0:v]{vf}[base];[1:v]format=rgba[title];[base][title]overlay=0:0:shortest=1,format=yuv420p[outv]",
+              "-filter_complex",f"[0:v]{vf}[base];[1:v]format=rgba[title];[base][title]overlay=0:0:shortest=1:enable=\'lt(t,2)\',format=yuv420p[outv]",
               "-map","[outv]","-map","0:a:0"]
     else:
         cmd+=["-t",str(duration),"-vf",vf]
@@ -279,8 +279,8 @@ with wave.open(str(score),"wb") as w:
 
 print("Applying speech-first music-ducked mix with burned dialogue captions...",flush=True)
 captions=mk_srt()
-# FFmpeg subtitles uses relative workspace path and white type with subtle black backing.
-caption_style="FontName=DejaVu Sans,FontSize=19,PrimaryColour=&H00FFFFFF,OutlineColour=&HC000000,BorderStyle=3,BackColour=&H90000000,Alignment=2,MarginV=118"
+# Mobile subtitles: very small white lettering on an opaque crimson-red block, centered at the very bottom inside the 9:16 video frame.
+caption_style="FontName=DejaVu Sans,FontSize=13,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H001717C8,BorderStyle=3,Outline=0,Shadow=0,Alignment=2,MarginV=22,MarginL=15,MarginR=15"
 run(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(base),"-i",str(score),
     "-filter_complex",
     "[0:a]aresample=48000,acompressor=threshold=-21dB:ratio=1.9:attack=10:release=150[native];"
@@ -306,6 +306,6 @@ report={"status":"editorial_preview_technical_verified_not_artistic_final",
         "width":v["width"],"height":v["height"],"fps":v["avg_frame_rate"],
         "source_footage":"41 Snapgen history assets",
         "speech":"original native Grok clips, no external TTS",
-        "human_lip_sync_review":"not verified", "editorial_changes":["removed duplicate S13 confrontation","S12 complete native speech retained","S11 ghosted handbag transition cut before damaged frames","S16 dead-air hold shortened","S24B original audio carried over TV insert to hide hair mismatch","S27 group-to-TV cut avoids mismatched closeup while retaining native words","S25 subtle title motion","word-timed trims and subtitles","audible original score ducked under speech"]}
+        "human_lip_sync_review":"not verified", "subtitle_style":"small white text on opaque crimson-red background, lower-center inside frame, font size 13", "card_display_seconds":2.0, "editorial_changes":["removed duplicate S13 confrontation","S12 complete native speech retained","S11 ghosted handbag transition cut before damaged frames","S16 dead-air hold shortened","S24B original audio carried over TV insert to hide hair mismatch","S27 group-to-TV cut avoids mismatched closeup while retaining native words","S25 subtle title motion","word-timed trims and subtitles","audible original score ducked under speech"]}
 (WORK/"PREVIEW_EXPORT_REPORT.json").write_text(json.dumps(report,indent=2)+"\n")
 print("FINAL_EXPORT "+json.dumps(report),flush=True)
