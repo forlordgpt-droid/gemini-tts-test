@@ -1,0 +1,43 @@
+name: Hotel Room Next Door — Download Snapgen History Assets
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'film/snapgen-asset-manifest.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hotel-room-snapgen-asset-download
+  cancel-in-progress: false
+
+jobs:
+  retrieve-snapgen-media:
+    name: Retrieve 14 existing Snapgen assets by UUID
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download and verify completed Snapgen generations
+        env:
+          SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
+        run: python film/download_snapgen_assets.py
+
+      - name: Upload verified reference images and Muse videos
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-room-next-door-snapgen-assets
+          path: hotel-room-next-door-assets/
+          retention-days: 30
+          if-no-files-found: error
+          compression-level: 0
