@@ -1,0 +1,68 @@
+name: Hotel Room Next Door - Source-Locked Preproduction and Gemini TTS
+on:
+  push:
+    paths:
+      - '.github/workflows/hotel-voice-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preproduction:
+    name: V9.1 audit, source lock and manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate source-locked V9.1 manifests
+        run: python film/worker.py preflight
+      - name: Upload V9.1 preproduction artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-preproduction
+          path: output/
+          retention-days: 14
+          if-no-files-found: error
+
+  tts:
+    name: Kie Gemini 3.8 Flash-Lite TTS / Scene ${{ matrix.scene }}
+    needs: preproduction
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        scene: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify secret is available without printing it
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        shell: bash
+        run: |
+          if [ -z "$KIE_API_KEY" ]; then
+            echo "::error::KIE_API_KEY is not configured. Add as repository Actions secret."
+            exit 1
+          fi
+      - name: Generate exact-script character performances using Kie.ai ONLY for voice
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: python film/worker.py voices --scene ${{ matrix.scene }}
+      - name: Upload per-scene voice clips and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-voice-scene-${{ matrix.scene }}
+          path: |
+            output/voices/
+            output/voice_receipts/
+          retention-days: 14
+          if-no-files-found: warn
