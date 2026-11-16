@@ -32,6 +32,14 @@ jobs:
           SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
         run: python film/download_snapgen_assets.py
 
+      - name: Install image preview dependency
+        if: success()
+        run: python -m pip install --disable-pip-version-check Pillow
+
+      - name: Check video streams and create inspection contact sheets
+        if: success()
+        run: python film/inspect_snapgen_clips.py
+
       - name: Upload verified reference images and Muse videos
         if: success()
         uses: actions/upload-artifact@v4
