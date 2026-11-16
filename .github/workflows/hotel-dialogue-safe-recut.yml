@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/hotel-dialogue-safe-recut.yml'
+      - 'film/build_dialogue_safe_recut.py'
 
 permissions:
   contents: read
