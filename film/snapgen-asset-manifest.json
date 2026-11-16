@@ -105,5 +105,6 @@
     }
   ],
   "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations",
-  "description": "Includes 5 completed character/ensemble reference images and the submitted first Grok multi-reference test clip. GitHub Actions will wait for clip completion before archival."
+  "description": "Includes 5 completed character/ensemble reference images and the submitted first Grok multi-reference test clip. GitHub Actions will wait for clip completion before archival.",
+  "archive_qa_revision": "ffmpeg-enabled check after 20/20 recovered"
 }
