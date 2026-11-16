@@ -36,6 +36,12 @@ jobs:
         if: success()
         run: python -m pip install --disable-pip-version-check Pillow
 
+      - name: Install FFmpeg and FFprobe for video inspection
+        if: success()
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
       - name: Check video streams and create inspection contact sheets
         if: success()
         run: python film/inspect_snapgen_clips.py
