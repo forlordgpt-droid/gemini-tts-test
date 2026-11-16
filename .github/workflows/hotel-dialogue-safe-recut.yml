@@ -1,0 +1,49 @@
+name: Hotel Film — Dialogue-Safe Recut (Existing Assets Only)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hotel-dialogue-safe-recut.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recut-without-generation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out approved edit code
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install film finishing tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Fetch all 41 original files from verified GitHub artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hotel-room-next-door-snapgen-assets
+          repository: forlordgpt-droid/gemini-tts-test
+          run-id: 43928825705
+          github-token: ${{ github.token }}
+          path: hotel-room-next-door-assets
+      - name: Recut from original videos without creating assets
+        run: python film/build_dialogue_safe_recut.py
+      - name: Upload corrected movie and QA to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: HOTEL_ROOM_NEXT_DOOR_DIALOGUE_SAFE_RECUT_480P
+          path: |
+            hotel-video-recut/HOTEL_ROOM_NEXT_DOOR_DIALOGUE_SAFE_RECUT_480P.mp4
+            hotel-video-recut/PREVIEW_EXPORT_REPORT.json
+            hotel-video-recut/dialogue-verified.srt
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
