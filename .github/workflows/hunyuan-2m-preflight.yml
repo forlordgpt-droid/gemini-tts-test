@@ -35,17 +35,7 @@ jobs:
             browser-webcodecs)
               npm install --no-save playwright@1.65.1
               npx playwright install --with-deps chromium
-              node - <<'JS'
-          const {chromium}=require('playwright');
-          (async()=>{
-            const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
-            const page=await browser.newPage();
-            const caps=await page.evaluate(async()=>({webgl:(()=>{let c=document.createElement('canvas');return !!c.getContext('webgl2')})(),webcodecs:typeof VideoEncoder!=='undefined', avc:typeof VideoEncoder==='undefined'?false:(await VideoEncoder.isConfigSupported({codec:'avc1.42001E',width:1280,height:720,framerate:30,bitrate:3000000})).supported}));
-            console.log(JSON.stringify(caps));
-            await browser.close();
-            if(!caps.webgl || !caps.webcodecs || !caps.avc) process.exitCode=1;
-          })().catch(e=>{console.error(e);process.exitCode=1});
-          JS
+              node film/hunyuan-2m/verify-webcodecs.cjs
               ;;
             ffmpeg)
               sudo apt-get update -qq
