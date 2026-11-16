@@ -1,0 +1,52 @@
+name: Hotel Room Next Door — Export 3-Minute Film
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hotel-export-preview.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hotel-room-cinematic-preview-export
+  cancel-in-progress: false
+
+jobs:
+  export-vertical-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out film pipeline
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install media tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow
+
+      - name: Download 41 original assets by Snapgen UUID
+        env:
+          SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
+        run: python film/download_snapgen_assets.py
+
+      - name: Assemble 180-second cinematic vertical preview
+        run: python film/build_vertical_preview.py
+
+      - name: Publish finished MP4 and technical report on GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: HOTEL_ROOM_NEXT_DOOR_3_MINUTE_FILM_480P
+          path: |
+            hotel-video-export/HOTEL_ROOM_NEXT_DOOR_CINEMATIC_VERTICAL_PREVIEW_480P.mp4
+            hotel-video-export/PREVIEW_EXPORT_REPORT.json
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
