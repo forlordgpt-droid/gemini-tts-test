@@ -92,6 +92,35 @@ def mk_srt():
     with path.open("w",encoding="utf-8") as f:
         for i,(st,en,line) in enumerate(entries,1):
             f.write(f"{i}\n{clock(st)} --> {clock(en)}\n{line}\n\n")
+    # Explicit ASS styling is required. Some FFmpeg/libass builds silently
+    # ignore force_style when ingesting SRT, leaving large white subtitles.
+    # Here the subtitle style itself is authored and applied natively.
+    ass=WORK/"dialogue-small-white-on-red.ass"
+    with ass.open("w",encoding="utf-8") as f:
+        f.write("""[Script Info]
+Title: Hotel Room Next Door - Small Lower Red Subtitles
+ScriptType: v4.00+
+PlayResX: 480
+PlayResY: 854
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,DejaVu Sans,13,&H00FFFFFF,&H00FFFFFF,&H001010C8,&H001010C8,-1,0,0,0,100,100,0,0,3,2,0,2,15,15,22,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+""")
+        def ass_time(seconds):
+            n=round(max(0.0,seconds)*100)
+            hours,n=divmod(n,360000)
+            minutes,n=divmod(n,6000)
+            sec,centis=divmod(n,100)
+            return f"{hours}:{minutes:02d}:{sec:02d}.{centis:02d}"
+        for st,en,line in entries:
+            clean=line.replace("\n",r"\N").replace("{","(").replace("}",")")
+            f.write(f"Dialogue: 0,{ass_time(st)},{ass_time(en)},Default,,0,0,0,,{clean}\n")
     return path
 
 def run(cmd,timeout=180):
@@ -280,7 +309,7 @@ with wave.open(str(score),"wb") as w:
 print("Applying speech-first music-ducked mix with burned dialogue captions...",flush=True)
 captions=mk_srt()
 # Mobile subtitles: very small white lettering on an opaque crimson-red block, centered at the very bottom inside the 9:16 video frame.
-caption_style="FontName=DejaVu Sans,FontSize=13,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H001717C8,BorderStyle=3,Outline=0,Shadow=0,Alignment=2,MarginV=22,MarginL=15,MarginR=15"
+ass_path=WORK/"dialogue-small-white-on-red.ass"
 run(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(base),"-i",str(score),
     "-filter_complex",
     "[0:a]aresample=48000,acompressor=threshold=-21dB:ratio=1.9:attack=10:release=150[native];"
@@ -288,7 +317,7 @@ run(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(base),"-i",str(sc
     "[score][native]sidechaincompress=threshold=0.020:ratio=4.5:attack=30:release=350[duck];"
     "[native][duck]amix=inputs=2:duration=first:weights=1 1,loudnorm=I=-16:LRA=10:TP=-1.5[mix]",
     "-map","0:v:0","-map","[mix]",
-    "-vf",f"subtitles={captions}:force_style='{caption_style}'",
+    "-vf",f"ass={ass_path}",
     "-c:v","libx264","-preset","veryfast","-crf","20","-threads","4","-r","24","-pix_fmt","yuv420p",
     "-c:a","aac","-b:a","192k",
     "-ar","48000","-ac","2","-movflags","+faststart","-t",str(TOTAL_SECONDS),str(OUTPUT)],300)
@@ -306,6 +335,6 @@ report={"status":"editorial_preview_technical_verified_not_artistic_final",
         "width":v["width"],"height":v["height"],"fps":v["avg_frame_rate"],
         "source_footage":"41 Snapgen history assets",
         "speech":"original native Grok clips, no external TTS",
-        "human_lip_sync_review":"not verified", "subtitle_style":"small white text on opaque crimson-red background, lower-center inside frame, font size 13", "card_display_seconds":2.0, "editorial_changes":["removed duplicate S13 confrontation","S12 complete native speech retained","S11 ghosted handbag transition cut before damaged frames","S16 dead-air hold shortened","S24B original audio carried over TV insert to hide hair mismatch","S27 group-to-TV cut avoids mismatched closeup while retaining native words","S25 subtle title motion","word-timed trims and subtitles","audible original score ducked under speech"]}
+        "human_lip_sync_review":"not verified", "subtitle_style":"verified explicit ASS style: font 13 bold white on opaque red rectangular background, bottom-center", "subtitle_renderer":"libass native ASS file", "card_display_seconds":2.0, "editorial_changes":["removed duplicate S13 confrontation","S12 complete native speech retained","S11 ghosted handbag transition cut before damaged frames","S16 dead-air hold shortened","S24B original audio carried over TV insert to hide hair mismatch","S27 group-to-TV cut avoids mismatched closeup while retaining native words","S25 subtle title motion","word-timed trims and subtitles","audible original score ducked under speech"]}
 (WORK/"PREVIEW_EXPORT_REPORT.json").write_text(json.dumps(report,indent=2)+"\n")
 print("FINAL_EXPORT "+json.dumps(report),flush=True)
