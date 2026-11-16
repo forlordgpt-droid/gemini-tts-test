@@ -102,9 +102,114 @@
       "id": "GROK_TEST_S12",
       "kind": "video",
       "uuid": "9b9d06ea-e1e7-11f1-b1b9-9600ef9545ae"
+    },
+    {
+      "id": "GROK_S03",
+      "kind": "video",
+      "uuid": "cbe5cd9e-e1e9-11f1-9664-42023871cd0e"
+    },
+    {
+      "id": "GROK_S04",
+      "kind": "video",
+      "uuid": "ccf6e2b8-e1e9-11f1-bddd-8e0ddcca9a95"
+    },
+    {
+      "id": "GROK_S05",
+      "kind": "video",
+      "uuid": "ce5747ce-e1e9-11f1-af9e-123aae635bda"
+    },
+    {
+      "id": "GROK_S07",
+      "kind": "video",
+      "uuid": "cff39dee-e1e9-11f1-a564-f6a542c95a2d"
+    },
+    {
+      "id": "GROK_S08",
+      "kind": "video",
+      "uuid": "d28664a6-e1e9-11f1-867e-da065a57f229"
+    },
+    {
+      "id": "GROK_S09",
+      "kind": "video",
+      "uuid": "12def9f0-e1ea-11f1-a0af-9a1a9fabab6a"
+    },
+    {
+      "id": "GROK_S11",
+      "kind": "video",
+      "uuid": "14e7ca24-e1ea-11f1-89fa-32c2e0d712a9"
+    },
+    {
+      "id": "GROK_S13",
+      "kind": "video",
+      "uuid": "16dfecf8-e1ea-11f1-8d9b-cec8765e7b71"
+    },
+    {
+      "id": "GROK_S14",
+      "kind": "video",
+      "uuid": "185bca0c-e1ea-11f1-a667-7ad3356757c8"
+    },
+    {
+      "id": "GROK_S15",
+      "kind": "video",
+      "uuid": "19e31916-e1ea-11f1-b1b9-9600ef9545ae"
+    },
+    {
+      "id": "GROK_S16",
+      "kind": "video",
+      "uuid": "1b58e9e2-e1ea-11f1-a22d-560241dd8675"
+    },
+    {
+      "id": "GROK_S17",
+      "kind": "video",
+      "uuid": "403fd6e4-e1ea-11f1-b1b9-9600ef9545ae"
+    },
+    {
+      "id": "GROK_S18",
+      "kind": "video",
+      "uuid": "41c2e7ea-e1ea-11f1-ab77-16bd51f04887"
+    },
+    {
+      "id": "GROK_S19",
+      "kind": "video",
+      "uuid": "43561578-e1ea-11f1-8c97-eaa20c436fa9"
+    },
+    {
+      "id": "GROK_S21A",
+      "kind": "video",
+      "uuid": "450d6786-e1ea-11f1-afb5-eaeea2831bc1"
+    },
+    {
+      "id": "GROK_S21B",
+      "kind": "video",
+      "uuid": "469d5d22-e1ea-11f1-beb0-6aa20aaf5633"
+    },
+    {
+      "id": "GROK_S23",
+      "kind": "video",
+      "uuid": "71de6f3a-e1ea-11f1-af9e-123aae635bda"
+    },
+    {
+      "id": "GROK_S24A",
+      "kind": "video",
+      "uuid": "73723750-e1ea-11f1-bf37-b6451561d9a7"
+    },
+    {
+      "id": "GROK_S24B",
+      "kind": "video",
+      "uuid": "74d51bd0-e1ea-11f1-9712-defb2ffa4297"
+    },
+    {
+      "id": "GROK_S26",
+      "kind": "video",
+      "uuid": "766900b0-e1ea-11f1-9c9c-3aa44f238063"
+    },
+    {
+      "id": "GROK_S27",
+      "kind": "video",
+      "uuid": "7829742a-e1ea-11f1-afb5-eaeea2831bc1"
     }
   ],
   "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations",
-  "description": "Includes 5 completed character/ensemble reference images and the submitted first Grok multi-reference test clip. GitHub Actions will wait for clip completion before archival.",
+  "description": "All 22 Grok clips (including test), four Muse clips, and fifteen Snapgen images. 21 new clips submitted with 2-5 reference image URLs each; workflow waits until completion and recovers them by UUID.",
   "archive_qa_revision": "ffmpeg-enabled check after 20/20 recovered"
 }
