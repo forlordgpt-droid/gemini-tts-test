@@ -1,0 +1,759 @@
+{
+  "title": "THE HOTEL ROOM NEXT DOOR",
+  "subtitle": "3-Minute American Drama Screenplay | Romance • Infidelity • Betrayal • Suspense",
+  "setting": "Manhattan, New York City. A luxurious five-star hotel on a rainy Friday night.",
+  "plot_secret": "Ethan is cheating with Jenna. Brian is cheating with Chloe. Neither pair knows the other is having an affair.",
+  "scene_titles": [
+    "THE WRONG HOTEL",
+    "THE ELEVATOR",
+    "FOUR LIARS",
+    "WHO STARTED IT?"
+  ],
+  "scene_target_seconds": [
+    40,
+    35,
+    60,
+    45
+  ],
+  "characters": {
+    "ETHAN": {
+      "age": 34,
+      "identity": "34-year-old handsome white American man with dark brown neatly side-parted hair, sculpted jaw, expressive hazel eyes, clean shaven, lean athletic build",
+      "wide": "tailored charcoal wool blazer, crisp white open-collar dress shirt, black tailored trousers, polished black shoes, subtle platinum wedding band",
+      "close": "tailored charcoal blazer lapels over a white open-collar shirt, clean shaven jaw",
+      "voice": "Charon",
+      "vocal": "American man in his thirties, low velvety baritone, charming at first, defensive then devastated."
+    },
+    "CHLOE": {
+      "age": 30,
+      "identity": "30-year-old elegant American woman with warm olive complexion, long chestnut waves to her shoulders, deep brown eyes, refined facial structure, slim build",
+      "wide": "black silk blouse, tailored black blazer, ankle-length black skirt, minimalist silver earrings and black heels",
+      "close": "black silk neckline and blazer collar, subtle silver earrings, glossy chestnut waves",
+      "voice": "Kore",
+      "vocal": "American woman in her early thirties, intelligent poised smoky mezzo voice, guarded and increasingly fragile."
+    },
+    "BRIAN": {
+      "age": 36,
+      "identity": "36-year-old accomplished Black American man with warm deep brown skin, closely cropped hair, sharp cheekbones, deep-set dark brown eyes, tall athletic build",
+      "wide": "perfectly fitted midnight navy suit, ivory open-collar shirt, oxblood dress shoes and silver wedding band",
+      "close": "midnight navy jacket lapel and ivory open-collar shirt, closely cropped dark hair",
+      "voice": "Orus",
+      "vocal": "American man in his mid-thirties, resonant warm baritone, cool confidence that fractures into fear."
+    },
+    "JENNA": {
+      "age": 29,
+      "identity": "29-year-old stunning East Asian American woman with luminous light-golden complexion, sleek jet-black shoulder-length hair, dark almond eyes, delicate angular cheekbones, slender figure",
+      "wide": "deep burgundy silk evening dress, discreet gold drop earrings, gold wedding ring and elegant nude heels",
+      "close": "deep burgundy silk neckline, small gold drop earrings, glossy straight black hair",
+      "voice": "Aoede",
+      "vocal": "American woman in her late twenties, airy warm alto, playful early then trembling remorse and fear."
+    }
+  },
+  "locations": {
+    "suite": "luxury Manhattan five-star hotel suite at night, tall rain-streaked glass with blurred skyscraper lights, pale veined marble nightstand, warm amber bedside lamp, plush ivory bed linens, smoky navy and burgundy art-deco details",
+    "elevator": "private polished brass-and-black-marble elevator inside upscale Manhattan hotel at night, warm recessed lights, mirrored wall panels, softly illuminated floor display",
+    "corridor": "eighteenth-floor corridor of ultra-luxury Manhattan hotel at night, warm golden sconces, symmetrical dark walnut suite doors, lush muted teal carpet, brass room numerals, deep long perspective",
+    "restaurant": "grainy security-camera surveillance viewpoint inside intimate upscale Manhattan restaurant six months earlier, softly luminous art-deco booth, dark wood, evening windows and two friends seated across a small table"
+  },
+  "props": {
+    "ring": "thin polished gold wedding ring with a small emerald-cut stone, realistic refractive gold and diamond glint",
+    "phone": "premium black smartphone with satin graphite bezel, clear glass screen and softly glowing edge, readable screen content always composited later",
+    "handbag": "distinctive structured burnt-orange crocodile-embossed designer handbag with semicircular rigid handle and gold clasp",
+    "door": "massive walnut suite door with dark inlaid central panel and narrow brushed-brass frame",
+    "television": "large ultra-thin 65-inch television on the dark wall inside hotel suite",
+    "remote": "small matte-black luxury television remote with a clearly visible play triangle button"
+  },
+  "dialogue": {
+    "1": [
+      [
+        "JENNA",
+        "You know what's crazy? Brian thinks I'm in Philadelphia.",
+        "MEDIUM",
+        "JENNA",
+        "nervous secretive smile",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "And Chloe thinks I'm meeting investors in Chicago.",
+        "OTS",
+        "ETHAN",
+        "careless conspiratorial confidence",
+        "SLOW_PUSH"
+      ],
+      [
+        "JENNA",
+        "We're terrible people.",
+        "CU",
+        "JENNA",
+        "conflicted half-smile, eyes dropping",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Then why are you smiling?",
+        "CU",
+        "ETHAN",
+        "charming dangerous teasing",
+        "SLOW_PUSH"
+      ],
+      [
+        "JENNA",
+        "Your wife?",
+        "REACTION",
+        "JENNA",
+        "smile evaporating, brow tightening",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Relax. She never calls twice.",
+        "MEDIUM",
+        "ETHAN",
+        "casual bravado as he glances at phone",
+        "HOLD"
+      ]
+    ],
+    "2": [
+      [
+        "CHLOE",
+        "Brian, what if Ethan finds out?",
+        "CU",
+        "CHLOE",
+        "anxious guarded eyes",
+        "SLOW_PUSH"
+      ],
+      [
+        "BRIAN",
+        "Ethan trusts me with his life.",
+        "OTS",
+        "BRIAN",
+        "smooth self-assurance",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "That's not comforting.",
+        "REACTION",
+        "CHLOE",
+        "tight-lipped discomfort",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "Then stop thinking about your husband for one night.",
+        "MEDIUM",
+        "BRIAN",
+        "seductively dismissive confidence",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "I'm serious. Jenna was asking questions yesterday.",
+        "CU",
+        "CHLOE",
+        "urgent whisper, deep fear",
+        "SLOW_PUSH"
+      ],
+      [
+        "BRIAN",
+        "My wife doesn't suspect anything.",
+        "CU",
+        "BRIAN",
+        "controlled smug denial",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "Wait. I bought Jenna that exact bag.",
+        "REACTION",
+        "CHLOE",
+        "sudden recognition, blood draining from face",
+        "SLOW_PUSH"
+      ]
+    ],
+    "3": [
+      [
+        "CHLOE",
+        "Ethan?",
+        "CU",
+        "CHLOE",
+        "shocked, breath caught, widened eyes",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Brian? What the hell are you doing with my wife?",
+        "MEDIUM",
+        "ETHAN",
+        "stunned outrage and clenched jaw",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "I could ask you the same question about mine!",
+        "CU",
+        "BRIAN",
+        "betrayed incandescent anger",
+        "HOLD"
+      ],
+      [
+        "JENNA",
+        "Brian, please. I can explain.",
+        "CU",
+        "JENNA",
+        "pleading fragile panic",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "Explain what? That you came to a hotel with my best friend?",
+        "OTS",
+        "BRIAN",
+        "controlled fury, rigid posture",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "You told me you were in Chicago!",
+        "CU",
+        "CHLOE",
+        "sharp disbelief, glossy eyes",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "And you told me you were visiting your mother!",
+        "CU",
+        "ETHAN",
+        "heated accusatory disbelief",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "Don't turn this around on me!",
+        "CU",
+        "CHLOE",
+        "angry defensive tears",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "You're standing here with my best friend!",
+        "MEDIUM",
+        "ETHAN",
+        "broken fury",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "You sat at my dinner table last Sunday. You looked me in the eye!",
+        "CU",
+        "BRIAN",
+        "intensely wounded, stiff shoulders",
+        "SLOW_PUSH"
+      ],
+      [
+        "ETHAN",
+        "You borrowed my car yesterday to take my wife out!",
+        "CU",
+        "ETHAN",
+        "bitter dawning realization",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "And you slept with mine!",
+        "CU",
+        "BRIAN",
+        "white-hot restrained rage",
+        "HOLD"
+      ],
+      [
+        "JENNA",
+        "STOP!",
+        "CU",
+        "JENNA",
+        "desperate shout, face wet with tears",
+        "HOLD"
+      ],
+      [
+        "JENNA",
+        "All four of us are liars! Nobody here is innocent!",
+        "MEDIUM",
+        "JENNA",
+        "exhausted brave truth, trembling",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "How long, Ethan?",
+        "CU",
+        "CHLOE",
+        "small voice, eyes shining",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "HOW LONG?!",
+        "CU",
+        "CHLOE",
+        "pain breaking through composure",
+        "SLOW_PUSH"
+      ],
+      [
+        "JENNA",
+        "Eight months.",
+        "CU",
+        "JENNA",
+        "hollow guilt, eyes downward",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "Eight months?",
+        "REACTION",
+        "BRIAN",
+        "stunned, face dropping, blank disbelief",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "You told me we'd only been doing this for three.",
+        "MEDIUM",
+        "BRIAN",
+        "quiet devastation, searching Chloe",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Three months?",
+        "REACTION",
+        "ETHAN",
+        "incredulous bitter realization",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "So while I was cheating on my wife, my wife was cheating on me... with my best friend.",
+        "CU",
+        "ETHAN",
+        "broken sardonic laugh, hollow eyes",
+        "SLOW_PULL"
+      ]
+    ],
+    "4": [
+      [
+        "BRIAN",
+        "Who sent that?",
+        "CU",
+        "BRIAN",
+        "threatened confusion",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "I got the same message this afternoon. That's why I asked you to come here.",
+        "MEDIUM",
+        "CHLOE",
+        "frightened admission",
+        "HOLD"
+      ],
+      [
+        "JENNA",
+        "Wait. I got one too.",
+        "CU",
+        "JENNA",
+        "shaking terrified understanding",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Someone booked our room under my name.",
+        "CU",
+        "ETHAN",
+        "apprehensive grave realization",
+        "SLOW_PUSH"
+      ],
+      [
+        "RECORDED JENNA",
+        "I think Ethan is cheating with someone.",
+        "TWO-SHOT",
+        "JENNA,CHLOE",
+        "Jenna in tears and Chloe listening, concealed old conversation",
+        "HOLD"
+      ],
+      [
+        "RECORDED CHLOE",
+        "Then we need to teach him a lesson.",
+        "OTS",
+        "CHLOE",
+        "ominous calm as she takes Jenna's hand",
+        "HOLD"
+      ],
+      [
+        "JENNA",
+        "Chloe... what did you do?",
+        "CU",
+        "JENNA",
+        "terrified betrayal and wet eyes",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "I didn't send that!",
+        "CU",
+        "CHLOE",
+        "genuine alarm and frantic denial",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "Six months ago? But you said your affair started three months ago.",
+        "MEDIUM",
+        "BRIAN",
+        "uneasy suspicion taking shape",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "Ethan, don't play it!",
+        "REACTION",
+        "CHLOE",
+        "desperate clutch at Ethan wrist",
+        "HOLD"
+      ],
+      [
+        "ETHAN",
+        "Why? What are you hiding?",
+        "CU",
+        "ETHAN",
+        "low cold challenge",
+        "HOLD"
+      ],
+      [
+        "CHLOE",
+        "Because after you watch it... you'll know who destroyed both marriages.",
+        "CU",
+        "CHLOE",
+        "pleading frightened warning",
+        "SLOW_PUSH"
+      ],
+      [
+        "UNKNOWN VOICE",
+        "It was never supposed to go this far.",
+        "INSERT",
+        "television",
+        "mysterious male voice from television, no person face visible",
+        "HOLD"
+      ],
+      [
+        "BRIAN",
+        "Oh, God.",
+        "REACTION",
+        "BRIAN",
+        "shock, awful recognition and dread",
+        "HOLD"
+      ]
+    ]
+  },
+  "actions": {
+    "1": [
+      [
+        0,
+        "WIDE",
+        "rain-soaked Manhattan hotel facade through cinematic glass, five-star entrance, moody neon reflections, no people",
+        "hotel",
+        "SLOW_PAN",
+        "opening_establish",
+        3
+      ],
+      [
+        0,
+        "INSERT",
+        "pale veined marble bedside table by blurred rainy window, pristine empty tabletop with a clean space for wedding ring compositing, no people",
+        "ring",
+        "HOLD",
+        "ring_drop",
+        2.1
+      ],
+      [
+        2,
+        "TWO-SHOT",
+        "Jenna steps closer to Ethan inside suite, secret closeness, romantic yet dangerous distance, both faces visible",
+        "JENNA,ETHAN",
+        "HOLD",
+        "approach",
+        1.3
+      ],
+      [
+        4,
+        "INSERT",
+        "premium black smartphone lying face-up on marble bedside surface, powered-off black screen, clean blank screen for caller graphics, no people",
+        "phone",
+        "HOLD",
+        "phone_wake",
+        1.8
+      ],
+      [
+        6,
+        "INSERT",
+        "premium black smartphone on marble with dark blank screen, Ethan's thumb entering near decline control; phone dominates",
+        "phone",
+        "HOLD",
+        "decline",
+        1.2
+      ],
+      [
+        6,
+        "INSERT",
+        "near-black dramatic closeup of a vibrating phone with empty black glass display, no people, screen left clean for an incoming anonymous text",
+        "phone",
+        "HOLD",
+        "mystery_message",
+        2.6
+      ]
+    ],
+    "2": [
+      [
+        0,
+        "WIDE",
+        "Brian holding Chloe gently at her waist in black-brass mirrored elevator, tense intimate closeness, both faces readable",
+        "BRIAN,CHLOE",
+        "SLOW_PAN",
+        "elevator_establish",
+        3
+      ],
+      [
+        4,
+        "REACTION",
+        "Chloe pulls away from Brian, isolated uneasy glance, medium portrait, no second person visible",
+        "CHLOE",
+        "HOLD",
+        "pull_away",
+        1.5
+      ],
+      [
+        6,
+        "INSERT",
+        "elevator brass floor indicator and buttons, 18 visible but nonluminous before floor-ding compositing, no people",
+        "elevator",
+        "HOLD",
+        "floor_ding",
+        1.4
+      ],
+      [
+        6,
+        "WIDE",
+        "elevator opens onto long symmetrical eighteenth-floor hotel corridor, Brian and Chloe leaving into it, gold sconces",
+        "BRIAN,CHLOE",
+        "SLOW_PAN",
+        "exit_elevator",
+        2
+      ],
+      [
+        6,
+        "INSERT",
+        "distinctive burnt-orange structured crocodile-embossed handbag beside a walnut suite door on lush teal hotel carpet; bag dominates, no people",
+        "handbag",
+        "HOLD",
+        "bag_clue",
+        1.7
+      ],
+      [
+        7,
+        "DOORWAY",
+        "eighteenth-floor suite doorway viewed obliquely; clean open dark doorway and wall with no door leaf and no humans, room interior visible for composited swinging door",
+        "door",
+        "HOLD",
+        "door_swing",
+        1.2
+      ],
+      [
+        7,
+        "MEDIUM",
+        "Jenna steps laughing out of hotel suite doorway into corridor, authentic spontaneous pleasure turning into shock, Jenna only",
+        "JENNA",
+        "HOLD",
+        "jenna_exit",
+        1.2
+      ],
+      [
+        7,
+        "MEDIUM",
+        "Ethan follows Jenna out of same suite door adjusting white shirt collar, charm vanishes into fear, only Ethan visible",
+        "ETHAN",
+        "HOLD",
+        "ethan_exit",
+        1.4
+      ],
+      [
+        7,
+        "WIDE",
+        "all four frozen in hotel corridor in two betrayed couples, Chloe and Brian left opposite Jenna and Ethan right, perfect uncomfortable four-person blocking",
+        "CHLOE,BRIAN,JENNA,ETHAN",
+        "HOLD",
+        "four_freeze",
+        2.2
+      ]
+    ],
+    "3": [
+      [
+        1,
+        "REACTION",
+        "Ethan staring across corridor from Chloe toward Brian in stunned silent realization, single clean character portrait",
+        "ETHAN",
+        "HOLD",
+        "ethan_stare",
+        0.7
+      ],
+      [
+        4,
+        "MEDIUM",
+        "Jenna visibly steps away from Ethan in corridor, hurt and guilty distance, Jenna isolated in frame",
+        "JENNA",
+        "HOLD",
+        "jenna_step_away",
+        0.7
+      ],
+      [
+        12,
+        "MEDIUM",
+        "four people in hotel corridor frozen in painful silence after Jenna shout, each separate from the others, source-supported tension",
+        "CHLOE,BRIAN,JENNA,ETHAN",
+        "HOLD",
+        "after_shout",
+        0.8
+      ],
+      [
+        14,
+        "REACTION",
+        "Chloe wipes a tear from her eyes, a private collapse, single clean portrait",
+        "CHLOE",
+        "HOLD",
+        "chloe_wipe",
+        0.9
+      ],
+      [
+        17,
+        "REACTION",
+        "Brian's face changes at eight-month admission, almost imperceptible collapse of authority",
+        "BRIAN",
+        "HOLD",
+        "eight_months_reaction",
+        0.8
+      ],
+      [
+        21,
+        "WIDE",
+        "four exhausted friends standing far apart in long corridor, broken couples in still tableau",
+        "CHLOE,BRIAN,JENNA,ETHAN",
+        "SLOW_PULL",
+        "bitter_aftermath",
+        0.9
+      ]
+    ],
+    "4": [
+      [
+        0,
+        "INSERT",
+        "four premium phones face-up on a reflective dark hotel console, all screens initially dark, clearly separate phone devices in composition, no people",
+        "phone",
+        "HOLD",
+        "four_beeps",
+        2
+      ],
+      [
+        0,
+        "INSERT",
+        "one black smartphone screen against dark walnut hotel wall, empty black glass prepared for very long mystery message caption; no humans",
+        "phone",
+        "HOLD",
+        "identical_text",
+        1.5
+      ],
+      [
+        4,
+        "DOORWAY",
+        "hotel suite walnut door in eighteenth-floor corridor, partly open revealing dark room and television area; no people",
+        "door",
+        "HOLD",
+        "door_click",
+        1
+      ],
+      [
+        4,
+        "WIDE",
+        "dark luxury hotel suite interior with large black switched-off wall television, edge of illuminated corridor visible through open door, no people",
+        "television",
+        "SLOW_PUSH",
+        "tv_turn_on",
+        1.4
+      ],
+      [
+        4,
+        "WIDE",
+        "security-camera footage view of upscale restaurant booth six months earlier, Jenna distressed opposite Chloe, clear two-character geography",
+        "JENNA,CHLOE",
+        "HOLD",
+        "recorded_restaurant",
+        1.1
+      ],
+      [
+        6,
+        "INSERT",
+        "closeup of large television playing cold blue security-camera footage of Jenna and Chloe at restaurant, control-room authenticity, no corridor people",
+        "television",
+        "HOLD",
+        "recording_freeze",
+        1.2
+      ],
+      [
+        9,
+        "INSERT",
+        "large television framed across suite doorway with almost black display for second mystery video title card, no people",
+        "television",
+        "HOLD",
+        "next_file_title",
+        0.9
+      ],
+      [
+        9,
+        "INSERT",
+        "Ethan's right hand reaching forward for small matte-black television remote on dark wood console, fingers poised above PLAY button, no face",
+        "remote",
+        "HOLD",
+        "remote_reach",
+        0.9
+      ],
+      [
+        12,
+        "INSERT",
+        "tight macro of masculine hand gripping black remote, index finger above triangular play button, remote fills frame, no face",
+        "remote",
+        "HOLD",
+        "remote_play",
+        0.9
+      ],
+      [
+        13,
+        "REACTION",
+        "Ethan, Chloe, Jenna all off-screen turning toward Brian, focus on Brian processing the male voice, alone with dread",
+        "BRIAN",
+        "HOLD",
+        "everyone_turns",
+        0.8
+      ],
+      [
+        14,
+        "INSERT",
+        "pure cinematic black screen for final cliffhanger typography only, no visual background",
+        "none",
+        "HOLD",
+        "end_card",
+        4
+      ]
+    ]
+  },
+  "format_version": 1
+}
