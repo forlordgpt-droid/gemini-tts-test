@@ -72,7 +72,38 @@
       "id": "MUSE_BROLL_D",
       "kind": "video",
       "uuid": "017f677e-e1e2-11f1-804f-8e79aa0665ce"
+    },
+    {
+      "id": "C_ETHAN",
+      "kind": "image",
+      "uuid": "1ab372b2-e1e7-11f1-a0af-9a1a9fabab6a"
+    },
+    {
+      "id": "C_CHLOE",
+      "kind": "image",
+      "uuid": "1be4ef30-e1e7-11f1-867e-da065a57f229"
+    },
+    {
+      "id": "C_BRIAN",
+      "kind": "image",
+      "uuid": "1d2c9af0-e1e7-11f1-a3a1-aec5b497e814"
+    },
+    {
+      "id": "C_JENNA",
+      "kind": "image",
+      "uuid": "1f1a116c-e1e7-11f1-8636-1e8ec82d14d1"
+    },
+    {
+      "id": "E_GROUP",
+      "kind": "image",
+      "uuid": "4d9b3db8-e1e7-11f1-b262-6a590d9ff81b"
+    },
+    {
+      "id": "GROK_TEST_S12",
+      "kind": "video",
+      "uuid": "9b9d06ea-e1e7-11f1-b1b9-9600ef9545ae"
     }
   ],
-  "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations"
+  "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations",
+  "description": "Includes 5 completed character/ensemble reference images and the submitted first Grok multi-reference test clip. GitHub Actions will wait for clip completion before archival."
 }
