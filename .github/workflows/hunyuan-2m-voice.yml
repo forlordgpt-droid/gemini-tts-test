@@ -1,0 +1,64 @@
+name: Hunyuan First Two Minutes KIE Narration
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-2m-voice.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  voice:
+    name: KIE TTS segment ${{ matrix.segment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: true
+      matrix:
+        segment: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact KIE provider and selected narrative
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+          SEGMENT: ${{ matrix.segment }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$KIE_API_KEY" ]; then echo "KIE_API_KEY missing"; exit 1; fi
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=json.loads(Path('film/hunyuan-2m/NARRATION_SEGMENTS.json').read_text())
+          assert p['model']=='google/gemini-3-8-flash-lite-tts', 'Unexpected model'
+          i=int(os.environ['SEGMENT'])
+          assert p['segments'][i]['index']==i
+          assert p['segments'][i]['source_end']<=120
+          Path('segment.txt').write_text(p['segments'][i]['text'])
+          print('Validated segment',i,'with',len(p['segments'][i]['text'].split()),'words')
+          PY
+      - name: Produce voice with verified KIE model (existing repository tool)
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+          SEGMENT: ${{ matrix.segment }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 gemini38_tts_kie.py --text "$(cat segment.txt)" --voice Fola --output "segment_${SEGMENT}.wav"
+          python3 - <<'PY'
+          import os,wave,json
+          n=int(os.environ['SEGMENT'])
+          with wave.open(f'segment_{n}.wav','rb') as w:
+              duration=w.getnframes()/w.getframerate()
+              meta=dict(segment=n, duration_seconds=duration,frames=w.getnframes(),sample_rate=w.getframerate(),channels=w.getnchannels())
+          assert meta['duration_seconds']>2,'Suspiciously short speech output'
+          with open('audio_metadata.json','w') as f:json.dump(meta,f,indent=2)
+          print('Audio metadata:',json.dumps(meta))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hunyuan-kie-voice-${{ matrix.segment }}
+          path: |
+            segment_${{ matrix.segment }}.wav
+            audio_metadata.json
+          if-no-files-found: error
+          retention-days: 14
