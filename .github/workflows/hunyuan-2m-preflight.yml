@@ -1,0 +1,58 @@
+name: Hunyuan 2D two-minute production preflight
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-2m-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: true
+      matrix:
+        check: [javascript-stack, browser-webcodecs, ffmpeg, kie-secret]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check required production tools
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+          CHECK: ${{ matrix.check }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Checking production requirement: $CHECK"
+          case "$CHECK" in
+            javascript-stack)
+              npm install --no-save --ignore-scripts three@0.187.0 gsap@3.15.1 mediabunny@1.66.0 playwright@1.65.1
+              node --input-type=module -e "for(const name of ['three','gsap','mediabunny','playwright']) { const m=await import(name); if(!m) throw new Error(name); console.log('OK',name) }"
+              ;;
+            browser-webcodecs)
+              npm install --no-save playwright@1.65.1
+              npx playwright install --with-deps chromium
+              node - <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
+            const page=await browser.newPage();
+            const caps=await page.evaluate(async()=>({webgl:(()=>{let c=document.createElement('canvas');return !!c.getContext('webgl2')})(),webcodecs:typeof VideoEncoder!=='undefined', avc:typeof VideoEncoder==='undefined'?false:(await VideoEncoder.isConfigSupported({codec:'avc1.42001E',width:1280,height:720,framerate:30,bitrate:3000000})).supported}));
+            console.log(JSON.stringify(caps));
+            await browser.close();
+            if(!caps.webgl || !caps.webcodecs || !caps.avc) process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+              ;;
+            ffmpeg)
+              ffmpeg -hide_banner -version | head -2
+              ffprobe -hide_banner -version | head -2
+              ;;
+            kie-secret)
+              if [ -z "$KIE_API_KEY" ]; then echo "KIE_API_KEY is not set"; exit 1; fi
+              echo "KIE_API_KEY present (value not printed)"
+              ;;
+          esac
