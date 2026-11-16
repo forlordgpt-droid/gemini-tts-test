@@ -6,6 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 from faster_whisper import WhisperModel
 import json, csv, subprocess, os
+import numpy as np
 ROOT=Path("hotel-room-next-door-assets/video")
 OUT=Path("hotel-asr-report")
 OUT.mkdir(exist_ok=True)
@@ -15,7 +16,10 @@ order=sorted(ROOT.glob("GROK*.mp4"))
 for i,p in enumerate(order):
     audio=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_format","-of","json",str(p)],text=True))
     duration=float(audio.get("format",{}).get("duration") or 0)
-    segments,info=model.transcribe(str(p),beam_size=5,language="en",word_timestamps=True,condition_on_previous_text=False,
+    # Decode with FFmpeg directly, avoiding PyAV version incompatibility.
+    raw_pcm=subprocess.check_output(["ffmpeg","-hide_banner","-loglevel","error","-i",str(p),"-vn","-ac","1","-ar","16000","-f","f32le","pipe:1"])
+    waveform=np.frombuffer(raw_pcm,dtype="<f4").copy()
+    segments,info=model.transcribe(waveform,beam_size=5,language="en",word_timestamps=True,condition_on_previous_text=False,
         vad_filter=False,temperature=0.0, no_speech_threshold=0.45)
     secs=[]
     words=[]
