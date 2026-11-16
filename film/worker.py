@@ -299,7 +299,7 @@ def voices(scene):
     d=[s for s in SHOTS if s["scene"]==scene and s["kind"]=="DIALOGUE"]
     def do(s):
         speaker=s["speaker"].replace("RECORDED ","")
-        if speaker=="UNKNOWN VOICE":speaker="BRIAN" # screenplay directs everyone's recognition to Brian
+        if speaker=="UNKNOWN VOICE":speaker="BRIAN"
         c=STORY["characters"][speaker]
         emotion=s["delivery"].lower()
         intensity="restrained";pace="measured and natural"
@@ -307,11 +307,24 @@ def voices(scene):
         if any(k in emotion for k in ("fear","shock","panic","terrified","devastation","hurt")):intensity="subdued, emotionally authentic";pace="slower with breath"
         if "bitter" in emotion:intensity="wry devastated";pace="hesitant, bitterly ironic"
         style=f"Act as {c['vocal']} Performance: {emotion}. {intensity}, {pace}. American English. Recite the supplied text exactly, not character names or directions. No invented words."
-        result=kie_task(MODEL_TTS,dict(temperature=0.75,
-             speakers=[dict(speaker_id="Speaker 1",voice_name=c["voice"])],
-             dialogue_turns=[dict(speaker_id="Speaker 1",style=style,text=s["spoken_text"])]),
-             OUT/"voices"/(s["id"]+".wav"))
         p=OUT/"voices"/(s["id"]+".wav")
+        if p.exists() and p.stat().st_size>600:
+            result=dict(model=MODEL_TTS,file=str(p),bytes=p.stat().st_size,
+                        cached_from_previous_run=True)
+        else:
+            for attempt in range(3):
+                try:
+                    result=kie_task(MODEL_TTS,dict(temperature=0.75,
+                      speakers=[dict(speaker_id="Speaker 1",voice_name=c["voice"])],
+                      dialogue_turns=[dict(speaker_id="Speaker 1",style=style,text=s["spoken_text"])]),
+                      p)
+                    break
+                except RuntimeError as e:
+                    if any(y in str(e).lower() for y in ("internal error","please try again later","timeout")) and attempt<2:
+                        print("Transient audio error, retrying only",s["id"],flush=True)
+                        time.sleep(7*(attempt+1))
+                    else:
+                        raise
         with wave.open(str(p),"rb") as w:
             dur=w.getnframes()/w.getframerate()
             fmt=dict(channels=w.getnchannels(),rate=w.getframerate(),bits=w.getsampwidth()*8)
