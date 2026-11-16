@@ -1,0 +1,77 @@
+{
+  "project": "The Hotel Room Next Door",
+  "source": "Snapgen generation history API",
+  "generated_2026_11_16": true,
+  "assets": [
+    {
+      "id": "L_EXTERIOR",
+      "kind": "image",
+      "uuid": "61427b48-e1e1-11f1-951d-c6e3afbb2f2e"
+    },
+    {
+      "id": "L_SUITE",
+      "kind": "image",
+      "uuid": "62b09e6a-e1e1-11f1-a564-f6a542c95a2d"
+    },
+    {
+      "id": "L_ELEVATOR",
+      "kind": "image",
+      "uuid": "63fd3d28-e1e1-11f1-b4ae-e6037c18b25a"
+    },
+    {
+      "id": "L_HALLWAY",
+      "kind": "image",
+      "uuid": "652ba784-e1e1-11f1-98c2-be6d6036b178"
+    },
+    {
+      "id": "L_SUITE_TV",
+      "kind": "image",
+      "uuid": "66eb9642-e1e1-11f1-beb0-6aa20aaf5633"
+    },
+    {
+      "id": "L_RESTAURANT",
+      "kind": "image",
+      "uuid": "682adb1c-e1e1-11f1-9e9e-fadb28ffb7a6"
+    },
+    {
+      "id": "P_BAG",
+      "kind": "image",
+      "uuid": "69a66132-e1e1-11f1-beb0-6aa20aaf5633"
+    },
+    {
+      "id": "P_RING",
+      "kind": "image",
+      "uuid": "6add074a-e1e1-11f1-abb8-82966043ee57"
+    },
+    {
+      "id": "P_PHONE",
+      "kind": "image",
+      "uuid": "6bef4ed6-e1e1-11f1-9712-defb2ffa4297"
+    },
+    {
+      "id": "P_REMOTE",
+      "kind": "image",
+      "uuid": "6ce609d8-e1e1-11f1-a564-f6a542c95a2d"
+    },
+    {
+      "id": "MUSE_BROLL_A",
+      "kind": "video",
+      "uuid": "fdb53fd8-e1e1-11f1-8ee9-9e33361a771b"
+    },
+    {
+      "id": "MUSE_BROLL_B",
+      "kind": "video",
+      "uuid": "fee6d650-e1e1-11f1-abb8-82966043ee57"
+    },
+    {
+      "id": "MUSE_BROLL_C",
+      "kind": "video",
+      "uuid": "0052523a-e1e2-11f1-8ab9-e63bbe9fe40e"
+    },
+    {
+      "id": "MUSE_BROLL_D",
+      "kind": "video",
+      "uuid": "017f677e-e1e2-11f1-804f-8e79aa0665ce"
+    }
+  ]
+}
