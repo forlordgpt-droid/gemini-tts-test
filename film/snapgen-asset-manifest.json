@@ -111,7 +111,7 @@
     {
       "id": "GROK_S04",
       "kind": "video",
-      "uuid": "ccf6e2b8-e1e9-11f1-bddd-8e0ddcca9a95"
+      "uuid": "ff81b144-e1ea-11f1-8d9b-cec8765e7b71"
     },
     {
       "id": "GROK_S05",
@@ -210,6 +210,6 @@
     }
   ],
   "workflow_activation": "GitHub Actions secret configured; run history download for 14 completed generations",
-  "description": "All 22 Grok clips (including test), four Muse clips, and fifteen Snapgen images. 21 new clips submitted with 2-5 reference image URLs each; workflow waits until completion and recovers them by UUID.",
+  "description": "41 assets planned; S04 replaced after initial rejected clip. 22 Grok shots completed/submitted, 4 Muse clips, 15 reference stills. All references are to video (multi-image).",
   "archive_qa_revision": "ffmpeg-enabled check after 20/20 recovered"
 }
