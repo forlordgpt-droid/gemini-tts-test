@@ -1,0 +1,36 @@
+name: Hunyuan Original Rig Validation
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-original-rig-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-rig:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original archive and run the supplied engine tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,hashlib,pathlib
+          p=pathlib.Path('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip')
+          assert p.exists(), 'Original package missing'
+          assert p.stat().st_size==1005362, f'Unexpected package size: {p.stat().st_size}'
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None, 'ZIP integrity failure'
+              for f in ['HUNYUAN_2D/art.js','HUNYUAN_2D/engine.js','HUNYUAN_2D/API.md','HUNYUAN_2D/assets/RIG.json','HUNYUAN_2D/tests/engine.test.cjs']:
+                  assert f in z.namelist(), 'Missing original component: '+f
+              z.extractall('rig-validation')
+          print('Original package SHA256:',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+          node rig-validation/HUNYUAN_2D/tests/engine.test.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-hunyuan-engine-tests
+          path: rig-validation/HUNYUAN_2D/tests/results.json
+          if-no-files-found: error
