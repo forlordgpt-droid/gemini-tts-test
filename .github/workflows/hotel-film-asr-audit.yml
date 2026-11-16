@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   dialogue-audit:
@@ -23,10 +24,14 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
           python -m pip install --disable-pip-version-check faster-whisper
-      - name: Recover existing source media by UUID (no generation)
-        env:
-          SNAPGEN_API_KEY: \${{ secrets.SNAPGEN_API_KEY }}
-        run: python film/download_snapgen_assets.py
+      - name: Download verified historical GitHub artifact (no Snapgen API or credits)
+        uses: actions/download-artifact@v4
+        with:
+          name: hotel-room-next-door-snapgen-assets
+          path: hotel-room-next-door-assets
+          repository: forlordgpt-droid/gemini-tts-test
+          run-id: 43928825705
+          github-token: \${{ github.token }}
       - name: Transcribe and time-align original clip dialogue
         run: python film/asr_diagnose_original_dialogue.py
       - name: Upload transcript and word timestamps
