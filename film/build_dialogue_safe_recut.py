@@ -35,9 +35,9 @@ SHOTS=[
 ("S05",8.3,"GROK_S05",0),("S06",3.8,"MUSE_BROLL_B",5),
 ("S07",6.0,"GROK_S07",0),("S08",5.9,"GROK_S08",0),
 ("S09",6.8,"GROK_S09",0),("S10",3.2,"MUSE_BROLL_C",2),
-("S11",8.0,"GROK_S11",0),("S12",9.9,"GROK_TEST_S12",0),
+("S11",6.8,"GROK_S11",0),("S12",9.9,"GROK_TEST_S12",0),
 ("S14",8.3,"GROK_S14",0),
-("S15",6.0,"GROK_S15",0),("S16",7.0,"GROK_S16",0),
+("S15",6.0,"GROK_S15",0),("S16",5.8,"GROK_S16",0),
 ("S17",7.5,"GROK_S17",0),("S18",6.0,"GROK_S18",0),
 ("S19",7.0,"GROK_S19",0),("S20",3.8,"MUSE_BROLL_D",0),
 ("S21A",6.3,"GROK_S21A",0),("S21B",6.5,"GROK_S21B",0),
@@ -156,12 +156,17 @@ for n in ["S25","S28A","S28B","S28C"]:
     title_card(n,GFX/f"{n}.png")
 
 def ffmpeg_card(name,duration,path):
-    run(["ffmpeg","-hide_banner","-loglevel","error","-y",
+    command=["ffmpeg","-hide_banner","-loglevel","error","-y",
         "-loop","1","-framerate","24","-i",str(GFX/f"{name}.png"),
         "-f","lavfi","-i","anullsrc=r=48000:cl=stereo",
-        "-t",str(duration),"-r","24",
-        "-c:v","libx264","-preset","veryfast","-crf","20","-pix_fmt","yuv420p",
-        "-c:a","aac","-b:a","128k","-shortest",str(path)],120)
+        "-t",str(duration),"-r","24"]
+    if name=="S25":
+        # Subtle editorial push on the surveillance-file title; no new AI assets.
+        command+=["-vf",
+          "zoompan=z='min(zoom+0.0007,1.065)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=480x854:fps=24,format=yuv420p"]
+    command+=["-c:v","libx264","-preset","veryfast","-crf","20",
+        "-pix_fmt","yuv420p","-c:a","aac","-b:a","128k","-shortest",str(path)]
+    run(command,120)
     return path
 
 def render_one(s):
@@ -179,6 +184,27 @@ def render_one(s):
         ct.write_text("".join(f"file '{p.absolute()}'\n" for p in parts))
         run(["ffmpeg","-hide_banner","-loglevel","error","-y",
             "-f","concat","-safe","0","-i",str(ct),"-c","copy",str(dst)],80)
+        return dst
+    # Ending: keep the original seven seconds of native dialogue, but cut away
+    # BEFORE a visibly different Brian appears in close-up. His final whispered
+    # confession plays OFF CAMERA over the ominous television, as in real cinema.
+    if name=="S27":
+        source=ASSETS/"GROK_S27.mp4"
+        tv=ASSETS/"MUSE_BROLL_D.mp4"
+        vf0="scale=480:854:force_original_aspect_ratio=increase:flags=lanczos,crop=480:854,setsar=1,format=yuv420p"
+        vf1="scale=480:854:force_original_aspect_ratio=increase:flags=lanczos,crop=480:854,setsar=1,eq=saturation=0.62:contrast=1.12,format=yuv420p"
+        command=["ffmpeg","-hide_banner","-loglevel","error","-y",
+                 "-i",str(source),"-ss","7.0","-i",str(tv),"-t",str(duration),
+                 "-filter_complex",
+                 f"[0:v]trim=start=0:end=4.375,setpts=PTS-STARTPTS,{vf0}[v0];"
+                 f"[1:v]trim=start=0:duration=2.425,setpts=PTS-STARTPTS,{vf1}[v1];"
+                 f"[v0][v1]concat=n=2:v=1:a=0,fps=24,fade=t=out:st=6.71:d=0.09[vid];"
+                 f"[0:a]atrim=start=0:end={duration},asetpts=PTS-STARTPTS,aresample=48000,highpass=f=65,afade=t=out:st=6.68:d=0.1[aud]",
+                 "-map","[vid]","-map","[aud]",
+                 "-c:v","libx264","-preset","veryfast","-crf","21","-threads","2",
+                 "-r","24","-pix_fmt","yuv420p",
+                 "-c:a","aac","-b:a","160k","-ar","48000","-ac","2",str(dst)]
+        run(command,160)
         return dst
     # Hide the recast buzz-cut Brian on screen, but KEEP his native words.
     # His off-screen voice is heard while the mystery television remains in frame.
@@ -199,7 +225,7 @@ def render_one(s):
     if not file.is_file(): raise FileNotFoundError(str(file))
     vf="scale=480:854:force_original_aspect_ratio=increase:flags=lanczos,crop=480:854,fps=24,setsar=1,format=yuv420p"
     if name=="S23": vf+=",eq=saturation=0.55:contrast=1.04"
-    if name=="S27": vf+=",fade=t=out:st=5.55:d=1.22"
+    # S27 uses deliberate cut to television rather than showing recast actor close-up.
     cmd=["ffmpeg","-hide_banner","-loglevel","error","-y","-ss",str(ss),"-i",str(file)]
     af=f"aresample=48000,highpass=f=65,afade=t=in:st=0:d=0.025,afade=t=out:st={max(0,duration-0.06):.3f}:d=0.05"
     if name in ("S01","S06","S20","S23"):
@@ -236,14 +262,14 @@ with wave.open(str(score),"wb") as w:
         vals=array.array("h")
         for i in range(sr):
             t=(start+i)/sr
-            if t>=TOTAL_SECONDS-2: amp=0
+            if t>=TOTAL_SECONDS: amp=0
             elif t<33:amp=.65
             elif t<66:amp=.75
             elif t<125:amp=1
             elif t<143:amp=1.15
             else:amp=1.3
-            fade=min(1,t/2,max(0,(TOTAL_SECONDS-2-t)/2))
-            x=amp*.006*fade*(math.sin(2*math.pi*55*t)+.25*math.sin(2*math.pi*82.5*t))
+            fade=min(1,t/1.5,max(0,(TOTAL_SECONDS-t)/0.7))
+            x=amp*.013*fade*(math.sin(2*math.pi*55*t)+.25*math.sin(2*math.pi*82.5*t))
             for onset,level in ((60,.025),(92,.018),(114,.025),(137,.027),(151,.032),(TOTAL_SECONDS-10,.045)):
                 dt=t-onset
                 if 0<=dt<1.2: x+=level*math.exp(-dt*5)*math.sin(2*math.pi*62*t)
@@ -280,6 +306,6 @@ report={"status":"editorial_preview_technical_verified_not_artistic_final",
         "width":v["width"],"height":v["height"],"fps":v["avg_frame_rate"],
         "source_footage":"41 Snapgen history assets",
         "speech":"original native Grok clips, no external TTS",
-        "human_lip_sync_review":"not verified", "editorial_changes":["removed duplicate S13 confrontation","S12 full native speech retained","S24B original native audio carried over TV insert to hide changed Brian hairstyle","S27 fades before mismatched closeup","speech-timestamp guided trims","burned mobile dialogue captions","stronger score with voice ducking"]}
+        "human_lip_sync_review":"not verified", "editorial_changes":["removed duplicate S13 confrontation","S12 complete native speech retained","S11 ghosted handbag transition cut before damaged frames","S16 dead-air hold shortened","S24B original audio carried over TV insert to hide hair mismatch","S27 group-to-TV cut avoids mismatched closeup while retaining native words","S25 subtle title motion","word-timed trims and subtitles","audible original score ducked under speech"]}
 (WORK/"PREVIEW_EXPORT_REPORT.json").write_text(json.dumps(report,indent=2)+"\n")
 print("FINAL_EXPORT "+json.dumps(report),flush=True)
