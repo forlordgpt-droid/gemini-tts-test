@@ -1,0 +1,82 @@
+name: Hunyuan Original-Rig 8s Cinematic Gate
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-2m-scene-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  representative-scene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install the specified media verification tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -hide_banner -version | sed -n '1p'
+          ffprobe -hide_banner -version | sed -n '1p'
+      - name: Unpack original Hunyuan rig and independently authored illustrated movie stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,pathlib,shutil
+          root=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(root/'HUNYUAN_SCENE_TEST_SOURCE.zip') as z:z.extractall(root)
+          with zipfile.ZipFile(root/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            assert z.testzip() is None
+            for name in ['art.js','engine.js']:
+              dest=root/'scene_test'/'rig'/name
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes(z.read('HUNYUAN_2D/'+name))
+          assert (root/'scene_test/rig/art.js').exists()
+          PY
+      - name: Install Three.js GSAP Mediabunny Playwright and export browser
+        working-directory: film/hunyuan-2m/scene_test
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - name: Mux actual KIE audio and verify MP4 at 1920x1080 30fps
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='film/hunyuan-2m'
+          ffmpeg -hide_banner -loglevel error -y \
+            -i "$base/scene_test/qc/hunyuan_8sec_video_only.mp4" \
+            -i "$base/audio/BUNKER_FIRST_120S_NARRATION.m4a" \
+            -t 8 -c:v copy -c:a aac -b:a 128k -movflags +faststart \
+            "$base/scene_test/qc/hunyuan_8sec_preview_with_voice.mp4"
+          ffprobe -v error -show_entries stream=codec_type,codec_name,width,height,r_frame_rate,nb_frames:format=duration -of json \
+            "$base/scene_test/qc/hunyuan_8sec_preview_with_voice.mp4" > "$base/scene_test/qc/ffprobe.json"
+          python3 - <<'PY'
+          import json
+          x=json.load(open('film/hunyuan-2m/scene_test/qc/ffprobe.json'))
+          v=next(s for s in x['streams'] if s['codec_type']=='video')
+          a=next(s for s in x['streams'] if s['codec_type']=='audio')
+          assert (v['width'],v['height'],v['r_frame_rate'])==(1920,1080,'30/1')
+          assert int(v['nb_frames'])==240
+          assert a['codec_name']=='aac'
+          assert abs(float(x['format']['duration'])-8)<.12
+          print('PASS: verified 8s voiced film with 240 frames, 1080p/30 and AAC.')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i "$base/scene_test/qc/hunyuan_8sec_preview_with_voice.mp4" \
+            -vf 'fps=1/2,scale=640:-1,tile=2x2' -frames:v 1 \
+            "$base/scene_test/qc/contact_sheet.jpg"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hunyuan-illustrated-8sec-scene-gate
+          path: film/hunyuan-2m/scene_test/qc/
+          if-no-files-found: warn
+          retention-days: 14
