@@ -1,0 +1,75 @@
+name: Hotel Room Next Door - Recover Scene 3 Voices
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hotel-scene3-recover.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recover-scene3:
+    name: Restore cached audio and generate only missing Scene 3 lines
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Recover successful WAVs from failed November 16 production run
+        uses: actions/download-artifact@v4
+        with:
+          name: hotel-voice-scene-3
+          run-id: 43827981521
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: output
+      - name: Inspect restored clips without exposing API credentials
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from wave import open as wave_open
+          files=sorted(Path('output/voices').glob('S3_*.wav'))
+          print(f'Restored {len(files)} pre-existing Scene 3 WAVs; successfully decoded:')
+          for f in files:
+              with wave_open(str(f),'rb') as w:
+                  print(f.name, f'{w.getnframes()/w.getframerate():.2f}s')
+          PY
+      - name: Reuse valid clips, generate missing lines via the requested Kie Gemini model
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: python film/worker.py voices --scene 3
+      - name: Verify all source-dialogue lines have decodable audio
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, wave
+          from pathlib import Path
+          story=json.loads(Path('film/story.json').read_text())
+          expected=len(story['dialogue']['3'])
+          receipts=json.loads(Path('output/voice_receipts/scene_3.json').read_text())
+          if len(receipts)!=expected:
+              raise SystemExit(f'Expected {expected} source lines, got {len(receipts)} receipts')
+          durations=[]
+          for key,item in receipts.items():
+              wav=Path(item['file'])
+              if not wav.exists(): raise SystemExit(f'Missing {wav}')
+              with wave.open(str(wav),'rb') as w:
+                  seconds=w.getnframes()/w.getframerate()
+              if seconds < 0.20: raise SystemExit(f'Suspiciously short {wav}')
+              durations.append(seconds)
+          print(f'PASS {len(receipts)}/{expected} Scene 3 clips; total {sum(durations):.2f}s')
+          PY
+      - name: Upload complete Scene 3 audio and receipt manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-scene3-recovered-audio
+          path: |
+            output/voices/S3_*.wav
+            output/voice_receipts/scene_3.json
+          if-no-files-found: error
+          retention-days: 30
