@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source-locked preproduction, character/reference plates, Kie imagery and Gemini TTS.
+"""Source-locked preproduction and Kie Gemini TTS. ChatGPT exclusively generates images.
 No secrets are logged or persisted. Fail closed rather than substitute fake assets.
 """
 import argparse, concurrent.futures, hashlib, json, os, pathlib, re, time, urllib.parse, urllib.request, urllib.error, wave
@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 ROOT=pathlib.Path(__file__).resolve().parent
 STORY=json.loads((ROOT/"story.json").read_text(encoding="utf-8"))
 OUT=pathlib.Path("output")
-MODEL_IMAGE="nano-banana-2-1"
+MODEL_IMAGE="CHATGPT_IMAGE_GENERATION_ONLY"
 MODEL_TTS="google/gemini-3-8-flash-lite-tts"
 STYLE=("Photorealistic premium American psychological thriller; meticulous 35mm anamorphic film cinematography, "
        "deep cobalt shadows against subtle tungsten and crimson practicals, rain-reflected Manhattan city lights, "
@@ -117,7 +117,7 @@ def preflight():
     settings=dict(PROJECT_MODE="REALISTIC_DRAMA",ASPECT_RATIO="16:9",TARGET_RESOLUTION="1920x1080",
        TARGET_FPS=30,SETTING_AND_ACCENT="Manhattan, New York City; American English",
        SCRIPT_LOCK="Source screenplay dialogue exact, no new story material",
-       IMAGE_ENGINE=MODEL_IMAGE,TTS_ENGINE=MODEL_TTS,ANIMATION_ENGINE="Pillow/OpenCV-free 2.5D compositing",
+       IMAGE_ENGINE="ChatGPT native image generation ONLY; assets must be imported as real PNGs",TTS_ENGINE=MODEL_TTS,ANIMATION_ENGINE="Pillow/OpenCV-free 2.5D compositing",
        RENDER_ENGINE="Python/Pillow/NumPy + FFmpeg x264 CPU",
        MAX_REFERENCES_PER_SHOT=4,CHARACTER_ANIMATION="NONE",OBJECT_ANIMATION="STORY_MOTIVATED",
        ENVIRONMENT_MODE="LAYERED_2_5D",DELIVERY_MODE="rendered movie",DURATION_TARGET_SECONDS=180,
@@ -290,48 +290,10 @@ def kie_task(model,inputs,output_path):
     raise RuntimeError(f"Kie task timed out: {tid} (check status to recover; do not duplicate expense blindly)")
 
 def reference_jobs():
-    tasks={}
-    for who,c in STORY["characters"].items():
-        prompt=(STYLE+"Single pure-white studio image containing exactly THREE views of one SAME person, arranged from left to right, with generous blank white spacing: "+
-            "LEFT head-only front close-up, only minimal neck, neutral front face; "+
-            "CENTER full-body directly front, standing naturally with arms relaxed and hair-to-shoes visible; "+
-            "RIGHT full-body direct back view, back of head and outfit, face not visible. "+
-            f"{who} identity: {c['identity']}. Wardrobe: {c['wide']}. "+
-            "The EXACT same face, hairstyle, proportions, skin color and costume across all three views. "+
-            "Uniform bright high-key studio illumination, solid pure-white background everywhere, no extra fourth figure or collage. "+NO_LABEL)
-        tasks["CHAR_"+who]=prompt
-    for name,loc in STORY["locations"].items():
-        tasks["LOC_"+name.upper()]=STYLE+"One beautiful EMPTY location reference plate with no people: "+loc+". Believable perspective, generous photo real detail. "+NO_LABEL
-    for name,desc in STORY["props"].items():
-        tasks["PROP_"+name.upper()]=STYLE+"Clean photoreal premium product reference shot of "+desc+" isolated on light studio background, single prop only, no humans. "+NO_LABEL
-    def do(t):
-        k,p=t
-        return k,kie_task(MODEL_IMAGE,dict(prompt=p,image_input=[],aspect_ratio="16:9" if not k.startswith("CHAR_") else "3:2",resolution="2K",output_format="png"),OUT/"refs"/(k+".png"))
-    result={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
-        for key,val in ex.map(do,tasks.items()):
-            result[key]=val
-    save_json("refs.json",result)
-    print("Generated",len(result),"reference media, identity masks supplied by URL",flush=True)
+    raise RuntimeError("DISABLED: images MUST be generated with ChatGPT, not Kie.ai. Supply native ChatGPT PNG references under output/refs/ and verify independently.")
 
 def frames(shard):
-    refs=json.loads((OUT/"refs.json").read_text())
-    mine=[s for i,s in enumerate(SHOTS) if i%8==shard]
-    def do(s):
-        images=[refs[k]["public_url"] for k in s["references_used"] if k in refs][:4]
-        result=kie_task(MODEL_IMAGE,dict(prompt=s["image_prompt"],image_input=images,
-                    aspect_ratio="16:9",resolution="2K",output_format="png"),
-                    OUT/"frames"/(s["id"]+".png"))
-        from PIL import Image
-        p=OUT/"frames"/(s["id"]+".png")
-        with Image.open(p) as im:
-            im.verify()
-        return s["id"],result
-    res={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-        for k,v in ex.map(do,mine):res[k]=v
-    save_json(f"frame_receipts/shard_{shard}.json",res)
-    print("Validated image decode",len(res),"frames in shard",shard,flush=True)
+    raise RuntimeError("DISABLED: images MUST be generated with ChatGPT, not Kie.ai. Supply native ChatGPT PNG frames under output/frames/ and verify independently.")
 
 def voices(scene):
     d=[s for s in SHOTS if s["scene"]==scene and s["kind"]=="DIALOGUE"]
