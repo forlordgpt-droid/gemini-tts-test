@@ -62,12 +62,12 @@
         134
       ],
       "narration": "...even retinal burns, from miles away. Your eyes are the first thing you must protect.",
-      "composition": "Illustrated dramatic face/eye protection insert; avoid simulated eye-damage gore",
-      "source_art": "ART_CLOSE_PROTECTION_PLANNED",
+      "composition": "Close framing reusing art-directed field-medium source image; live Hunyuan rig shown shielding eyes, no static character insert",
+      "source_art": "ART_FIELD_MEDIUM_PLANNED",
       "layers": [
-        "FG_DUST_BLADES_PLANNED",
+        "FG_DUST_OVERLAY_FROM_ART_FIELD_MEDIUM_PLANNED",
         "MID_HUNYUAN_SHIELD_POSE_PLANNED",
-        "FAR_REAR_LIGHT_PLANNED"
+        "FAR_FIELD_PLANNED"
       ],
       "rig_action": "hand/glove shield and squint, continuous eye line, active expressive response",
       "camera": {
