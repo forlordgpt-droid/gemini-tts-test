@@ -50,6 +50,50 @@ def foreground_mask(shape,idx):
 
 def smart_actor_mask(src,scene):
     H,W=src.shape[:2];s=.5
+    if scene==0:
+        # Story5 new frame: hand-constrained foreground + OpenCV GrabCut, preserving original 2D Emma
+        # while rejecting the toxic-yellow cloud/building pixels that naive broad segmentation captured.
+        coords=[(950,0),(1000,10),(1042,28),(1060,55),(1066,90),(1060,132),
+            (1046,166),(1047,206),(1067,245),(1075,287),(1080,326),(1096,365),
+            (1097,420),(1080,460),(1055,480),(1016,506),(977,521),(949,545),
+            (925,560),(878,571),(846,582),(842,640),(830,700),(813,756),
+            (803,810),(766,869),(768,928),(749,941),(653,941),(630,895),
+            (613,852),(601,823),(574,838),(557,888),(527,930),(497,941),
+            (459,935),(442,900),(445,855),(465,806),(479,780),(501,760),
+            (530,755),(555,710),(576,668),(574,627),(573,592),(575,558),
+            (577,545),(587,503),(594,456),(602,416),(606,383),(612,339),
+            (614,309),(626,275),(644,247),(670,220),(691,205),(703,182),
+            (720,174),(701,142),(732,110),(752,100),(739,82),(772,56),
+            (812,50),(845,27),(884,10)]
+        # Coordinates were artist-reviewed on the exact NEW 1672x941 SnapGen gpt-image-2.5-lower still.
+        # Scale if output retains the 16:9 aspect ratio but model changes resolution.
+        sx,sy=W/1672,H/941
+        pts=np.asarray([(round(x*sx),round(y*sy)) for x,y in coords],np.int32)
+        boundary=np.zeros((H,W),np.uint8)
+        cv2.fillPoly(boundary,[pts],255)
+        w,h=W//2,H//2
+        mini=cv2.resize(src,(w,h),interpolation=cv2.INTER_AREA)
+        poly=cv2.resize(boundary,(w,h),interpolation=cv2.INTER_NEAREST)
+        mask=np.full((h,w),cv2.GC_BGD,np.uint8)
+        mask[poly>0]=cv2.GC_PR_FGD
+        for x,y,rx,ry in [(950,125,52,61),(890,290,77,77),
+            (807,380,78,130),(680,375,55,100),(721,650,82,101),
+            (668,810,33,81),(534,855,24,58),(975,463,30,35)]:
+            cv2.ellipse(mask,(int(x*sx/2),int(y*sy/2)),
+                (max(2,int(rx*sx/2)),max(2,int(ry*sy/2))),
+                0,0,360,cv2.GC_FGD,-1)
+        for x,y,rx,ry in [(1100,190,33,48),(555,210,44,41),
+            (1012,630,45,67),(585,135,35,60),(888,730,29,53)]:
+            cv2.ellipse(mask,(int(x*sx/2),int(y*sy/2)),
+                (max(2,int(rx*sx/2)),max(2,int(ry*sy/2))),
+                0,0,360,cv2.GC_BGD,-1)
+        bg=np.zeros((1,65),np.float64);fg=np.zeros((1,65),np.float64)
+        cv2.grabCut(mini,mask,None,bg,fg,5,cv2.GC_INIT_WITH_MASK)
+        selected=np.where((mask==cv2.GC_FGD)|(mask==cv2.GC_PR_FGD),255,0).astype(np.uint8)
+        selected=cv2.resize(selected,(W,H),interpolation=cv2.INTER_LINEAR)
+        fraction=float((selected>128).mean())
+        if not .10<fraction<.24:raise RuntimeError('Emma alpha cutout implausible coverage '+str(fraction))
+        return selected
     h,w=H//2,W//2
     mini=cv2.resize(src,(w,h),interpolation=cv2.INTER_AREA)
     cx,cy,rw,rh=PEOPLE[scene]
