@@ -8,7 +8,7 @@
   "previous_successful_read_only_audit_run": 44149522287,
   "provider": "kie.ai",
   "model": "google/gemini-3-8-flash-tts",
-  "new_jobs_approved": 1,
+  "new_jobs_approved": 0,
   "new_max_credit_spend": 5,
   "hard_charge_cap_enforceable_by_provider": false,
   "user_acknowledged_no_hard_cap": true,
@@ -17,5 +17,17 @@
   "images_generated_new": 0,
   "first_10s_source": "The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped.",
   "job_one_time_workflow": "story5-v3-one-approved-retry-kie-narrator.yml",
-  "when_job_fails": "STOP; no further paid requests, report status and delta"
+  "when_job_fails": "STOP; no further paid requests, report status and delta",
+  "attempts_from_this_authorization": 1,
+  "consumed": true,
+  "second_task_id": "e023925f74d68ac373714f1ee9b78074",
+  "second_task_state": "fail",
+  "second_task_error": "generate task timeout.",
+  "second_observed_credit_debit": 0,
+  "second_credit_balance_before": 109.32,
+  "second_credit_balance_after": 109.32,
+  "second_generation_run_id": 44150369902,
+  "read_only_audit_run_id": 44150684304,
+  "no_further_paid_jobs_authorized": true,
+  "status": "CONSUMED_FAILED_NO_DEBIT"
 }
