@@ -33,6 +33,12 @@ RUN mkdir -p /opt/cinematic/examples/preview_30s/rig \
     && unzip -p /opt/cinematic/references/HUNYUAN_2D_CHARACTER_PACKAGE.zip HUNYUAN_2D/engine.js > /opt/cinematic/examples/preview_30s/rig/engine.js \
     && NODE_PATH=/opt/cinematic/node_modules /opt/cinematic/node_modules/.bin/esbuild /opt/cinematic/examples/preview_30s/main.js \
       --bundle --format=esm --outfile=/opt/cinematic/examples/preview_30s/app.js
+# Prebundle the shared local-PTS WebCodecs exporter ONCE; all stories use the
+# SAME deterministic, zero-based shard timestamps without reinstalling modules.
+RUN NODE_PATH=/opt/cinematic/node_modules /opt/cinematic/node_modules/.bin/esbuild \
+      /opt/cinematic/engine/scripts/temporal_export.js \
+      --bundle --format=esm \
+      --outfile=/opt/cinematic/engine/scripts/temporal_export.bundle.js
 # Source instructions are copied UNCHANGED; SHA256 checks must pass or build fails.
 RUN python3 /opt/cinematic/engine/scripts/doctor.py --check
 ENTRYPOINT ["/usr/bin/tini","--"]
