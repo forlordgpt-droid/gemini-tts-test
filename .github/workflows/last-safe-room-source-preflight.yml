@@ -66,7 +66,15 @@ jobs:
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
           npm run build
-          npm test
+          EXPORT_SFX=1 npm test
+          python3 - <<'PY'
+          import pathlib
+          code=pathlib.Path('main.js').read_text()
+          assert 'PerspectiveCamera' in code and 'gsap.timeline' in code
+          assert 'WebCodecs' in code and 'mediabunny' in code
+          assert 'OfflineAudioContext' in code
+          print('PASS: required Three.js, GSAP, WebCodecs, Mediabunny and WebAudio source integrations present')
+          PY
       - name: Upload reference ZIPs and inspection manifest
         uses: actions/upload-artifact@v4
         if: always()
