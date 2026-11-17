@@ -5,7 +5,7 @@ export async function quickSmoke(){
  const probe={phase:'start',dimensions:[c.width,c.height],frameCount:0};
  const target=new BufferTarget();
  const output=new Output({format:new Mp4OutputFormat(),target});
- const source=new CanvasSource(c,{codec:'avc',quality:new Quality('high')});
+ const source=new CanvasSource(c,{codec:'avc',bitrate:6500000});
  output.addVideoTrack(source,{frameRate:30});
  console.log('[SMOKE] Mediabunny configured');
  const timeout=(p,phase,ms=35000)=>Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(Error(phase+' timed out after '+ms+' ms')),ms))]);
