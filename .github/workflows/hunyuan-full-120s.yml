@@ -1,5 +1,5 @@
 name: Hunyuan Bunker — Full First 120 Seconds (12 Parallel CPU Shards)
-# Art-direction pass 2: foot-contact blocking corrected after original 120s contact-sheet review.
+# Art-direction pass 3: phone alert composition and real-time 15-minute countdown corrected after visual review.
 on:
   push:
     paths:
