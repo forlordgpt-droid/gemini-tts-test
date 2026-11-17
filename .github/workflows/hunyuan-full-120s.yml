@@ -1,0 +1,208 @@
+name: Hunyuan Bunker — Full First 120 Seconds (12 Parallel CPU Shards)
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-full-120s.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    name: Render 10s shard ${{ matrix.part }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      max-parallel: 12
+      matrix:
+        part: [0,1,2,3,4,5,6,7,8,9,10,11]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify required FFmpeg and FFprobe
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -hide_banner -version | head -n 1
+          ffprobe -hide_banner -version | head -n 1
+      - name: Expand original Hunyuan 2D rig and stage, install authored scene animation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile,shutil
+          base=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(base/'HUNYUAN_SCENE_TEST_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(base)
+          with zipfile.ZipFile(base/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              assert z.testzip() is None
+              for name in ('art.js','engine.js'):
+                  target=base/'scene_test'/'rig'/name
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(z.read('HUNYUAN_2D/'+name))
+          with zipfile.ZipFile(base/'HUNYUAN_FULL_120S_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(base)
+          for name in ('main.js','index.html','test-playwright.cjs'):
+              src=base/'full_source'/name
+              assert src.exists(), name
+              shutil.copy2(src,base/'scene_test'/name)
+          PY
+      - name: Use required Three.js, GSAP, Mediabunny, and Playwright browser export
+        working-directory: film/hunyuan-2m/scene_test
+        env:
+          SHARD_INDEX: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          node test-playwright.cjs
+      - name: Verify 10-second H264 1080p/30 shard and exact 300 frames
+        shell: bash
+        env:
+          SHARD_INDEX: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,json,subprocess,os
+          b=pathlib.Path('film/hunyuan-2m/scene_test/qc')
+          name=b/f"shard_{int(os.environ['SHARD_INDEX']):02d}.mp4"
+          assert name.exists() and name.stat().st_size>30000
+          raw=subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0','-show_entries','stream=codec_name,width,height,r_frame_rate,nb_read_frames','-show_entries','format=duration','-of','json',str(name)],text=True)
+          j=json.loads(raw);v=j['streams'][0]
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_read_frames']))==('h264',1920,1080,'30/1',300),raw
+          assert abs(float(j['format']['duration'])-10)<.08,raw
+          print('PASS verified shard',name)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hunyuan-shard-${{ matrix.part }}
+          path: film/hunyuan-2m/scene_test/qc/
+          if-no-files-found: warn
+          retention-days: 14
+  sfx:
+    name: Render original WebAudio OfflineAudioContext film sound design
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Expand native supplied rig and original illustrated stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile,shutil
+          b=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(b/'HUNYUAN_SCENE_TEST_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(b)
+          with zipfile.ZipFile(b/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              assert z.testzip() is None
+              for f in ('art.js','engine.js'):
+                  dest=b/'scene_test'/'rig'/f;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(z.read('HUNYUAN_2D/'+f))
+          with zipfile.ZipFile(b/'HUNYUAN_FULL_120S_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(b)
+          for f in ('main.js','index.html','test-playwright.cjs'):
+              shutil.copy2(b/'full_source'/f,b/'scene_test'/f)
+          PY
+      - name: Verify toolchain and export original 120s WebAudio sound effects
+        working-directory: film/hunyuan-2m/scene_test
+        env:
+          EXPORT_SFX: '1'
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          node test-playwright.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hunyuan-original-sfx
+          path: film/hunyuan-2m/scene_test/qc/original_sfx_120s.wav
+          if-no-files-found: error
+          retention-days: 14
+  assemble:
+    name: Assemble and verify complete 120-second voiced film
+    needs: [render, sfx]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required media tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hunyuan-shard-*
+          merge-multiple: true
+          path: render_out
+      - uses: actions/download-artifact@v4
+        with:
+          name: hunyuan-original-sfx
+          path: render_out
+      - name: Enforce all twelve correct parts and join video without re-encoding
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib
+          root=pathlib.Path('render_out')
+          files=sorted(root.glob('shard_*.mp4'))
+          expected=[root/f'shard_{i:02d}.mp4' for i in range(12)]
+          assert files==expected, f'Expected 12 unique ordered shards; got {files}'
+          (root/'concat.txt').write_text(''.join(f"file '{f.name}'\n" for f in files))
+          assert (root/'original_sfx_120s.wav').exists()
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i render_out/concat.txt -c:v copy render_out/visual_joined_120s.mp4
+      - name: Mix preserved authentic KIE narration with original WebAudio soundscape
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y \
+            -i render_out/visual_joined_120s.mp4 \
+            -i film/hunyuan-2m/audio/BUNKER_FIRST_120S_NARRATION.m4a \
+            -i render_out/original_sfx_120s.wav \
+            -filter_complex '[1:a]volume=1.0[n];[2:a]volume=0.35[s];[n][s]amix=inputs=2:duration=first:normalize=0[a]' \
+            -map 0:v:0 -map '[a]' -t 120 \
+            -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            render_out/HUNYUAN_BUNKER_FIRST_120S_FINAL.mp4
+      - name: Audit complete video, 3600 frames, codec, duration and sound
+        run: |
+          set -euo pipefail
+          ffprobe -hide_banner -v error -count_frames -show_entries stream=codec_type,codec_name,width,height,r_frame_rate,nb_read_frames:format=duration,size -of json render_out/HUNYUAN_BUNKER_FIRST_120S_FINAL.mp4 > render_out/full_ffprobe.json
+          python3 - <<'PY'
+          import json,pathlib,hashlib
+          d=pathlib.Path('render_out')
+          j=json.loads((d/'full_ffprobe.json').read_text())
+          v=next(s for s in j['streams'] if s['codec_type']=='video')
+          a=next(s for s in j['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'])==('h264',1920,1080,'30/1')
+          assert int(v['nb_read_frames'])==3600, j
+          assert a['codec_name']=='aac',j
+          assert abs(float(j['format']['duration'])-120)<.09,j
+          movie=d/'HUNYUAN_BUNKER_FIRST_120S_FINAL.mp4'
+          (d/'FULL_QA_REPORT.json').write_text(json.dumps({'status':'TECHNICAL_QA_PASS','duration_seconds':120,'frames':3600,'size_bytes':movie.stat().st_size,'sha256':hashlib.sha256(movie.read_bytes()).hexdigest(),'audio_provider':'KIE Gemini 3.8 Flash-Lite master plus original procedural WebAudio SFX'},indent=2))
+          print('PASS: Verified 120-second 1080p/30 H264+AAC narrated movie, exactly 3600 frames')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i render_out/HUNYUAN_BUNKER_FIRST_120S_FINAL.mp4 -vf 'fps=1/10,scale=480:270,tile=4x3' -frames:v 1 render_out/CONTACT_SHEET_12_SHOTS.jpg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hunyuan-first-120s-complete-film-and-qa
+          path: |
+            render_out/HUNYUAN_BUNKER_FIRST_120S_FINAL.mp4
+            render_out/FULL_QA_REPORT.json
+            render_out/full_ffprobe.json
+            render_out/CONTACT_SHEET_12_SHOTS.jpg
+          if-no-files-found: warn
+          retention-days: 14
