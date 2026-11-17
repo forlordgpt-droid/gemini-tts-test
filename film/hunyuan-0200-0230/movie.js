@@ -245,7 +245,7 @@ async function exportSegment(){
    if(i%30===0){status.textContent='Encoding '+(i+1)+' / '+frames+' on public CPU shard '+shard;await new Promise(r=>setTimeout(r,0));}
   }
   await output.finalize();
-  if(!(output.target.buffer instanceof ArrayBuffer)||output.target.buffer.byteLength<20000)throw Error('Mediabunny produced no valid MP4 data');
+  if(!output.target.buffer || output.target.buffer.byteLength<20000 || !(output.target.buffer instanceof ArrayBuffer || ArrayBuffer.isView(output.target.buffer))) throw Error('Mediabunny produced no valid MP4 bytes');
   window.__qc.status='TECHNICAL_ENCODE_READY_VISUAL_AUDIT_PENDING';window.__qc.encoded_frames=frames;
   downloadBlob(output.target.buffer,frames===150?'gate_5s.mp4':'part_'+shard+'.mp4','video/mp4');
   status.textContent='Encoded '+frames+' frames with Mediabunny and WebCodecs';
