@@ -15,7 +15,7 @@ async function waitServer(){for(let i=0;i<180;i++){if(server.exitCode!==null)thr
  page.on('pageerror',e=>errors.push('PAGE '+e.message));page.on('console',m=>{if(m.type()==='error')errors.push('CONSOLE '+m.text());});
  page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
  await page.goto('http://127.0.0.1:5196/?shard='+shard+'&frames='+frames,{waitUntil:'networkidle',timeout:90000});
- await page.waitForFunction('window.__HUNYUAN_READY===true',{timeout:120000});
+ await page.waitForFunction('window.__HUNYUAN_READY===true',null,{timeout:120000});
  if(errors.length)throw Error('Browser asset/console failure '+errors.join('\n'));
  const checks=await page.evaluate(async()=>{
   const c=document.querySelector('#stage');const gl=c.getContext('webgl2')||c.getContext('webgl');
