@@ -1,0 +1,133 @@
+name: Hunyuan Bunker — Full Scene Story/Code Smoke Gate
+on:
+  push:
+    paths:
+      - '.github/workflows/hunyuan-full-120s-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    name: Render 10s shard ${{ matrix.part }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+        part: [0,4,9,11]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify required FFmpeg and FFprobe
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -hide_banner -version | head -n 1
+          ffprobe -hide_banner -version | head -n 1
+      - name: Expand original Hunyuan 2D rig and stage, install authored scene animation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile,shutil
+          base=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(base/'HUNYUAN_SCENE_TEST_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(base)
+          with zipfile.ZipFile(base/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              assert z.testzip() is None
+              for name in ('art.js','engine.js'):
+                  target=base/'scene_test'/'rig'/name
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(z.read('HUNYUAN_2D/'+name))
+          with zipfile.ZipFile(base/'HUNYUAN_FULL_120S_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(base)
+          for name in ('main.js','index.html','test-playwright.cjs'):
+              src=base/'full_source'/name
+              assert src.exists(), name
+              shutil.copy2(src,base/'scene_test'/name)
+          PY
+      - name: Use required Three.js, GSAP, Mediabunny, and Playwright browser export
+        working-directory: film/hunyuan-2m/scene_test
+        env:
+          SHARD_INDEX: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          node test-playwright.cjs
+      - name: Verify 10-second H264 1080p/30 shard and exact 300 frames
+        shell: bash
+        env:
+          SHARD_INDEX: ${{ matrix.part }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,json,subprocess,os
+          b=pathlib.Path('film/hunyuan-2m/scene_test/qc')
+          name=b/f"shard_{int(os.environ['SHARD_INDEX']):02d}.mp4"
+          assert name.exists() and name.stat().st_size>30000
+          raw=subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0','-show_entries','stream=codec_name,width,height,r_frame_rate,nb_read_frames','-show_entries','format=duration','-of','json',str(name)],text=True)
+          j=json.loads(raw);v=j['streams'][0]
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_read_frames']))==('h264',1920,1080,'30/1',300),raw
+          assert abs(float(j['format']['duration'])-10)<.08,raw
+          print('PASS verified shard',name)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hunyuan-shard-${{ matrix.part }}
+          path: film/hunyuan-2m/scene_test/qc/
+          if-no-files-found: warn
+          retention-days: 14
+  sfx:
+    name: Render original WebAudio OfflineAudioContext film sound design
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Expand native supplied rig and original illustrated stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile,shutil
+          b=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(b/'HUNYUAN_SCENE_TEST_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(b)
+          with zipfile.ZipFile(b/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              assert z.testzip() is None
+              for f in ('art.js','engine.js'):
+                  dest=b/'scene_test'/'rig'/f;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(z.read('HUNYUAN_2D/'+f))
+          with zipfile.ZipFile(b/'HUNYUAN_FULL_120S_SOURCE.zip') as z:
+              assert z.testzip() is None
+              z.extractall(b)
+          for f in ('main.js','index.html','test-playwright.cjs'):
+              shutil.copy2(b/'full_source'/f,b/'scene_test'/f)
+          PY
+      - name: Verify toolchain and export original 120s WebAudio sound effects
+        working-directory: film/hunyuan-2m/scene_test
+        env:
+          EXPORT_SFX: '1'
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          node test-playwright.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hunyuan-original-sfx
+          path: film/hunyuan-2m/scene_test/qc/original_sfx_120s.wav
+          if-no-files-found: error
+          retention-days: 14
