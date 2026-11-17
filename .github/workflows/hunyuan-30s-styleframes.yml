@@ -1,0 +1,62 @@
+name: Hunyuan 30s Style Frames Review Export
+on:
+  push:
+    branches:
+      - hunyuan-30s-art-direction-v2
+    paths:
+      - '.github/workflows/hunyuan-30s-styleframes.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package-styleframes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download six approved-reference style-frame concepts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow
+          python - <<'PY'
+          import urllib.request, pathlib, time
+          from PIL import Image,ImageOps,ImageDraw,ImageFont
+          urls=["https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/2d81dcc8-e249-11f1-9e9e-fadb28ffb7a6/gen/20261117_053936_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054047Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=681f40cd02a1001e568ec00f4151408afebf0b0815fe34b8dac9a99eb3e7d428","https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/2f640ade-e249-11f1-a2e0-9a57b41f0ba1/gen/20261117_054008_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054049Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=aa487b593faf1ce5aef1ada8b6dcda43a37ae1078bbcc1c02c96b3aafe4d7c18","https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/313bf56a-e249-11f1-8304-ca3ddd4e2dbc/gen/20261117_053954_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054051Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=db320ef2946e3a9823ebedf3ba1d9c406a05d1c17d36f3465cbef5888336491d","https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/330e915e-e249-11f1-822a-a24363ea6e05/gen/20261117_054000_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054052Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ef2f51b3566ab2f7c4d98244645636c5545dc3c8809e3cb944bdd59b69a98129","https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/34b3eea0-e249-11f1-8247-2a0d90758856/gen/20261117_053940_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054053Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3c9b636fbf40f81f9fc4f584777545bfc9641cc3ed127036477c6cdda14c5742","https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/369ae746-e249-11f1-8d37-a6721a7ad8a8/gen/20261117_053950_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T054054Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=03281df097ac1368eb0d8ca4b19a0156274df1d5567aba73c16a7804a324db8c"]
+          times=["00-05","05-10","10-15","15-20","20-25","25-30"]
+          folder=pathlib.Path("review_frames")
+          folder.mkdir(exist_ok=True)
+          images=[]
+          for i,url in enumerate(urls):
+              dest=folder/f"HUNYUAN_FRAME_{i+1:02d}_{times[i]}.png"
+              for attempt in range(3):
+                  try:
+                      req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"})
+                      with urllib.request.urlopen(req,timeout=65) as resp:dest.write_bytes(resp.read())
+                      break
+                  except Exception:
+                      if attempt==2:raise
+                      time.sleep(2)
+              img=Image.open(dest).convert("RGB")
+              assert img.width>=900 and img.height>=500,(dest,img.size)
+              images.append(img)
+              print(dest,img.size,dest.stat().st_size)
+          W,H=720,405
+          board=Image.new("RGB",(W*2,H*3+76*3+35),(13,19,37))
+          d=ImageDraw.Draw(board)
+          try: font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",26)
+          except:font=ImageFont.load_default()
+          titlefont=font
+          for i,img in enumerate(images):
+              x=(i%2)*W;y=(i//2)*(H+76)+28
+              frame=ImageOps.fit(img,(W-24,H-4))
+              board.paste(frame,(x+12,y))
+              d.text((x+16,y+H+6),f"{i+1:02d}  /  {times[i].replace('-','–')} SEC",fill=(228,238,250),font=font)
+          board.save(folder/"HUNYUAN_30S_STYLE_DIRECTION_BOARD.jpg",quality=94)
+          print("SIX CONCEPT FRAMES + BOARD READY")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_30S_SIX_STYLE_FRAMES
+          path: review_frames/
+          retention-days: 30
