@@ -1,3 +1,5 @@
+> **SUPERSEDED BY NARRATION CORRECTION (2026-11-17).** This original storyboard incorporated dialogue-script timing and a 09:15 phone cue, and its Stage B first10 used no narrator. **Do not follow the timing or approval status below.** The authoritative corrected first10 and entire 60-second narration script are in [STORY5_NARRATION_LOCKED_MASTER.md](STORY5_NARRATION_LOCKED_MASTER.md). The old first10 MP4 is technically valid but narratively invalid. No paid voice may be generated without explicit spending approval.
+
 # EMMA — THE SAFE ROOM | Hunyuan V3, storyboard and strict production locks
 Source: user-supplied `story5.txt` (60 seconds, four named scenes). Production system: unchanged Hunyuan Cinematic Engine V3, original approved 30-second cinematic MP4, complete authorized blueprint and native 2D rig.
 Status: STAGE A, no newly authorized paid generation. FIRST 10 SECOND REVIEW REQUIRED BEFORE LATER FRAMES.
