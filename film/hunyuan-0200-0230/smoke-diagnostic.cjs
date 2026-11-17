@@ -31,6 +31,11 @@ const fs=require('fs'),path=require('path');
    return await quickSmoke();
   });console.log('MEDIABUNNY TWO-FRAME PASS',JSON.stringify(diag));
   await page.locator('#stage').screenshot({path:'smoke-frame.png'});
+  await page.evaluate(t=>window.renderAt(t),4.9666667);
+  await page.locator('#stage').screenshot({path:'smoke-frame-shield.png'});
+  const fontProof=await page.evaluate(()=>({spaceGrotesk:document.fonts.check('700 62px "Space Grotesk"'),inter:document.fonts.check('600 34px "Inter"')}));
+  if(!fontProof.spaceGrotesk || !fontProof.inter)throw Error('Required modern typography fonts were not loaded: '+JSON.stringify(fontProof));
+  console.log('CINEMATIC FONT PROOF',JSON.stringify(fontProof));
   fs.writeFileSync('smoke-qc.json',JSON.stringify({codec:configs,diag,status:'TWO_FRAME_TECH_PASS_VISUAL_REVIEW_REQUIRED'},null,2));
  }finally{if(browser)await browser.close();server.kill('SIGTERM');}
 })().catch(e=>{console.error(e.stack||String(e));process.exitCode=1;});
