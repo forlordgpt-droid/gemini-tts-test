@@ -1,0 +1,62 @@
+name: Last Safe Room FINAL 30s One Kie Gemini 3.8 Flash Dialogue Mix
+on:
+  push:
+    branches: [last-safe-room-full-30s-20261117]
+    paths: ['.github/workflows/lsr-final-kie-dialogue-mix.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  deliver-final:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ONLY required FFmpeg and FFprobe, reuse the authored visual master
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg zip
+      - name: Download already-fixed 900-frame 1080p visual master; never rerender it
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 44116608335
+          name: LSR_30S_CORRECTED_VISUAL_MASTER_PENDING_KIE
+          github-token: ${{ github.token }}
+          path: source_inputs
+      - name: Download the ONE previously authorized Kie Gemini 3.8 Flash two-speaker WAV
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 44118996885
+          name: LSR_ONE_KIE_3_8_FLASH_TTS_AND_CREDIT_AUDIT
+          github-token: ${{ github.token }}
+          path: source_inputs
+      - name: Download existing full-film source without any paid work
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 44116826088
+          name: LSR_30S_MOTION_FIXED_VISUAL_PREVIEW_AND_SOURCE_PENDING_KIE
+          github-token: ${{ github.token }}
+          path: original_source_package
+      - name: Mix three exact original spoken lines at movie timestamps, preserve all approved picture frames
+        run: |
+          set -euo pipefail
+          python3 film/last-safe-room-30s/tts/mix_existing_kie_audio.py
+          test -s final_delivery/LAST_SAFE_ROOM_FULL_30S_FINAL_KIE_3_8_FLASH_TTS.mp4
+          test -s final_delivery/FINAL_QC_AND_CREDIT_REPORT.json
+          test -s final_delivery/FINAL_30S_CONTACT_SHEET.jpg
+          cp original_source_package/LAST_SAFE_ROOM_30S_CINEMATIC_PROJECT_SOURCE.zip final_delivery/
+          cp source_inputs/NOAH_EMMA_ONE_KIE_3_8_FLASH_MULTISPEAKER.wav final_delivery/
+          zip -q -r final_delivery/LAST_SAFE_ROOM_30S_FINAL_SOURCE_AND_AUDIO_CUES.zip \
+            film/last-safe-room-30s/tts/ \
+            final_delivery/FINAL_QC_AND_CREDIT_REPORT.json \
+            final_delivery/DIALOGUE_AUDIO_CUE_SHEET.json \
+            final_delivery/KIE_COST_AND_SOURCE_AUDIT.json \
+            final_delivery/LAST_SAFE_ROOM_30S_CINEMATIC_PROJECT_SOURCE.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LAST_SAFE_ROOM_FULL_30S_FINAL_MP4_KIE_FLASH_3_8_AND_SOURCE
+          path: final_delivery/
+          retention-days: 30
