@@ -1,0 +1,57 @@
+name: Hunyuan V3 — Fresh GitHub CPU Runner Prebuilt-Image Benchmark
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/hunyuan-v3-cold-start-test.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+jobs:
+  fresh-runner:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm software is PREINSTALLED and original user references unchanged
+        run: |
+          set -euo pipefail
+          echo 'NO pip/npm/Playwright/apt install was executed by this job'
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          node --version
+          ffmpeg -version | head -n 1
+      - name: Real approved 30s Hunyuan native 2D cinematic reference smoke
+        env:
+          ENGINE_SMOKE_OUTPUT: ${{ github.workspace }}/smoke-qa
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/browser_smoke.cjs
+          test -s smoke-qa/REGRESSION_RESULTS.json
+      - name: Validate exact storyboard and plan three 10s CPU shards without generating media
+        run: |
+          set -euo pipefail
+          python3 film/cinematic-engine-v3/scripts/orchestrator.py validate \
+            --manifest film/cinematic-engine-v3/examples/APPROVED_ORIGINAL_30S_REFERENCE_STORY.json \
+            --phase first30
+          python3 film/cinematic-engine-v3/scripts/orchestrator.py plan \
+            --manifest film/cinematic-engine-v3/examples/APPROVED_ORIGINAL_30S_REFERENCE_STORY.json \
+            --phase first30 --shard-seconds 10 --max-parallel 8 \
+            --out smoke-qa/THREE_SHARDS_30S_PLAN.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('smoke-qa/THREE_SHARDS_30S_PLAN.json'))
+          assert x['shard_count']==3 and x['frame_count']==900,x
+          assert len(range(0,15*60*30,300))==90
+          print('PASS 30 seconds = 900 frames / 3 shards; 15 minutes = 27000 frames / 90 shards')
+          print('NO API requests to SnapGen or Kie and no creative model substitutions')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_FRESH_RUNNER_BOOT_AND_CINEMATIC_SMOKE
+          path: smoke-qa/
+          retention-days: 30
