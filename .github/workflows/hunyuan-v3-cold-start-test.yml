@@ -4,6 +4,9 @@ on:
     branches: [hunyuan-cinematic-engine-v3-20261117]
     paths: ['.github/workflows/hunyuan-v3-cold-start-test.yml']
   workflow_dispatch:
+defaults:
+  run:
+    shell: bash
 permissions:
   contents: read
   packages: read
