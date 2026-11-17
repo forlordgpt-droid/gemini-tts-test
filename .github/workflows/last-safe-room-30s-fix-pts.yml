@@ -1,0 +1,87 @@
+name: Last Safe Room — Fix 30s Frozen Continuation PTS (NO PAID CALLS)
+on:
+  push:
+    branches: [last-safe-room-full-30s-20261117]
+    paths: ['.github/workflows/last-safe-room-30s-fix-pts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  repair-pts-and-verify-visible-motion:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required FFmpeg FFprobe Pillow OpenCV
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          python3 -m pip install --break-system-packages --disable-pip-version-check Pillow opencv-python-headless
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 44113871109
+          name: LSR_30S_VISUAL_PREVIEW_AND_SOURCE_PENDING_KIE
+          github-token: ${{ github.token }}
+          path: uncorrected
+      - name: Normalize bad WebCodecs shard PTS at fixed 30fps without altering shot design or images
+        run: |
+          set -euo pipefail
+          mkdir -p delivery
+          test -s uncorrected/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4
+          ffmpeg -hide_banner -loglevel warning -y \
+            -i uncorrected/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4 \
+            -map 0:v:0 -map 0:a:0 -vf 'setpts=N/(30*TB)' -fps_mode passthrough \
+            -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -c:a copy \
+            -movflags +faststart \
+            delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_TIMESTAMP_FIXED_PENDING_KIE_VOICES.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration \
+            -of json delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_TIMESTAMP_FIXED_PENDING_KIE_VOICES.mp4 \
+            > delivery/ffprobe.json
+      - name: Mandatory actual decoded-frame motion checks across full second half
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import cv2,numpy as np,json,pathlib
+          root=pathlib.Path('delivery')
+          v=root/'LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_TIMESTAMP_FIXED_PENDING_KIE_VOICES.mp4'
+          cap=cv2.VideoCapture(str(v))
+          assert cap.isOpened()
+          assert round(cap.get(cv2.CAP_PROP_FPS))==30
+          assert round(cap.get(cv2.CAP_PROP_FRAME_COUNT))==900
+          xs={}
+          for ts in (0.5,5.5,9.5,10.5,11.5,14.5,15.5,18.5,20.5,23.5,27.,29.):
+            cap.set(cv2.CAP_PROP_POS_MSEC,ts*1000)
+            ok,frame=cap.read()
+            assert ok, ('Can't decode',ts)
+            xs[ts]=cv2.resize(frame,(160,90))
+          t=[10.5,11.5,14.5,15.5,18.5,20.5,23.5,27.,29.]
+          deltas=[{'from':a,'to':b,'mean_abs_pixel_change':float(np.mean(np.abs(xs[a].astype(np.int16)-xs[b].astype(np.int16))))} for a,b in zip(t,t[1:])]
+          print('ACTUAL FRAME MOVEMENT:',json.dumps(deltas,indent=2))
+          assert all(x['mean_abs_pixel_change']>2.5 for x in deltas),deltas
+          d=json.load(open(root/'ffprobe.json'))
+          video=next(s for s in d['streams'] if s['codec_type']=='video')
+          audio=next(s for s in d['streams'] if s['codec_type']=='audio')
+          assert (video['codec_name'],video['width'],video['height'],video['r_frame_rate'],int(video['nb_frames']))==('h264',1920,1080,'30/1',900)
+          assert audio['codec_name']=='aac'
+          assert abs(float(d['format']['duration'])-30)<.12
+          original=json.load(open('uncorrected/QC.json'))
+          original['status']='TECHNICAL_30S_PASS_WITH_ACTUAL_PLAYBACK_MOTION_KIE_DIALOGUE_STILL_PENDING'
+          original['repair']='Normalized timestamps from four Mediabunny shards using required FFmpeg setpts=N/(30*TB) and H264 re-encode'
+          original['visual_motion_quality_checks']=deltas
+          original['film_is_dialogue_complete']=False
+          original['final_file_bytes']=v.stat().st_size
+          (root/'QC.json').write_text(json.dumps(original,indent=2))
+          print('PASS 30s 900 frames, genuine changing video 10–30s, AAC audio; spoken dialogue pending approval')
+          PY
+          ffmpeg -hide_banner -loglevel error -y \
+            -i delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_TIMESTAMP_FIXED_PENDING_KIE_VOICES.mp4 \
+            -vf 'fps=1/3,scale=640:-1,tile=5x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+          cp uncorrected/LAST_SAFE_ROOM_30S_CINEMATIC_PROJECT_SOURCE.zip delivery/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LSR_30S_MOTION_FIXED_VISUAL_PREVIEW_AND_SOURCE_PENDING_KIE
+          path: delivery/
+          retention-days: 30
