@@ -66,10 +66,10 @@ jobs:
            const copy=document.createElement('canvas');copy.width=stage.width;copy.height=stage.height;
            const ctx=copy.getContext('2d');ctx.drawImage(stage,0,0);
            return [[120,210],[1510,330],[420,620]].map(([x,y])=>Array.from(ctx.getImageData(x,y,1,1).data).slice(0,3));
-});
-console.log('Illustrated background RGB probes:',JSON.stringify(backdrop));
-if(backdrop.every(rgb=>rgb[0]===29&&rgb[1]===44&&rgb[2]===82))throw Error('Illustrated environment missing: frame is only WebGL clear-color');
-"""
+          });
+          console.log('Illustrated background RGB probes:',JSON.stringify(backdrop));
+          if(backdrop.every(rgb=>rgb[0]===29&&rgb[1]===44&&rgb[2]===82))throw Error('Illustrated environment missing: frame is only WebGL clear-color');
+          """
           assert test.count(sentinel)==1, 'Cannot locate browser test insertion point'
           test_path.write_text(test.replace(sentinel,probe+sentinel))
           PY
