@@ -1,0 +1,83 @@
+name: Emma Story5 V3 — Finalize two passed 5s shards (no rerender / no paid)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-recover-assembly.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  assemble:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: STORY5_V3_FIRST10_SHARD_*
+          run-id: 44144552833
+          github-token: ${{ github.token }}
+          path: parts
+          merge-multiple: false
+      - name: Reuse already-authorized OfflineAudioContext SFX, no TTS required before first spoken line
+        uses: actions/download-artifact@v4
+        with:
+          name: LSR_10S_WEB_AUDIO
+          run-id: 44104478064
+          github-token: ${{ github.token }}
+          path: sound
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_APPROVED_EXISTING_ART_AND_SOURCE
+          run-id: 44144552833
+          github-token: ${{ github.token }}
+          path: film/story5-v3/first10
+      - name: Assemble local-PTS shards, decode every frame, inspect frozen sections and produce contact sheet
+        run: |
+          set -euo pipefail
+          mkdir -p delivery/qc
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          paths=[Path('parts')/f'STORY5_V3_FIRST10_SHARD_{x}'/f'part_{x}_150.mp4' for x in (0,150)]
+          for p in paths:
+            assert p.is_file() and p.stat().st_size>100000, str(p)
+            q=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,width,height,nb_frames','-of','json',str(p)]))
+            s=q['streams'][0]
+            assert s['codec_name']=='h264' and (s['width'],s['height'],int(s['nb_frames']))==(1920,1080,150),s
+          Path('parts.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in paths))
+          assert Path('sound/sfx_10.wav').is_file(),'No approved SFX; stop'
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i parts.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y -i delivery/video_only.mp4 -i sound/sfx_10.wav -map 0:v:0 -map 1:a:0 -af 'afade=t=out:st=9.7:d=0.3' -t 10 -c:v copy -c:a aac -b:a 192k -movflags +faststart delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4
+          python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4 --frames 300 --seconds 10 --sample-every 0.5 --out delivery/qc
+          sha256sum delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4 > delivery/VIDEO_SHA256.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report={'status':'TECHNICAL_PASS_UNCORRECTED_FIRST10_USER_VISUAL_APPROVAL_REQUIRED','story':'story5.txt, scene 1','artwork':'3 previously approved Emma city illustrations','new_paid_image_jobs':0,'new_paid_tts_jobs':0,'new_paid_credits':0,'shards':2,'fps':30,'frames':300,'approval_before_30s':True}
+          Path('delivery/PRODUCTION_REPORT.json').write_text(json.dumps(report,indent=2))
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          source=Path('film/story5-v3/first10')
+          assert (source/'STORY5_ZERO_PAID_GATES.json').is_file()
+          with zipfile.ZipFile('delivery/EMMA_STORY5_FIRST10_REUSABLE_SOURCE.zip','w',zipfile.ZIP_DEFLATED) as out:
+              for file in sorted(source.rglob('*')):
+                  if file.is_file():out.write(file,str(file))
+          PY
+          echo 'SUCCESS: first TEN seconds only; no further production authorized'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_FIRST10_UNCORRECTED_VERIFIED_DELIVERY
+          path: delivery/
+          retention-days: 30
