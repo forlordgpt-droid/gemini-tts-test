@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');const http=require('http'),fs=require('fs'),path=require('path');
+const ROOT=__dirname,PORT=8474,SHARD=Number(process.env.SHARD_INDEX),SFX=process.env.EXPORT_SFX==='1';
+if(!SFX&&(!Number.isInteger(SHARD)||SHARD<0||SHARD>1))throw Error('Expected SHARD_INDEX=0 or 1');
+const MIME={'.html':'text/html','.js':'application/javascript','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};
+const server=http.createServer((req,res)=>{try{const u=new URL(req.url,`http://127.0.0.1:${PORT}`),p=u.pathname==='/'?'/index.html':u.pathname;const full=path.resolve(ROOT,'.'+decodeURIComponent(p));if(!full.startsWith(ROOT+path.sep))throw Error('Bad path');const b=fs.readFileSync(full);res.writeHead(200,{'content-type':MIME[path.extname(full)]||'application/octet-stream'});res.end(b)}catch(e){res.writeHead(404);res.end('missing')}});
+(async()=>{await new Promise(r=>server.listen(PORT,'127.0.0.1',r));const browser=await chromium.launch({channel:'chromium',headless:true,args:['--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:1920,height:1080},acceptDownloads:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+try{await page.goto(`http://127.0.0.1:${PORT}/`);await page.waitForFunction(()=>window.ready===true,null,{timeout:90000});const qc=path.join(ROOT,'qc');fs.mkdirSync(qc,{recursive:true});
+if(SFX){const pending=page.waitForEvent('download',{timeout:120000});const r=await page.evaluate(()=>window.exportSfx());const d=await pending;await d.saveAs(path.join(qc,'sfx_10.wav'));if(r.seconds!==10)throw Error('Bad SFX length');console.log('PASS OfflineAudioContext',r)}
+else{const start=SHARD*5,frame=page.locator('#stage');for(const t of [start+.4,start+1.75,start+3.35,start+4.75].filter(t=>t<10)){
+const m=await page.evaluate(x=>window.renderFrame(x),t);await frame.screenshot({path:path.join(qc,`t_${t.toFixed(2).replace('.','_')}.png`)});console.log('FRAME',JSON.stringify(m));}
+await page.evaluate(x=>window.renderFrame(x),start+.5);const a=await frame.screenshot();await page.evaluate(x=>window.renderFrame(x),start+2);await page.evaluate(x=>window.renderFrame(x),start+.5);const b=await frame.screenshot();if(!a.equals(b))throw Error('Nondeterministic frame');
+const pending=page.waitForEvent('download',{timeout:480000});const result=await page.evaluate(x=>window.exportShard(x),start);const d=await pending;await d.saveAs(path.join(qc,`part_${SHARD}.mp4`));if(result.frames!==150||result.bytes<100000)throw Error('Bad shard');console.log('PASS WebCodecs Mediabunny 5s shard',result)}
+if(errors.length)throw Error('Browser errors '+errors.join('; '));
+}finally{await browser.close();await new Promise(r=>server.close(r))}})().catch(e=>{console.error(e.stack);process.exitCode=1});
