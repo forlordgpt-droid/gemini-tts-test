@@ -1,4 +1,5 @@
 name: Hunyuan Cinematic Engine V3 — Build and Publish Locked Environment
+# Rebuild: official esbuild module lookup via NODE_PATH, preserving exact JS dependencies.
 on:
   push:
     branches: [hunyuan-cinematic-engine-v3-20261117]
