@@ -1,6 +1,6 @@
 # Bunker Survival — Hunyuan 2D, first 120 seconds
 
-**State:** production manifests authored; **not yet renderable on GitHub**.
+**State:** original-rig 8-second illustrated scene and voiced preview verified on GitHub Actions; the full 120-second film remains unrendered.
 
 ## Locked output
 - 1920 × 1080; 30fps; 16:9; exactly 3,600 frames covering [0,120) seconds.
@@ -25,4 +25,4 @@
 ## Existing validation
 [GitHub Actions required-stack preflight #43971438743](https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/43971438743) passed all four jobs, including WebCodecs H.264 encoding at 1920×1080 in a secure local Chromium context.
 
-**Production is not yet finished. Do not claim the eight-second art-direction test or full film passes until rendered images and video have been reviewed.**
+**Production is not yet finished.** The 8-second technical scene gate passed on [run #44017410107](https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44017410107): 1920x1080/30, 240 frames, native rig, Three.js/GSAP, Mediabunny, FFmpeg/FFprobe and AAC. A verified voiced preview was uploaded to [Google Drive](https://drive.google.com/file/d/11ZQieloeImGWpeVEzw2Gxh6ebmM-YVMv/view). This is a technical representative scene, **not** the final story-accurate or visually approved 120-second film; full-scene production and export remain pending.
