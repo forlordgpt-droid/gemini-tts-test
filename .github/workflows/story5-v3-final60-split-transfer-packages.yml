@@ -1,0 +1,73 @@
+name: Emma Story5 V3 Final 60s — Split Existing Verified Artifacts for Google Drive Transfer (ZERO PAID)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-final60-split-transfer-packages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  split-only-no-rerender:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download previously verified COMPLETE 60s final video, source and QA
+        uses: actions/download-artifact@v4
+        with:
+          name: EMMA_STORY5_V3_COMPLETE_60S_FINAL_NARRATED_VIDEO_FULL_SOURCE_AND_QA
+          run-id: 44188105897
+          github-token: ${{ github.token }}
+          path: delivery
+      - name: Verify exact original final MP4 unchanged, source archive, QA and complete story before split
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,subprocess
+          d=Path('delivery')
+          m=d/'EMMA_STORY5_V3_FULL_60S_FINAL_NARRATED_FILM.mp4'
+          report=json.loads((d/'EMMA_STORY5_FULL60_FINAL_PRODUCTION_AND_SPEND_AUDIT.json').read_text())
+          assert report['status']=='TECHNICALLY_PASS_FULL_60_SECOND_NARRATED_STORY5_COMPLETE_USER_FINAL_DELIVERY'
+          assert m.is_file() and m.stat().st_size>60000000
+          assert hashlib.sha256(m.read_bytes()).hexdigest()==report['complete_mp4_sha256']=='84cbdaa91924cf34849419a50b32b0aaa97f626e9b50ea7495c04835311e1396'
+          assert report['frames']==1800 and report['visual_duration_seconds']==60 and report['first900_decoded_frames_exact']
+          assert report['total_final_stage_credit_spend']==8.77
+          assert (d/'EMMA_STORY5_V3_FULL60_COMPLETE_SOURCE_AND_QA.zip').is_file()
+          assert (d/'qc/ACTUAL_VIDEO_CONTACT_SHEET.jpg').is_file()
+          info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',str(m)]))
+          v=next(x for x in info['streams'] if x['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',1800)
+          assert abs(float(info['format']['duration'])-60)<.12
+          print('Verified original user-approved 60s complete film unchanged',m.stat().st_size,report['complete_mp4_sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EMMA_STORY5_FINAL60_MP4_DIRECT_MOVIE_ONLY
+          path: delivery/EMMA_STORY5_V3_FULL_60S_FINAL_NARRATED_FILM.mp4
+          compression-level: 0
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EMMA_STORY5_FINAL60_SOURCE_PROJECT_ONLY
+          path: delivery/EMMA_STORY5_V3_FULL60_COMPLETE_SOURCE_AND_QA.zip
+          compression-level: 0
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EMMA_STORY5_FINAL60_QA_CONTACT_AUDIT_ONLY
+          path: |
+            delivery/EMMA_STORY5_FULL60_FINAL_PRODUCTION_AND_SPEND_AUDIT.json
+            delivery/qc/ACTUAL_VIDEO_CONTACT_SHEET.jpg
+            delivery/qc/ACTUAL_VIDEO_QA.json
+            delivery/FFPROBE_FINAL_60S.json
+          retention-days: 30
