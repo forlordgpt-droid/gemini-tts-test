@@ -1,0 +1,163 @@
+{
+  "status": "PREPRODUCTION_ONLY",
+  "segment_absolute_start_seconds": 120,
+  "segment_end_exclusive_seconds": 150,
+  "shots": [
+    {
+      "id": "S01",
+      "source_seconds": [
+        120,
+        123.5
+      ],
+      "narration": "...entire series, so listen carefully.",
+      "composition": "Field-wide continuous geography; Hunyuan runs away from white horizon, never looks back",
+      "source_art": "ART_FIELD_WIDE_PLANNED",
+      "layers": [
+        "FG_GRASS_PLANNED",
+        "MID_FIELD_RUN_PATH_PLANNED",
+        "FAR_WHITE_HORIZON_PLANNED"
+      ],
+      "rig_action": "profile run; forward gaze; hard ground-contact shadow",
+      "camera": {
+        "fov_degrees": 40,
+        "move": "truck right",
+        "easing": "power2.inOut",
+        "purpose": "obvious grass/horizon differential parallax"
+      },
+      "environment": "dust wind, delicate grass bend; hardening rear white rim",
+      "graphics": "NONE—preserve urgent narration",
+      "audio": "Fola narrator; dry gravel steps and wind",
+      "qc": "PENDING"
+    },
+    {
+      "id": "S02",
+      "source_seconds": [
+        123.5,
+        128
+      ],
+      "narration": "Do not turn around. The flash of a nuclear detonation can cause permanent flash blindness...",
+      "composition": "Medium 3/4 side; Hunyuan keeps facing safety and raises a glove over eyes",
+      "source_art": "ART_FIELD_MEDIUM_PLANNED",
+      "layers": [
+        "FG_GRAVEL_WEEDS_PLANNED",
+        "MID_HUNYUAN_PLANE_PLANNED",
+        "FAR_FIELD_PLANNED"
+      ],
+      "rig_action": "run-to-shield-eyes extension, foot anchored; NO backwards turn",
+      "camera": {
+        "fov_degrees": 44,
+        "move": "motivated push-in plus tilt",
+        "easing": "power3.out",
+        "purpose": "isolate protective reaction"
+      },
+      "environment": "bright warm-to-white edge light; controlled dust",
+      "graphics": "DON'T TURN AROUND (Space Grotesk, brief <2s), then clear",
+      "audio": "Fola narrator; glove fabric sweep",
+      "qc": "PENDING"
+    },
+    {
+      "id": "S03",
+      "source_seconds": [
+        128,
+        134
+      ],
+      "narration": "...even retinal burns, from miles away. Your eyes are the first thing you must protect.",
+      "composition": "Illustrated dramatic face/eye protection insert; avoid simulated eye-damage gore",
+      "source_art": "ART_CLOSE_PROTECTION_PLANNED",
+      "layers": [
+        "FG_DUST_BLADES_PLANNED",
+        "MID_HUNYUAN_SHIELD_POSE_PLANNED",
+        "FAR_REAR_LIGHT_PLANNED"
+      ],
+      "rig_action": "hand/glove shield and squint, continuous eye line, active expressive response",
+      "camera": {
+        "fov_degrees": 48,
+        "move": "brief held reaction after small lateral drift",
+        "easing": "sine.inOut",
+        "purpose": "make eyes/shield gesture readable"
+      },
+      "environment": "animated glare occlusion/moving cast shadows",
+      "graphics": "brief authored protective light ray/eyeline mask, no extraneous text",
+      "audio": "Fola narrator; wind ducked for intelligibility",
+      "qc": "PENDING"
+    },
+    {
+      "id": "S04",
+      "source_seconds": [
+        134,
+        140
+      ],
+      "narration": "The blast wave hasn't arrived yet because light travels almost instantly, but pressure and sound do not.",
+      "composition": "Wide 2.5D side-perspective of huge distant white horizon and field, actor racing forward; space-time contrast",
+      "source_art": "ART_FIELD_WIDE_PLANNED",
+      "layers": [
+        "FG_OVERHANG_PLANNED",
+        "MID_HUNYUAN_AND_TRACK_PLANNED",
+        "FAR_LIGHT_PLANNED"
+      ],
+      "rig_action": "profile run with extended stride; no blast impact or manhole opening yet",
+      "camera": {
+        "fov_degrees": 38,
+        "move": "clear lateral truck and deliberate pullback",
+        "easing": "sine.inOut",
+        "purpose": "foreground overhang wipes while far horizon barely shifts"
+      },
+      "environment": "light reaches character before stylized pressure ring follows at distance",
+      "graphics": "Two restrained kinetic light vs sound lines authored in Canvas/GSAP",
+      "audio": "Fola narrator; atmosphere; pressure rumble stays distant",
+      "qc": "PENDING"
+    },
+    {
+      "id": "S05",
+      "source_seconds": [
+        140,
+        145.5
+      ],
+      "narration": "They move at roughly 340 meters per second. If the explosion is three kilometers away...",
+      "composition": "Highly art-directed countryside depth illustration with simple factual animated spatial-distance diagram overlaid",
+      "source_art": "ART_FIELD_DISTANCE_PLANNED",
+      "layers": [
+        "FG_POSTS_PLANNED",
+        "MID_RACING_HUNYUAN_PLANNED",
+        "FAR_EXPLOSION_FLASH_PLANNED"
+      ],
+      "rig_action": "continues running toward field shelter",
+      "camera": {
+        "fov_degrees": 42,
+        "move": "truck left, brief reframe to distant source",
+        "easing": "power2.inOut",
+        "purpose": "make scale and relative speed visually legible"
+      },
+      "environment": "animated dust and light separation",
+      "graphics": "340 m/s; 3 km—precisely timed, no unrelated countdown",
+      "audio": "Fola narrator; low distant delayed rumble",
+      "qc": "PENDING"
+    },
+    {
+      "id": "S06",
+      "source_seconds": [
+        145.5,
+        150
+      ],
+      "narration": "...you have around nine seconds between the flash and the shockwave. Nine seconds.",
+      "composition": "Rusted manhole visible ahead at edge of field but not reached until after 02:30; actor runs toward it, white horizon behind",
+      "source_art": "ART_MANHOLE_APPROACH_PLANNED",
+      "layers": [
+        "FG_FARM_WIRE_PLANNED",
+        "MID_HUNYUAN_MANHOLE_PLANNED",
+        "FAR_WHITENED_SKY_PLANNED"
+      ],
+      "rig_action": "last urgent run/eye shield; feet ground contacts; no opening hatch before 02:30",
+      "camera": {
+        "fov_degrees": 44,
+        "move": "push/reframe to manhole with near-wire occlusion",
+        "easing": "power2.in",
+        "purpose": "increase urgency, finish on forward safe direction"
+      },
+      "environment": "urgent shadow sweep; distant pressure ring still behind",
+      "graphics": "~9 SECONDS (short custom kinetic numeric reveal), clears before cut",
+      "audio": "Fola narrator ends cleanly before 30.0, sound does not falsely impact yet",
+      "qc": "PENDING"
+    }
+  ]
+}
