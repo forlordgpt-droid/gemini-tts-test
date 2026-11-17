@@ -71,9 +71,9 @@ jobs:
           import pathlib
           code=pathlib.Path('main.js').read_text()
           assert 'PerspectiveCamera' in code and 'gsap.timeline' in code
-          assert 'WebCodecs' in code and 'mediabunny' in code
+          assert 'Mp4OutputFormat' in code and 'CanvasSource' in code and 'mediabunny' in code
           assert 'OfflineAudioContext' in code
-          print('PASS: required Three.js, GSAP, WebCodecs, Mediabunny and WebAudio source integrations present')
+          print('PASS: required Three.js, GSAP, WebCodecs-backed Mediabunny and WebAudio source integrations present')
           PY
       - name: Upload reference ZIPs and inspection manifest
         uses: actions/upload-artifact@v4
