@@ -21,7 +21,14 @@ const bundler='/opt/cinematic/node_modules/.bin/esbuild';
 if(!fs.existsSync(bundler))throw Error('Prebuilt EXACT esbuild missing: STOP; do not npm install or swap tools');
 const src=path.resolve(project,source);
 if(!src.startsWith(project+path.sep)||!fs.existsSync(src))throw Error('Missing story-authored main.js; no generic flat substitute');
-cp.execFileSync(bundler,[src,'--bundle','--format=esm','--outfile='+path.join(project,'app.js')],{
+// Build a DERIVATIVE entry beside the story source. This does not edit the
+// authoritative native 2D Hunyuan source and imports Mediabunny ONCE.
+const sceneCode=fs.readFileSync(src,'utf8');
+const entry=path.join(project,'.v3_merged_story_entry.js');
+const v3SharedImport="import {Output as __v3Output, Mp4OutputFormat as __v3Mp4, BufferTarget as __v3Buffer, CanvasSource as __v3Canvas, Quality as __v3Quality} from 'mediabunny';\\n";
+const exportApi="\\nwindow.__hunyuanV3Mediabunny={Output:__v3Output,Mp4OutputFormat:__v3Mp4,BufferTarget:__v3Buffer,CanvasSource:__v3Canvas,Quality:__v3Quality};\\n";
+fs.writeFileSync(entry,v3SharedImport+sceneCode+exportApi);
+cp.execFileSync(bundler,[entry,'--bundle','--format=esm','--outfile='+path.join(project,'app.js')],{
  env:{...process.env,NODE_PATH:'/opt/cinematic/node_modules'},stdio:'pipe'
 });
 const server=http.createServer((req,res)=>{
