@@ -1,0 +1,88 @@
+name: Hunyuan Cinematic Engine V3 — Build and Publish Locked Environment
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/hunyuan-v3-environment.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  packages: write
+concurrency:
+  group: hunyuan-v3-locked-environment-image
+  cancel-in-progress: false
+jobs:
+  preflight-and-publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      IMAGE: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch EXACT reference MP4 from successful original GitHub Actions run
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 44029412483
+          name: HUNYUAN_FIRST_30S_PARALLAX_PREVIEW_AND_QA
+          github-token: ${{ github.token }}
+          path: film/cinematic-engine-v3/reference_input
+      - name: Block production if locked sources changed
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile,subprocess
+          root=pathlib.Path('film/cinematic-engine-v3')
+          spec=json.loads((root/'config/ORIGINAL_REFERENCE_SHA256.json').read_text())
+          for x in spec['text_files']:
+            p=root/x['path']
+            assert p.stat().st_size==x['bytes']
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256'],p
+          origin=pathlib.Path('film/hunyuan-2m')
+          for name in ('HUNYUAN_2D_CHARACTER_PACKAGE.zip','HUNYUAN_30S_PARALLAX_SOURCE.zip'):
+            x=next(v for v in spec['references'] if v['filename']==name)
+            p=origin/name
+            assert p.stat().st_size==x['bytes']
+            assert hashlib.sha256(p.read_bytes()).hexdigest()==x['sha256'],p
+            with zipfile.ZipFile(p) as z:assert z.testzip() is None
+          x=next(v for v in spec['references'] if v['filename']=='HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4')
+          movie=root/'reference_input'/x['filename']
+          assert movie.stat().st_size==x['bytes']
+          assert hashlib.sha256(movie.read_bytes()).hexdigest()==x['sha256']
+          print('PASS byte-for-byte authentic instructions, original 2D rig, original source, ACTUAL approved 30s MP4')
+          PY
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Build once and publish reusable SHA-locked production image to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: film/cinematic-engine-v3/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+          cache-from: type=gha,scope=hunyuan-engine-v3
+          cache-to: type=gha,mode=max,scope=hunyuan-engine-v3
+      - name: Confirm the published image really runs the ORIGINAL artistic source
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull "$IMAGE"
+          mkdir -p smoke-qa
+          docker run --rm --ipc=host "$IMAGE" python3 /opt/cinematic/engine/scripts/doctor.py --check
+          docker run --rm --ipc=host -e ENGINE_SMOKE_OUTPUT=/smoke-qa \
+            -v "$PWD/smoke-qa:/smoke-qa" \
+            "$IMAGE" node /opt/cinematic/engine/scripts/browser_smoke.cjs
+          test -s smoke-qa/REGRESSION_RESULTS.json
+          sha256sum film/cinematic-engine-v3/authoritative/*.txt > smoke-qa/IMMUTABLE_INSTRUCTION_FILES_SHA256.txt
+          docker image inspect "$IMAGE" --format '{{.RepoDigests}}' > smoke-qa/IMAGE_DIGEST.txt
+          echo "PASS: published reusable container, actual unchanged 2D rig and blueprint video and live camera checked"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUNYUAN_V3_ENVIRONMENT_BUILD_AND_ACTUAL_FILM_REGRESSION
+          path: smoke-qa/
+          retention-days: 30
