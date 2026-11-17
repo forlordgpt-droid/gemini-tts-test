@@ -1,0 +1,89 @@
+# THE HUNYUAN 30-SECOND CINEMATIC METHOD
+## Verified production features + reusable master instruction for any story
+
+**Production evidence:** Successful GitHub Actions run #44029412483, commit `716740ba4fb50b2d0c1ff3f033973d34a0209b34`; final `HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4`, 30 seconds, 900 frames, 1920×1080 at 30 fps, H.264 video and AAC audio.
+
+**Authoritative references:**
+- Successful run: https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44029412483
+- Render workflow: https://github.com/forlordgpt-droid/gemini-tts-test/blob/716740ba4fb50b2d0c1ff3f033973d34a0209b34/.github/workflows/hunyuan-30s-preview.yml
+- Source package: https://github.com/forlordgpt-droid/gemini-tts-test/blob/716740ba4fb50b2d0c1ff3f033973d34a0209b34/film/hunyuan-2m/HUNYUAN_30S_PARALLAX_SOURCE.zip
+- Original 2D character package: https://github.com/forlordgpt-droid/gemini-tts-test/blob/716740ba4fb50b2d0c1ff3f033973d34a0209b34/film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip
+- Art-direction review: https://github.com/forlordgpt-droid/gemini-tts-test/blob/716740ba4fb50b2d0c1ff3f033973d34a0209b34/film/hunyuan-2m/art-direction-review/ART_DIRECTION_FIRST_30S.md
+
+**Accuracy note:** The features below are corroborated by the video, workflows, QA JSON or art-direction plan. Exact numeric camera coordinates/easing curves in the source ZIP were not individually inspected here; any new LLM should open the source and recover them rather than inventing those settings. Space Grotesk/Inter were **specified in art direction**, but font embedding in this particular MP4 was not separately audited. Six earlier style-frame images were generated through SnapGen Nano Banana 2; the successful 30-second render made **zero additional paid media-generation calls**.
+
+## What produced the improved look
+
+1. **Cohesive high-end 2D illustrated art direction:** painterly hand-drawn rooms, detailed bed, table, lamp, plants, books, curtains, framing architecture, texture, depth, window views and accents. Avoid stock images, flat geometric rooms, photorealism and generic backgrounds.
+2. **Color script:** cobalt/indigo blue hour with teal fabrics and warm amber practical lamps; transition into magenta/cyan siren lighting and restricted emergency red. Maintain color contrast, focus and continuity.
+3. **Six intentionally designed 5-second shot compositions:** 00–05 bedroom, 05–10 coffee/desk, 10–15 curtains/last normal morning, 15–20 siren/character reaction, 20–25 vibrating phone, 25–30 alert reveal. For other stories, let narration dictate shot lengths rather than imposing rigid five-second cuts.
+4. **True 2.5D multiplane construction:** in the successful source were six JPG compositions and 12 WebP layer assets. Foreground, midground and background are differentiated and moved at different speeds; create clean painted-out patches, transparent mattes and overscan before camera movement. A single flattened image with a zoom is insufficient.
+5. **Three.js PerspectiveCamera:** perspective-based push/dolly/truck/countertrack/tilt and intentional reframing. Put separate illustrated planes at distinct Z depths; test for clipping and blank seams.
+6. **GSAP deterministic timeline:** absolute-time paths, eased transitions and synchronized camera/graphics. The same time `t` must produce exactly the same frame, independent of playback speed or random state.
+7. **Original authored character rig:** use the Hunyuan `art.js`/`engine.js` native 2D animation where present. Never swap character identity or replace it with a 3D model or a generic AI cutout. Keep pose, gaze, emotion, contact and character scale consistent.
+8. **Ambient animation and performance:** a living room with subtle drifting/steaming/swaying elements, sleeping/reaction poses, believable facial emotion, rather than a static image that only pans.
+9. **Camera-guided visual hierarchy:** foreground lamps/plants/curtains and close-up phone wipe past the camera; the character and action stay readable; no random camera movement.
+10. **Motion graphics tied to meaning:** quiet timestamp, meeting callout, 'last normal morning', siren ribbons, phone vibration rings, emergency alert and action callout. These are interpretive graphics, not decorative particle spam.
+11. **Compact temporary text labels:** small editorial capsules at the top; show only for needed beats, commonly ~1–2 seconds when legibility permits. Avoid permanent big captions or obscuring faces.
+12. **Typography:** the production art-direction specifies Space Grotesk Bold for display and Inter Regular/Medium for supporting interface; create text via SVG/Canvas during rendering so it is crisp and editable, with licensing respected.
+13. **Large scene-specific UI:** substantial red smartphone emergency-alert panel with clean hierarchy; maintain legible words and purposeful emphasis; preserve subject framing.
+14. **Timing-driven tension:** slower camera and softer color at the start, quicker visual cues and warning hues with the siren, and a stronger push/reframe for the alert.
+15. **Audio design:** reuse existing KIE.ai Gemini 3.8 Flash-Lite narration; generate original siren/phone effects with WebAudio OfflineAudioContext; mix in FFmpeg (successful workflow used narration volume 1.0 and SFX volume 0.17, with a 0.45-second fade out starting at 29.55s).
+16. **Parallel technical workflow:** three GitHub Actions render shards, 300 frames/10 seconds each; source validation, Playwright Chromium, WebCodecs + Mediabunny encoding, FFprobe checks, FFmpeg concat and final audio assembly, plus contact-sheet production.
+17. **Hard QA gates:** deliver exactly 900 frames over 30.00 seconds at 1920×1080/30 fps H.264/AAC, verify video/audio decodability, generate a contact sheet and visually inspect the real render, not just reference stills. The original technical status read `TECHNICAL_PASS_VISUAL_REVIEW_REQUIRED`, which means the technical pass was not a substitute for artistic approval.
+
+## Shot recipe from the verified example
+
+| Time | What the audience sees | Camera and depth | Timed graphic or FX |
+|---|---|---|---|
+| 00–05 | Warm lamplit bedroom, sleeping character, leafy foreground, city behind window | Low lateral dolly + subtle push; foreground lamp and plant travel faster than distant buildings | `TUESDAY / 06:41`, restrained room ambience |
+| 05–10 | Coffee steaming on desk, notebook/calendar, clock, everyday bedroom | Low tabletop track and layering; mug/steam closest, desk and room farther | `09:00 / MEETING` for a brief readable interval; steam curls |
+| 10–15 | View past sheer curtains toward the bed and dawn | Gentle through-curtain drift; passing transparent near planes, distant window | `THE LAST NORMAL MORNING`, low-key tension |
+| 15–20 | Hunyuan surprised with eerie magenta/cyan light, bedroom behind | Medium push/reframe; independent curtain/backdrop motion | `SIREN DETECTED`; stylized cyan-magenta flowing sound ribbons |
+| 20–25 | Phone glowing/vibrating on nearby furniture, character responding | Truck toward phone and character; strong foreground emphasis | `NOT A TEST`; repeated concentric red alert rings |
+| 25–30 | Oversized red warning phone foreground, character and room at side | Snap push to phone then composed reveal with both phone and character | `TAKE ACTION NOW`; red sound/radio arcs, legible `EMERGENCY ALERT` / `MISSILE THREAT INBOUND` / `SEEK SHELTER IMMEDIATELY` |
+
+For other stories, **do not copy these room/phone/alert specifics**. Recreate the system: rich stylized assets, storytelling shot design, separated parallax, motivated camera, character performance, contextual overlays and properly mixed sound.
+
+---
+
+# COPY-PASTE MASTER INSTRUCTION FOR ANOTHER LLM
+
+You are the **Animation Director, Art Director, Motion Designer, Technical Director and Film Editor** for a premium illustrated 2D animated short. Your job is to transform the attached story into a dazzling but clear cinematic animation using the same PRODUCTION METHOD as the successful Hunyuan first-30-second preview. Treat the named Hunyuan GitHub commit, source ZIP, rig ZIP, workflow and art-direction document above as the highest-fidelity implementation references when they are accessible. If absent, recreate the same method with equivalent ORIGINAL assets and the exact required tools below.
+
+## A. Mandatory style and art design
+- Film is **2D illustrated animation with camera-based 2.5D depth**, not photorealistic footage and not volumetric 3D characters. Three.js supplies *camera geometry*, not a switch to 3D-looking human characters.
+- Before rendering, make a **visual style bible**: reference character sheet, palettes, shapes, line weights, prop designs, perspective rules, lighting and six or more high-quality concept compositions as required by story density.
+- For each beat create richly illustrated environments with recognizable architecture, props, texture, atmospheric perspective, pools of light, cohesive palette and actual action staging. Convey the story visually; avoid empty gradients, generic icon templates and lazy flat backgrounds.
+- Plan foreground, midground, character plane and rear environment separately. Segment source illustrations into genuine transparent layers with clean removed-object patches and sufficient overscan for camera moves. Do not merely scale a single flattened image.
+- If the story's art style requires different colors than Hunyuan's indigo/amber/red, adapt colors thoughtfully while preserving richness, depth and motivated light changes.
+
+## B. Storyboard and cinematography
+- Read the complete requested story excerpt and narration. Mark exact beat in/out, spoken cue, location, mood, desired visual, subject action, action payoff, graphic purpose, lighting, camera move, transition and sound for **every shot**.
+- Choose shot lengths from narrative action (establishing, inserts, reactions, reveals). Aim for high density of meaningful changes, but never cut merely to meet an arbitrary shot count. In a 30-second demonstration, six ~5-second compositions worked well.
+- Mix gentle lateral dollies, controlled push-ins, foreground wipes, low-angle table tracks, curtain/window moves, motivated rack-like scale shifts, reaction holds and dramatic snap pushes. Never do the same Ken Burns zoom on all shots.
+- Use a **Three.js PerspectiveCamera** with distinct depth planes, compositional parallax and carefully controlled Z-distance. Ensure near objects move more than far objects; track through environmental elements to produce credible depth.
+- Drive camera, layers, labels and effects with **GSAP paused/absolute-time timelines**. Sample directly at `t = frame / fps`, so render is deterministic and independently shardable. Synchronize visual events to measured narration/audio timestamps.
+- Treat characters as performers: pose changes, gaze, blinks, facial reaction, gestures, stable proportions and believable ground contact. If an existing native 2D rig is supplied, use it, not a replacement AI-generated static cutout.
+
+## C. Motion graphics and sound
+- For meaningful events build small, professionally designed kinetic explanatory elements: siren frequency ribbons, reverberation lines, pulse rings, hand-drawn highlights, phone UI reveals, directional arrows, map routes, countdowns, particle dust, soft steam, etc. **Only if the story calls for them.**
+- Keep captions as short context graphics instead of clutter. Use a licensed modern display face (Space Grotesk Bold is one approved direction) and readable UI face (Inter Medium/Regular). Typeset in SVG/Canvas at export resolution; carefully control padding, contrast, duration, safe areas and hierarchy.
+- Color-grade and light the whole scene around action: subtle practical ambience, light direction, silhouettes, shadows, attention-guiding bloom only when appropriate, event-driven hue shifts. Avoid blown highlights and noisy overlays.
+- Narration stays intelligible and uncut. For Hunyuan, existing approved Gemini 3.8 Flash-Lite TTS should be reused. Build original story-appropriate sound with WebAudio OfflineAudioContext, then mix using FFmpeg. The demonstrated Hunyuan SFX mix level was 0.17 relative to narration 1.0; for other material adjust using a real listening pass, not by assuming these are universal loudness standards.
+
+## D. Required technical stack and quality
+- For this Hunyuan project, use **original Hunyuan art.js and engine.js**, **Three.js PerspectiveCamera**, **GSAP paused timelines**, **SVG/Canvas2D**, **WebAudio OfflineAudioContext**, **WebCodecs**, **Mediabunny**, **FFmpeg**, **FFprobe** and **Playwright**. If any required component fails, **stop and report it; do not silently swap the toolchain**.
+- Render 16:9, 1920×1080, 30 fps; for a 30-second pilot, exactly 900 frames. Split jobs into three 10-second independent shards on GitHub Actions if convenient; encode H.264 at 30 fps and assemble with FFmpeg; preserve time continuity and audio alignment.
+- Validate dependencies; verify every shard's frame count and duration; assemble final AAC narration/SFX mix; generate timestamped contact sheet and metadata QC. Inspect 0, 5, 10, 15, 20, 25 and final seconds **plus intermediate frames around every action and cut**. Look for frozen foreground, flat parallax, clipping, layer holes, giant captions, strange poses, lip/audio mismatch, dead time and unintended discontinuity.
+- Deliver: a playable 30-second MP4, contact sheet, source/project package, rendering commands, QC JSON, clear visual-review notes and a durable accessible file link. A pass from FFprobe does not prove the film is visually excellent.
+
+## E. Spending permissions
+- Do **not** call SnapGen, image, video, TTS, music or other paid/credit-consuming APIs without explicit owner approval of provider, specific model, number of jobs, per-job estimated cost and total. Approval of a *style* is not permission to spend.
+- First reuse the provided character package, previously approved illustrations, narration and assets. If new paid art is needed, explain the blocker and compare cheaper compatible models for approval; never consume expensive credits silently. Rendering and code-based effects should use existing authorized GitHub Actions CPUs when appropriate.
+
+## F. Creative acceptance gate
+- Before calling the video complete, show actual animated footage and answer: Are the environments truly beautiful? Are the parallax layers separate? Does the camera visibly move with purpose? Is the character really performing? Does every graphic communicate something? Does the soundtrack support the edit? Is the color narrative coherent? Is each crucial story beat visualized without needless clutter? Are all frames technically and editorially sound?
+- If the animation merely displays static images with a digital zoom, **REJECT IT and improve the scene construction**.
+
+**Input to process:** [PASTE OR ATTACH STORY + PROVIDED RIG/ASSETS + AUDIO + DURATION]. Execute the first 30 seconds as a review gate, and do not proceed with the rest until review approval. Prefer existing assets and no new paid generation unless separately authorized.
