@@ -1,5 +1,5 @@
 name: Hunyuan Cinematic Engine V3 — Build and Publish Locked Environment
-# Rebuild: official esbuild module lookup via NODE_PATH, preserving exact JS dependencies.
+# V3 full release: immutable art directives and real original video, offline source bundle, validated longform planner and no-install CPU shards.
 on:
   push:
     branches: [hunyuan-cinematic-engine-v3-20261117]
@@ -27,6 +27,17 @@ jobs:
           name: HUNYUAN_FIRST_30S_PARALLAX_PREVIEW_AND_QA
           github-token: ${{ github.token }}
           path: film/cinematic-engine-v3/reference_input
+      - name: Build the offline production source + unchanged original video/rig/instruction ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 film/cinematic-engine-v3/scripts/package_release.py
+          test -s release/HUNYUAN_CINEMATIC_ENGINE_V3_SOURCE_AND_UNCHANGED_REFERENCES.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_OFFLINE_ENGINE_AND_UNCHANGED_USER_REFERENCES
+          path: release/HUNYUAN_CINEMATIC_ENGINE_V3_SOURCE_AND_UNCHANGED_REFERENCES.zip
+          retention-days: 30
       - name: Block production if locked sources changed
         run: |
           set -euo pipefail
@@ -74,6 +85,8 @@ jobs:
           docker pull "$IMAGE"
           mkdir -p smoke-qa
           docker run --rm --ipc=host "$IMAGE" python3 /opt/cinematic/engine/scripts/doctor.py --check
+          docker run --rm --ipc=host "$IMAGE" bash -lc "python3 -m compileall -q /opt/cinematic/engine/scripts && test -s /opt/cinematic/engine/scripts/temporal_export.bundle.js"
+          docker run --rm --ipc=host "$IMAGE" python3 /opt/cinematic/engine/scripts/orchestrator.py plan --manifest /opt/cinematic/engine/examples/APPROVED_ORIGINAL_30S_REFERENCE_STORY.json --phase first30 --shard-seconds 10 --max-parallel 8
           docker run --rm --ipc=host -e ENGINE_SMOKE_OUTPUT=/smoke-qa \
             -v "$PWD/smoke-qa:/smoke-qa" \
             "$IMAGE" node /opt/cinematic/engine/scripts/browser_smoke.cjs
