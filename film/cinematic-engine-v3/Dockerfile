@@ -31,9 +31,8 @@ RUN mkdir -p /opt/cinematic/examples/preview_30s/rig \
     && unzip -q /opt/cinematic/references/HUNYUAN_30S_PARALLAX_SOURCE.zip \
     && unzip -p /opt/cinematic/references/HUNYUAN_2D_CHARACTER_PACKAGE.zip HUNYUAN_2D/art.js > /opt/cinematic/examples/preview_30s/rig/art.js \
     && unzip -p /opt/cinematic/references/HUNYUAN_2D_CHARACTER_PACKAGE.zip HUNYUAN_2D/engine.js > /opt/cinematic/examples/preview_30s/rig/engine.js \
-    && /opt/cinematic/node_modules/.bin/esbuild /opt/cinematic/examples/preview_30s/main.js \
-      --bundle --format=esm --outfile=/opt/cinematic/examples/preview_30s/app.js \
-      --node-path:/opt/cinematic/node_modules
+    && NODE_PATH=/opt/cinematic/node_modules /opt/cinematic/node_modules/.bin/esbuild /opt/cinematic/examples/preview_30s/main.js \
+      --bundle --format=esm --outfile=/opt/cinematic/examples/preview_30s/app.js
 # Source instructions are copied UNCHANGED; SHA256 checks must pass or build fails.
 RUN python3 /opt/cinematic/engine/scripts/doctor.py --check
 ENTRYPOINT ["/usr/bin/tini","--"]
