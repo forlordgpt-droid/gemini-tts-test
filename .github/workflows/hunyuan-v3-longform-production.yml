@@ -1,0 +1,185 @@
+name: Hunyuan V3 — Reusable Exact-Stack Story Plan and Parallel CPU Render (NO PAID API)
+on:
+  workflow_dispatch:
+    inputs:
+      manifest_path:
+        description: "Existing story-specific JSON manifest in repo; BOTH original art directives remain mandatory"
+        required: true
+        type: string
+        default: film/cinematic-engine-v3/examples/APPROVED_ORIGINAL_30S_REFERENCE_STORY.json
+      project_dir:
+        description: "Story-authored illustrated Three.js/GSAP project with index.html, main.js and approved layered images"
+        required: true
+        type: string
+        default: film/cinematic-engine-v3/examples/preview_30s
+      mode:
+        description: "Plan only (safe default) or render using PRE-APPROVED assets/audio only"
+        required: true
+        type: choice
+        default: plan
+        options: [plan, render]
+      phase:
+        description: "10s draft first, 30s approval second, remainder only after BOTH approvals"
+        required: true
+        type: choice
+        default: first10
+        options: [first10, first30, remainder, all]
+      approved_audio_file:
+        description: "Required for render: synced preapproved WAV with original WebAudio SFX + authorized Kie dialogue; never auto-TTS"
+        required: false
+        type: string
+        default: ""
+      assets_run_id:
+        description: "Optional existing GitHub Actions artifact run ID containing APPROVED imagery/sound (no generation)"
+        required: false
+        type: string
+        default: ""
+      assets_artifact_name:
+        description: "Optional existing asset-artifact name"
+        required: false
+        type: string
+        default: ""
+permissions:
+  contents: read
+  actions: read
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove original unchanged creative instructions + 2D rig and actual video baseline
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Stop if unapproved 30s/remainder or wrong models, then create deterministic 10s CPU shards
+        id: plan
+        env:
+          PHASE: ${{ inputs.phase }}
+          MANIFEST: ${{ inputs.manifest_path }}
+          MODE: ${{ inputs.mode }}
+          AUDIO: ${{ inputs.approved_audio_file }}
+        run: |
+          set -euo pipefail
+          if [ "$MODE" = render ] && [ -z "$AUDIO" ]; then
+            echo "No preapproved synchronized audio specified; STOP, do not substitute" >&2
+            exit 1
+          fi
+          mkdir -p build
+          python3 /opt/cinematic/engine/scripts/orchestrator.py validate --manifest "$MANIFEST" --phase "$PHASE"
+          python3 /opt/cinematic/engine/scripts/orchestrator.py plan --manifest "$MANIFEST" --phase "$PHASE" --shard-seconds 10 --max-parallel 8 --out build/plan.json
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open('build/plan.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+            out.write('matrix='+json.dumps(d['matrix'],separators=(',',':'))+'\n')
+          print('PASS planned',d['shard_count'],'CPU shards; no new paid media API calls')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_PLAN
+          path: build/plan.json
+          retention-days: 30
+
+  render:
+    needs: plan
+    if: inputs.mode == 'render'
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve existing approved story assets from GitHub artifact only if supplied
+        if: inputs.assets_run_id != '' && inputs.assets_artifact_name != ''
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.assets_run_id }}
+          name: ${{ inputs.assets_artifact_name }}
+          github-token: ${{ github.token }}
+          path: ${{ inputs.project_dir }}
+      - name: Restore only exact same-version, same-SHA successful CPU shard from cache
+        id: cached
+        uses: actions/cache/restore@v4
+        with:
+          key: hunyuan-v3-cpu-${{ github.sha }}-${{ matrix.cache_key }}
+          path: build/shard
+      - name: Render 1080p THREE/GSAP/V3 local-PTS WebCodecs segment, NO installs
+        if: steps.cached.outputs.cache-hit != 'true'
+        env:
+          PROJECT_DIR: ${{ inputs.project_dir }}
+          START_FRAME: ${{ matrix.start_frame }}
+          FRAME_COUNT: ${{ matrix.duration_frames }}
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "$GITHUB_WORKSPACE/$PROJECT_DIR" \
+            --start-frame "$START_FRAME" --frame-count "$FRAME_COUNT" --out build/shard
+      - name: Save validated checkpoint for reruns of exactly the same version
+        if: steps.cached.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: hunyuan-v3-cpu-${{ github.sha }}-${{ matrix.cache_key }}
+          path: build/shard
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_SHARD_${{ matrix.start_frame }}
+          path: build/shard
+          if-no-files-found: error
+          retention-days: 30
+
+  assemble:
+    needs: [plan,render]
+    if: inputs.mode == 'render'
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine:v3.0.0-locked
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_V3_PLAN
+          path: build
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: HUNYUAN_V3_SHARD_*
+          path: build/chunk_artifacts
+      - name: Restore already-approved/paid audio asset only, never create a TTS task
+        if: inputs.assets_run_id != '' && inputs.assets_artifact_name != ''
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.assets_run_id }}
+          name: ${{ inputs.assets_artifact_name }}
+          github-token: ${{ github.token }}
+          path: ${{ inputs.project_dir }}
+      - name: Assemble local-PTS verified shots, sound and real video QA
+        env:
+          APPROVED_AUDIO: ${{ inputs.approved_audio_file }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/shards build/final build/qc
+          find build/chunk_artifacts -name 'part_*.mp4' -type f -exec cp {} build/shards/ \;
+          test -s "$APPROVED_AUDIO" || { echo 'Missing approved story-specific Kie/WebAudio sound: BLOCKED' >&2; exit 1; }
+          python3 /opt/cinematic/engine/scripts/assemble_shards.py \
+            --plan build/plan.json --chunks-dir build/shards --approved-audio "$APPROVED_AUDIO" \
+            --out build/final/HUNYUAN_V3_ACTUAL_FILM_REQUIRES_ART_REVIEW.mp4 --qc-dir build/qc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_VIDEO_SOURCE_AND_QA_FOR_GOOGLE_DRIVE
+          path: |
+            build/final/
+            build/qc/
+            build/plan.json
+          retention-days: 30
