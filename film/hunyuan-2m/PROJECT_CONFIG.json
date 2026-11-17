@@ -46,5 +46,7 @@
   "STORY_END_EXCLUSIVE": "02:00.000",
   "AVOID_SPOILERS_AFTER_02_00": true,
   "ART_DIRECTION": "Rich cobalt-blue pre-dawn and warm amber domestic interiors transition to jade, coral and signal red emergency illumination. Clear hand-drawn SVG paths, painterly gradients, bold friendly contour shapes, multi-plane tracking. No photorealism.",
-  "PRODUCTION_STATUS": "SCOPING_PREP_ONLY_NOT_RENDERED"
+  "PRODUCTION_STATUS": "EIGHT_SECOND_TECHNICAL_GATE_PASSED_FULL_120_PENDING",
+  "EIGHT_SECOND_QA_RUN": 44017410107,
+  "EIGHT_SECOND_PREVIEW_DRIVE_URL": "https://drive.google.com/file/d/11ZQieloeImGWpeVEzw2Gxh6ebmM-YVMv/view?usp=drivesdk"
 }
