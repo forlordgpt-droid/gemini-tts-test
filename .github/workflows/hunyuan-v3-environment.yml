@@ -91,9 +91,26 @@ jobs:
             -v "$PWD/smoke-qa:/smoke-qa" \
             "$IMAGE" node /opt/cinematic/engine/scripts/browser_smoke.cjs
           test -s smoke-qa/REGRESSION_RESULTS.json
+          # Exercise the ACTUAL reusable WebCodecs shard exporter in the new published
+          # image. A basic browser smoke is insufficient: reject double Mediabunny
+          # imports, malformed H264 timestamps, or visually frozen footage.
+          docker run --rm --ipc=host \
+            -v "$PWD/smoke-qa:/smoke-qa" \
+            "$IMAGE" node /opt/cinematic/engine/scripts/render_shard.cjs \
+              --project /opt/cinematic/examples/preview_30s \
+              --start-frame 0 --frame-count 150 --out /smoke-qa/actual-shard
+          python3 - <<'PY'
+          import json,pathlib
+          qc=pathlib.Path('smoke-qa/actual-shard/shard_qc.json')
+          assert qc.is_file(), 'Actual Hunyuan V3 video shard did not pass QA'
+          data=json.loads(qc.read_text())
+          assert data['pass'] and data['frame_count']==150 and data['visible_frame_change'] and data['deterministic'],data
+          assert data['first_pts']==0 and data['fps'] if 'fps' in data else data['first_pts']==0
+          print('PASS immutable Hunyuan real 150-frame 2.5D WebCodecs/Mediabunny exporter',data)
+          PY
           sha256sum film/cinematic-engine-v3/authoritative/*.txt > smoke-qa/IMMUTABLE_INSTRUCTION_FILES_SHA256.txt
           docker image inspect "$IMAGE" --format '{{.RepoDigests}}' > smoke-qa/IMAGE_DIGEST.txt
-          echo "PASS: published reusable container, actual unchanged 2D rig and blueprint video and live camera checked"
+          echo "PASS: published reusable container, original 2D rig, real authored 150-frame WebCodecs export, actual video and camera checked"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
