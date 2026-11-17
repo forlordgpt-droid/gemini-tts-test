@@ -3,7 +3,7 @@
   "source": "user supplied story5.txt",
   "authoritative_story": "film/story5-v3/STORY5_NARRATION_LOCKED_MASTER.md",
   "milestone": "FIRST10_ONLY",
-  "approval_user": "Approved preparation of corrected narration-driven draft; no quantified spending limit approved after preflight disclosure",
+  "approval_user": "User explicitly approved ONE Kie.ai google/gemini-3-8-flash-tts generation request with a 5-credit proposed maximum, acknowledging Kie.ai cannot enforce hard charge cap automatically",
   "title": "Emma: The Safe Room",
   "narration_mode": "SINGLE_NARRATOR_VERBATIM",
   "scene_1_00_to_15": "Entire city evacuated, toxic yellow gas, Emma trapped and running, phone rings ONLY near second 15",
@@ -18,8 +18,12 @@
     "estimated_credits_per_job": "about 0.4–1.0",
     "proposed_max_credits": 5,
     "hard_cap_enforceable_by_provider": false,
-    "authorized_credits": 0,
-    "paid_generation_disabled": true
+    "authorized_credits": 5,
+    "paid_generation_disabled": false,
+    "approved_generation_jobs": 1,
+    "automatic_retries_allowed": false,
+    "approval_scope": "ONE SINGLE NARRATOR JOB for first10 of story5 only",
+    "user_acknowledged_no_hard_cap": true
   },
   "image_reuse": {
     "provider": "SnapGen",
