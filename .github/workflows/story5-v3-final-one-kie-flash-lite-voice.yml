@@ -1,0 +1,61 @@
+name: Emma Story5 V3 — Final 30–60 EXACT ONE Kie Flash-Lite Charon Narrator (MAX4 Credits)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-final-one-kie-flash-lite-voice.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: story5-final-30to60-one-paid-kie-job-ever
+  cancel-in-progress: false
+defaults:
+  run:
+    shell: bash
+jobs:
+  one-authorized-kie-task:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable original native Hunyuan V3 reference and exact software toolchain
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Confirm user's story5 full-video authorization, exact model and source words, one-job limit
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import ast,json,os
+          m=json.loads(Path('film/story5-v3/final-30to60/FINAL_30TO60_APPROVED_PRODUCTION_MANIFEST.json').read_text())
+          assert m['approve_first30']['do_not_change'] is True
+          assert m['source_narration_30_60']==m['source_narration_30_45']+' '+m['source_narration_45_60']
+          assert m['words']==85 and m['tts_model']=='google/gemini-3-8-flash-lite-tts'
+          assert m['story_mode']=='VERBATIM_SINGLE_NARRATOR_NOT_DIALOGUE'
+          c=m['credit_plan']
+          assert c['new_tts_jobs_max']==1 and c['tts_credit_budget_max']==4 and c['stage_new_credits_cap']==12
+          assert c['no_auto_paid_retry'] is True and c['provider_enforces_hard_spend_limit'] is False
+          assert os.environ.get('GITHUB_RUN_NUMBER')=='1' and os.environ.get('GITHUB_RUN_ATTEMPT')=='1'
+          s=Path('film/story5-v3/final-30to60/generate_one_approved_kie_flash_lite_85_words.py').read_text()
+          ast.parse(s)
+          assert s.count('task=req("/api/v1/jobs/createTask",payload)')==1
+          print('APPROVED one Kie Flash-Lite narration task, estimated under 2 credits, ceiling 4 credits, provider does not enforce hard cap, automatic retry disabled')
+          PY
+      - name: Generate and audit exactly ONE approved Flash-Lite TTS voice for all 85 original narrator words
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/final-30to60/generate_one_approved_kie_flash_lite_85_words.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EMMA_STORY5_V3_FINAL_30TO60_CHARON_KIE_ONE_JOB_VOICE_CREDIT_QA
+          path: emma_story5_final_kie_voice/
+          if-no-files-found: warn
+          retention-days: 30
