@@ -1,0 +1,1 @@
+{"name":"last-safe-room-20s-illustrated-cinematic","private":true,"version":"1.0.0","type":"module","scripts":{"build":"esbuild main.js --bundle --format=esm --outfile=app.js","test":"node test-playwright.cjs"},"dependencies":{"three":"0.187.0","gsap":"3.15.1","mediabunny":"1.66.0"},"devDependencies":{"esbuild":"0.25.12","playwright":"1.65.1"}}
