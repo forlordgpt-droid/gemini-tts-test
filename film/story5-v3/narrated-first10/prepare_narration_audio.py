@@ -49,7 +49,7 @@ with wave.open(str(out),"rb") as w:
 assert sec>4 and sec<=9.84,("Voice cannot fit into first ten seconds",sec)
 o={
  "status":"AUDIO_TIMING_TECHNICAL_PASS; ACTUAL WORDS REQUIRE LISTENING REVIEW",
- "provider":"kie.ai","model":"google/gemini-3-8-flash-tts",
+ "provider":"kie.ai","model":"google/gemini-3-8-flash-lite-tts",
  "original_wave_duration_seconds":round(duration,3),
  "trimmed_outer_silence_start_seconds":round(begin,4),
  "trimmed_outer_silence_end_seconds":round(duration-end,4),
