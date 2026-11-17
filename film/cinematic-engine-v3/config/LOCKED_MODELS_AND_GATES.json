@@ -1,0 +1,90 @@
+{
+  "engine": "Hunyuan Cinematic Production Engine V3",
+  "visual_style": "image-first 2D illustrated cinematic with genuine 2.5D camera depth",
+  "camera_3d_geometry_only": true,
+  "characters_must_remain_2d": true,
+  "exact_models": {
+    "illustrations": {
+      "provider": "SnapGen",
+      "model": "gpt-image-2.5-lower"
+    },
+    "speech": {
+      "provider": "kie.ai",
+      "model": "google/gemini-3-8-flash-tts"
+    }
+  },
+  "no_substitutions": true,
+  "paid_generation_default": "DISABLED",
+  "approved_generation_must_name": [
+    "provider",
+    "exact_model",
+    "number_of_jobs",
+    "cost_per_job_estimate",
+    "maximum_total_cost"
+  ],
+  "working_tools": [
+    "Three.js PerspectiveCamera",
+    "GSAP",
+    "original Hunyuan art.js",
+    "original Hunyuan engine.js",
+    "SVG + Canvas2D",
+    "Pillow",
+    "OpenCV",
+    "Web Audio OfflineAudioContext",
+    "WebCodecs",
+    "Mediabunny",
+    "FFmpeg",
+    "FFprobe",
+    "Playwright",
+    "GitHub Actions",
+    "Google Drive"
+  ],
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "h264_aac_mp4",
+    "aspect_ratio": "16:9"
+  },
+  "human_approval_gates": [
+    {
+      "phase": "first 10 seconds",
+      "render": "uncorrected draft",
+      "purpose": "visually approve look, depth, animation, camera and typography"
+    },
+    {
+      "phase": "first complete 30 seconds",
+      "purpose": "approve before producing remainder, even if story is 15 minutes"
+    }
+  ],
+  "longform": {
+    "frames_per_second": 30,
+    "example_seconds": 900,
+    "expected_total_frames": 27000,
+    "default_shard_seconds": 10,
+    "default_max_parallel": 8,
+    "resume_completed_shards": true
+  },
+  "required_visual_checks": [
+    "at normal playback speed",
+    "illustration beauty and unique story beats",
+    "real independent depth-layer parallax",
+    "visible deliberate camera movement",
+    "living environments",
+    "contextual motion graphics",
+    "character action and identity",
+    "audio/dialogue alignment",
+    "non-frozen frames",
+    "no clipping or layer holes"
+  ],
+  "forbidden": [
+    "photorealistic environments",
+    "3D rendered human characters",
+    "flat SVG city backgrounds",
+    "uniform Ken Burns zoom",
+    "static slideshow",
+    "generic decorative effects",
+    "unapproved paid tasks",
+    "silently substituted libraries or models"
+  ]
+}
