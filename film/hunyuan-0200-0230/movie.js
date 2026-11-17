@@ -22,6 +22,8 @@ let renderer,scene,camera,actorCanvas,actorCtx,actorTexture,actorMesh,graphicCan
 let activeGroup=null;
 let lastTime=-1,ready=false;let snapshot={};
 window.__HUNYUAN_READY=false;
+window.__EXPORT_ERROR=null;
+window.__EXPORT_DONE=false;
 window.__planSummary=spec.map(x=>({id:x.id,at:[x.start,x.end],source:x.art}));
 window.__qc={status:'UNRENDERED',sources:[],samples:[]};
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n)),smooth=t=>t*t*(3-2*t);
@@ -242,14 +244,15 @@ async function exportSegment(){
   for(let i=0;i<frames;i++){
    await renderAt((shard*300+i)/FPS);
    await source.add(i/FPS,1/FPS,{keyFrame:i===0||i%60===0});
-   if(i%30===0){status.textContent='Encoding '+(i+1)+' / '+frames+' on public CPU shard '+shard;await new Promise(r=>setTimeout(r,0));}
+   if(i%30===0){status.textContent='Encoding '+(i+1)+' / '+frames+' on public CPU shard '+shard;console.log('[ENCODE_PROGRESS] '+(i+1)+'/'+frames+' shard '+shard);await new Promise(r=>setTimeout(r,0));}
   }
   await output.finalize();
   if(!output.target.buffer || output.target.buffer.byteLength<20000 || !(output.target.buffer instanceof ArrayBuffer || ArrayBuffer.isView(output.target.buffer))) throw Error('Mediabunny produced no valid MP4 bytes');
   window.__qc.status='TECHNICAL_ENCODE_READY_VISUAL_AUDIT_PENDING';window.__qc.encoded_frames=frames;
   downloadBlob(output.target.buffer,frames===150?'gate_5s.mp4':'part_'+shard+'.mp4','video/mp4');
+  window.__EXPORT_DONE=true;
   status.textContent='Encoded '+frames+' frames with Mediabunny and WebCodecs';
- }catch(e){console.error(e);status.textContent='HARD STOP: '+e.message;throw e;}
+ }catch(e){window.__EXPORT_ERROR=String(e?.stack||e);console.error('ENCODER_ERROR',e);status.textContent='ENCODER ERROR: '+e.message;throw e;}
 }
 window.exportSegment=exportSegment;
 function wavFromPCM(audio){
