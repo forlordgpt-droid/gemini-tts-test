@@ -8,7 +8,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: story5-v3-first10-\${{ github.ref }}
+  group: story5-v3-first10-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   prepare:
@@ -16,8 +16,8 @@ jobs:
     container:
       image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
       credentials:
-        username: \${{ github.actor }}
-        password: \${{ github.token }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - name: Verify entire original V3 exact stack; no substitutions
@@ -35,7 +35,7 @@ jobs:
         with:
           name: LSR_PREPARED_10S_PLANES
           run-id: 44104478064
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: film/story5-v3/first10
       - name: Enforce story5 caller anonymity and no new paid images
         run: |
@@ -80,8 +80,8 @@ jobs:
     container:
       image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
       credentials:
-        username: \${{ github.actor }}
-        password: \${{ github.token }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -100,14 +100,14 @@ jobs:
           python3 /opt/cinematic/engine/scripts/doctor.py --check
       - name: Render authored 2.5D story with THREE PerspectiveCamera + GSAP + WebCodecs Mediabunny
         env:
-          START: \${{ matrix.start_frame }}
+          START: ${{ matrix.start_frame }}
         run: |
           set -euo pipefail
           node /opt/cinematic/engine/scripts/render_shard.cjs --project film/story5-v3/first10 --start-frame "$START" --frame-count 150 --out shard
-          test -s "shard/part_\${START}_150.mp4"
+          test -s "shard/part_${START}_150.mp4"
       - uses: actions/upload-artifact@v4
         with:
-          name: STORY5_V3_FIRST10_SHARD_\${{ matrix.start_frame }}
+          name: STORY5_V3_FIRST10_SHARD_${{ matrix.start_frame }}
           path: shard/
           retention-days: 30
   assemble:
@@ -116,8 +116,8 @@ jobs:
     container:
       image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
       credentials:
-        username: \${{ github.actor }}
-        password: \${{ github.token }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -130,7 +130,7 @@ jobs:
         with:
           name: LSR_10S_WEB_AUDIO
           run-id: 44104478064
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           path: sound
       - uses: actions/download-artifact@v4
         with:
