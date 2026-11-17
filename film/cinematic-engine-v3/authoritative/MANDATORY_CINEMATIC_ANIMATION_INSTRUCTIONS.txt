@@ -1,0 +1,53 @@
+# MANDATORY CINEMATIC ANIMATION INSTRUCTIONS
+
+Produce a **premium, image-first, 2D illustrated cinematic film with true 2.5D camera depth**, following the supplied Hunyuan cinematic blueprint, also check source/library
+for HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 (That is the video the blueprint it produced)
+
+Do the first 30 seconds of the attached story
+check library for HUNYUAN_2D_CHARACTER_PACKAGE.zip
+Aspect Ration: 16:9
+use my github action multiple parallel public cpu for the environment and processing 
+You must use specified tools/library specify in the instruction if any of the tools fail, fix immediately and if unfixable stop let me know instead of using another library 
+use kie.ai gemini 3.8 tts flash (my secret api key has been added to github)
+use snapgen GPT image 2.5 Lower to generate images (secret api key has been added to my github
+use my google drive to send and receive files 
+You mut give me 10 seconds draft video first without correction so i can check if it is visuals i want is what you are doing   
+Do not change the model for snapgen and kie if i dont approve.
+
+## REQUIRED TOOLS — NO SUBSTITUTIONS
+
+- **SnapGen GPT Image 2.5 Lower:** Generate beautiful, detailed, story-specific cinematic illustrations. Images must tell the story, not merely provide backgrounds.
+- **Three.js PerspectiveCamera:** Build actual foreground, midground and background depth planes with visible cinematic camera movement, parallax, dolly, truck, push-ins and foreground reveals.
+- **GSAP:** Animate cameras, objects, props, lighting, transitions, typography and effects using precisely synchronized timelines.
+- **Original Hunyuan art.js + engine.js:** Use Hunyuan selectively for important close-ups, expressions and physical actions. Do not force Hunyuan into every scene or rely on continuous walking/running.
+- **SVG + Canvas2D:** Create professional motion graphics, animated diagrams, particles, effects, UI and modern typography.
+- **Pillow + OpenCV:** Prepare illustrated depth layers, transparent masks and repaired background plates. Visually inspect and correct imperfect separations.
+- **Web Audio OfflineAudioContext:** Produce synchronized environmental sound effects.
+- **WebCodecs + Mediabunny:** Export the animated footage.
+- **FFmpeg + FFprobe:** Assemble audio/video and verify the final output.
+- **Playwright:** Automatically test browser rendering, camera movement, animation and export.
+- **GitHub Actions:** Use multiple parallel public CPU runners for processing.
+- **Google Drive:** Store completed video and source files.
+
+## NON-NEGOTIABLE CREATIVE REQUIREMENTS
+
+1. **STORY FIRST:** Design approximately 6–8 distinct, visually compelling cinematic shots per 30 seconds, adjusting the count to the story.
+2. **IMAGE FIRST:** Generate story-telling compositions before animation. Some shots should feature Hunyuan within the illustrated image; others should focus on environments, objects, events or information.
+3. **VISIBLE CINEMATOGRAPHY:** Every 30-second sequence must demonstrate strong, obvious camera movement and genuine independent depth-layer parallax.
+4. **LIVING ENVIRONMENTS:** Animate relevant objects, atmosphere, particles, lighting, shadows and environmental reactions.
+5. **PROFESSIONAL EDITING:** Include varied shot scales, meaningful transitions, cinematic pacing, modern kinetic graphics and accurately synchronized sound.
+6. **SELECTIVE CHARACTER PERFORMANCE:** Use large, expressive Hunyuan animations only when the story requires them.
+
+## STRICT QUALITY ENFORCEMENT
+
+**FORBIDDEN:** Basic SVG environments, static slideshows, uniform image zooms, repetitive walking loops, barely perceptible camera movement, generic effects and visually empty shots.
+
+Every shot must communicate a distinct story beat. Inspect the **actual exported video at normal playback speed**, not merely code or screenshots.
+
+**If the video lacks compelling story imagery, obvious cinematic depth, animated objects, deliberate camera choreography or professional editing, it FAILS. Redesign and rerender before delivery.**
+
+Automatically fix technical failures without changing the required tool stack. Reuse existing assets and obtain explicit approval of model, quantity and maximum cost before any new paid generation.
+
+**DELIVERABLE:** 1920×1080, 16:9, 30 fps cinematic MP4. Provide the first complete 30-second sequence for visual approval before producing the remainder.
+
+**ULTIMATE RULE: The film must feel like an expertly directed illustrated cinematic movie, NOT a simple 2D character animation.**
