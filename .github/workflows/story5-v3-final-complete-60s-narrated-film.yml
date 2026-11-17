@@ -202,7 +202,7 @@ jobs:
             -map 0:v:0 -map '[m]' -t 30 -c:v copy -c:a aac -b:a 192k -ar 24000 -ac 1 -movflags +faststart \
             delivery/EMMA_STORY5_V3_30TO60_NARRATED_ENDING.mp4
           python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_30TO60_NARRATED_ENDING.mp4 --frames 900 --seconds 30 --sample-every .5 --out delivery/qc-ending
-      - name: Assemble all 60 seconds losslessly: preserve approved first30 H264/AAC packets exactly, append new 900 frame ending
+      - name: 'Assemble all 60 seconds losslessly: preserve approved first30 H264/AAC packets exactly, append new 900 frame ending'
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -222,7 +222,7 @@ jobs:
           ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i complete60.concat.txt -map 0:v:0 -map 0:a:0 -c copy -movflags +faststart \
             delivery/EMMA_STORY5_V3_FULL_60S_FINAL_NARRATED_FILM.mp4
           python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_FULL_60S_FINAL_NARRATED_FILM.mp4 --frames 1800 --seconds 60 --sample-every .75 --out delivery/qc
-      - name: Bitwise decoded-frame SHA256 of first900 from approved master vs final60: no edits or regeneration
+      - name: 'Bitwise decoded-frame SHA256 of first900 from approved master vs final60: no edits or regeneration'
         run: |
           set -euo pipefail
           ffmpeg -hide_banner -loglevel error -i approved_first30/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4 -map 0:v:0 -frames:v 900 -f hash -hash sha256 - > delivery/APPROVED_FIRST30_VIDEO_FRAME_HASH.txt
