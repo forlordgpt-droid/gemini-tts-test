@@ -1,0 +1,57 @@
+name: Hunyuan 02:00-02:30 Recover Authorized KIE Audio (zero paid createTask)
+on:
+  push:
+    branches: [hunyuan-0200-0230-v21-preproduction]
+    paths: ['.github/workflows/hunyuan-0200-kie-audio-recovery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover-existing-approved-tts:
+    name: Resume both existing KIE task IDs; no paid generation or retry
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download completed Gemini 3.8 Flash-Lite Fola WAVs by known task IDs ONLY
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$KIE_API_KEY"
+          mkdir -p film/hunyuan-0200-0230/audio
+          # Exactly two previously authorized, successful requests. --task-id
+          # enters retrieval-only path; NEVER invokes KIE /createTask.
+          python3 gemini38_tts_kie.py --voice Fola \
+            --task-id 73a3af873fb9eeb935d7335e6bb5a1ad \
+            --output film/hunyuan-0200-0230/audio/segment_0.wav
+          python3 gemini38_tts_kie.py --voice Fola \
+            --task-id be36a266dd54291568fc8717ee66ff73 \
+            --output film/hunyuan-0200-0230/audio/segment_1.wav
+          python3 - <<'PY'
+          import pathlib, wave, json, array
+          base=pathlib.Path('film/hunyuan-0200-0230/audio')
+          result=[]
+          for i in range(2):
+              path=base/f'segment_{i}.wav'
+              with wave.open(str(path),'rb') as w:
+                  assert (w.getframerate(),w.getnchannels(),w.getsampwidth())==(24000,1,2)
+                  samples=array.array('h',w.readframes(w.getnframes()))
+                  frame=int(w.getframerate()*.02)
+                  amps=[sum(abs(x) for x in samples[j:j+frame])/max(1,len(samples[j:j+frame])) for j in range(0,len(samples),frame)]
+                  q={'index':i,'source_task_id':['73a3af873fb9eeb935d7335e6bb5a1ad','be36a266dd54291568fc8717ee66ff73'][i],
+                    'seconds':w.getnframes()/w.getframerate(),'bytes':path.stat().st_size,
+                    'below_200ms_20ms_windows':sum(1 for a in amps if a<200),
+                    'below_350ms_20ms_windows':sum(1 for a in amps if a<350)}
+                  result.append(q)
+          (base/'RECOVERED_TASK_IDS.json').write_text(json.dumps({'provider':'KIE.ai','model':'google/gemini-3-8-flash-lite-tts',
+            'new_generation_requests':0,'reused_paid_task_ids':[x['source_task_id'] for x in result],
+            'segments':result},indent=2))
+          print(json.dumps(result,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_TWO_EXISTING_KIE_WAVS
+          path: film/hunyuan-0200-0230/audio/
+          retention-days: 30
+          if-no-files-found: error
