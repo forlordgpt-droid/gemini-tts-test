@@ -51,6 +51,15 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Install exact required FFmpeg and FFprobe (Ubuntu CPU runner)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffmpeg -version
+          ffprobe -version
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -114,7 +123,7 @@ jobs:
 
   voice:
     name: Produce exactly two approved KIE Gemini 3.8 Flash-Lite Fola WAVs — no retry
-    needs: preflight
+    needs: [render, preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -148,7 +157,7 @@ jobs:
 
   render:
     name: Original-rig 1920x1080 H.264 CPU shard ${{ matrix.shard }} (300 frames)
-    needs: [voice, stage_art]
+    needs: [preflight, stage_art]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -157,6 +166,15 @@ jobs:
         shard: [0, 1, 2]
     steps:
       - uses: actions/checkout@v4
+      - name: Install exact required FFmpeg and FFprobe (Ubuntu CPU runner)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffmpeg -version
+          ffprobe -version
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -209,6 +227,15 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Install exact required FFmpeg and FFprobe (Ubuntu CPU runner)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          command -v ffmpeg
+          command -v ffprobe
+          ffmpeg -version
+          ffprobe -version
       - uses: actions/download-artifact@v4
         with:
           pattern: HUNYUAN_0200_0230_SHARD_*
