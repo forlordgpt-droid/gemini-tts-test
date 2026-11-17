@@ -1,0 +1,31 @@
+{
+  "project_id": "NEW_STORY_15_MIN_STARTER",
+  "status": "NOT_RENDER_READY_INSERT_YOUR_REAL_STORY_AND_COMPLETE_ALL_SHOTS",
+  "story_source": "REPLACE_WITH_ACTUAL_FULL_STORY",
+  "duration_seconds": 900,
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "video_codec": "h264",
+    "audio_codec": "aac"
+  },
+  "image_provider": "SnapGen",
+  "image_model": "gpt-image-2.5-lower",
+  "tts_provider": "kie.ai",
+  "tts_model": "google/gemini-3-8-flash-tts",
+  "camera": "Three.js PerspectiveCamera",
+  "animation": "GSAP paused absolute-time",
+  "character_rig": "original native Hunyuan 2D art.js + engine.js",
+  "approvals": {
+    "first10_approved": false,
+    "first30_approved": false
+  },
+  "paid_media": {
+    "default_disabled": true,
+    "image_generation_approved": false,
+    "tts_generation_approved": false
+  },
+  "shots": [],
+  "note": "RENDER BLOCKED until story-specific storyboard, image-first original art, depth planes, camera moves, sound cues and required user approvals exist. At 30fps 900s=27000 frames. A plan with 10s segments will have 90 shards. Never reuse Hunyuan bedroom scenes as generic shots."
+}
