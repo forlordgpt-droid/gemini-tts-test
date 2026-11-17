@@ -1,0 +1,98 @@
+name: Emma Story5 V3 — Verify 1 New and 3 Reused Illustrated 2.5D Layers (Zero New Paid)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-10to30-2d-layer-prep.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  layered-art:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify every original reference and locked exact libraries
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Recover three existing approved Emma paintings and their 2.5D layers from old run (NO GENERATION)
+        uses: actions/download-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_PREPARED
+          run-id: 44113871109
+          github-token: ${{ github.token }}
+          path: film/story5-v3/continuation-10to30
+      - name: Acquire only the already completed ONE new SnapGen gpt-image-2.5-lower artwork (NO PAID GENERATION API)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,urllib.request,io,hashlib
+          from pathlib import Path
+          from PIL import Image
+          root=Path('film/story5-v3/continuation-10to30')
+          m=json.loads((root/'APPROVED_10TO30_MANIFEST.json').read_text())
+          img=m['images']
+          assert img['model']=='gpt-image-2.5-lower' and img['new_jobs_completed']==1
+          assert img['new_paid_credits']==1 and img['new_jobs_completed']<=m['user_authorization']['image_jobs_max']
+          assert img['new_uuid']=='a1c54b02-e2bb-11f1-87a3-32bcf30a2274'
+          assert img['reuse_count']==3 and img['existing_reuse_scene_indices']==[1,2,3]
+          assert img['new_art_url'].startswith('https://')
+          req=urllib.request.Request(img['new_art_url'],headers={'User-Agent':'Hunyuan-V3-original-artwork-fetch/1.0'})
+          with urllib.request.urlopen(req,timeout=100) as res:data=res.read()
+          if len(data)<100000:raise ValueError('New paid artwork could not be retrieved; fail closed')
+          art=Image.open(io.BytesIO(data));art.load()
+          assert abs(art.width/art.height-16/9)<.025,art.size
+          assert art.width>=1000 and art.height>=550,art.size
+          dest=root/'raw/raw_0.png';dest.parent.mkdir(parents=True,exist_ok=True)
+          art.convert('RGB').save(dest,compress_level=4)
+          for i in (1,2,3):
+            f=root/'raw'/f'raw_{i}.png'
+            assert f.is_file() and f.stat().st_size>100000,f
+          q=root/'qc';q.mkdir(parents=True,exist_ok=True)
+          (q/'STORY5_ORIGINAL_PAID_IMAGE_SHA256.json').write_text(json.dumps({'model':img['model'],'new_uuid':img['new_uuid'],'source_bytes':len(data),'source_sha256':hashlib.sha256(data).hexdigest(),'size':[art.width,art.height],'new_image_credits_spent':1,'previous_images_reused':3,'no_extra_paid_jobs':True},indent=2))
+          print('PASS new story5 EMPTY SUBWAY image retrieved; reused three earlier exact Emma illustrations; charged earlier 1 credit only')
+          PY
+      - name: Required Pillow/OpenCV 12 real alpha-separated planes, inpainted backgrounds, inspectable QA
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/continuation-10to30/prepare_layers.py
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          import json
+          root=Path('film/story5-v3/continuation-10to30')
+          qa=json.loads((root/'qc/LAYER_QA.json').read_text())
+          assert qa['layers_per_scene']==3 and len(qa['scenes'])==4
+          assert qa['approved_additional_images']==1
+          labels=['10–15 EMPTY STREET / PHONE / SUBWAY','15–19 SUBWAY STAIRS','19–24 LOCKED MAIN GATE','24–30 MAINTENANCE TUNNEL']
+          s=Image.new('RGB',(1600,1020),'#0b1424');d=ImageDraw.Draw(s)
+          for i in range(4):
+            file=root/'raw'/f'raw_{i}.png';raw=Image.open(file).convert('RGB').resize((780,439),Image.Resampling.LANCZOS)
+            x=(i%2)*800;y=(i//2)*510;s.paste(raw,(x,y+35))
+            d.text((x+12,y+10),labels[i],fill='white')
+            for kind,ext in [('far','jpg'),('mid','png'),('front','png')]:
+              layer=root/'assets'/f'{kind}_{i}.{ext}'
+              assert layer.is_file() and layer.stat().st_size>10000,layer
+              with Image.open(layer) as im:
+                assert im.size==(1920,1080),(layer,im.size)
+                if kind!='far':assert im.mode=='RGBA'
+          s.save(root/'qc/EMMA_STORY5_10TO30_ILLUSTRATIONS_CONTACT.jpg',quality=90)
+          print('PASS full 4-scene 1920x1080 original alpha-depth images and model-lock QA')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_10TO30_ILLUSTRATED_DEPTH_PLANES_VERIFIED
+          path: |
+            film/story5-v3/continuation-10to30/assets/
+            film/story5-v3/continuation-10to30/raw/
+            film/story5-v3/continuation-10to30/rig/
+            film/story5-v3/continuation-10to30/qc/
+          retention-days: 30
