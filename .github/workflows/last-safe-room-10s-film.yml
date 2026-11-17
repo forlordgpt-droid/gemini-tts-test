@@ -94,7 +94,7 @@ jobs:
           npx playwright install --with-deps chromium
           npm run build
           npm test
-      - name: FFprobe hard gate: exactly 150 H264 frames at 1080p
+      - name: FFprobe hard gate for 150 frames at 1080p
         env:
           SHARD_INDEX: ${{ matrix.shard }}
         run: |
