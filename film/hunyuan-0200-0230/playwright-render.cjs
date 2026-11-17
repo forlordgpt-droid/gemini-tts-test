@@ -10,7 +10,7 @@ async function waitServer(){for(let i=0;i<180;i++){if(server.exitCode!==null)thr
 (async()=>{
  const errors=[];let browser;try{
  await waitServer();
- browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-features=WebCodecs']});
+ browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1920,height:1080},acceptDownloads:true,deviceScaleFactor:1});
  page.on('pageerror',e=>errors.push('PAGE '+e.message));page.on('console',m=>{if(m.type()==='error')errors.push('CONSOLE '+m.text());});
  page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
@@ -20,8 +20,15 @@ async function waitServer(){for(let i=0;i<180;i++){if(server.exitCode!==null)thr
  if(errors.length)throw Error('Browser asset/console failure '+errors.join('\n'));
  const checks=await page.evaluate(async()=>{
   const c=document.querySelector('#stage');const gl=c.getContext('webgl2')||c.getContext('webgl');
-  const supported=await VideoEncoder.isConfigSupported({codec:'avc1.420028',width:1920,height:1080,bitrate:6000000,framerate:30,hardwareAcceleration:'prefer-software'});
-  return {canvas:[c.width,c.height],videoEncoder:typeof VideoEncoder,h264:supported.supported,gl:!!gl,rig:typeof window.HunyuanArt,world:typeof window.HunyuanWorld2D,plans:window.__planSummary};
+  const supported=await VideoEncoder.isConfigSupported({codec:'avc1.420028',width:1920,height:1080,bitrate:5000000,framerate:30});
+  const checks=[];
+  for(const hardwareAcceleration of [undefined,'prefer-software','prefer-hardware']){
+    const cfg={codec:'avc1.420028',width:1920,height:1080,framerate:30,bitrate:5000000};
+    if(hardwareAcceleration)cfg.hardwareAcceleration=hardwareAcceleration;
+    try{checks.push({acceleration:hardwareAcceleration||'no-preference',...(await VideoEncoder.isConfigSupported(cfg))});}
+    catch(e){checks.push({acceleration:hardwareAcceleration||'no-preference',error:String(e)});}
+  }
+  return {canvas:[c.width,c.height],videoEncoder:typeof VideoEncoder,h264:supported.supported,webcodecsProbes:checks,chromiumAgent:navigator.userAgent,isSecureContext,gl:!!gl,rig:typeof window.HunyuanArt,world:typeof window.HunyuanWorld2D,plans:window.__planSummary};
  });
  if(!checks.h264||!checks.gl||checks.rig!=='object'||checks.world!=='function')throw Error('Required codec/WebGL/native rig unavailable: '+JSON.stringify(checks));
  const base=shard*10;const times=gate?[0,2.5,4.966666]:[base,base+5,base+9.9666667];
