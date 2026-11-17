@@ -169,12 +169,13 @@ window.exportSfx=async()=>{
  const filt=offline.createBiquadFilter();filt.type='lowpass';filt.frequency.value=340;
  ns.connect(filt);filt.connect(master);ns.start();
  const tone=(at,len,f1,f2,vol,type='triangle')=>{
-  if(at<0||at+len>20.001)throw Error('Out of audio bounds');
+  if(at<0||at>=20)throw Error('Out of audio bounds');
+  const end=Math.min(at+len,19.998),duration=end-at;
   const osc=offline.createOscillator(),v=offline.createGain();osc.type=type;
-  osc.frequency.setValueAtTime(f1,at);osc.frequency.exponentialRampToValueAtTime(Math.max(1,f2),at+len);
-  v.gain.setValueAtTime(.0001,at);v.gain.linearRampToValueAtTime(vol,at+Math.min(.025,len/3));
-  v.gain.exponentialRampToValueAtTime(.0001,at+len);
-  osc.connect(v);v.connect(master);osc.start(at);osc.stop(at+len);
+  osc.frequency.setValueAtTime(f1,at);osc.frequency.exponentialRampToValueAtTime(Math.max(1,f2),end);
+  v.gain.setValueAtTime(.0001,at);v.gain.linearRampToValueAtTime(vol,at+Math.min(.025,duration/3));
+  v.gain.exponentialRampToValueAtTime(.0001,end);
+  osc.connect(v);v.connect(master);osc.start(at);osc.stop(end);
  };
  // Sidewalk and subway footsteps accelerate with perspective.
  for(let i=0;i<29;i++){
