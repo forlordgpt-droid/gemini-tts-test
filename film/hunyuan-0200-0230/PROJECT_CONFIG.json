@@ -44,9 +44,28 @@
     "FFmpeg + FFprobe",
     "Playwright"
   ],
-  "paid_generation_status": "BLOCKED_UNTIL_APPROVED",
-  "completed_video_status": "NOT_RENDERED",
-  "no_paid_calls_completed": true,
+  "paid_generation_status": "COMPLETE_WITHIN_ORIGINAL_APPROVED_CAP",
+  "completed_video_status": "TECHNICALLY_VERIFIED_900_FRAMES_30_SECONDS_GDRIVE_MP4",
+  "no_paid_calls_completed": false,
   "stop_on_required_tool_failure": true,
-  "storage": "Google Drive verified durable MP4 + source ZIP once complete"
+  "storage": "Google Drive verified durable MP4 + source ZIP once complete",
+  "approved_image_outputs_used": 4,
+  "approved_kie_tts_tasks_used": 2,
+  "existing_kie_task_ids": [
+    "73a3af873fb9eeb935d7335e6bb5a1ad",
+    "be36a266dd54291568fc8717ee66ff73"
+  ],
+  "retry_authorization": "ZERO_ADDITIONAL_PAID_GENERATION",
+  "audio_timing_mode": "SILENCE_ONLY_30S_MASTER_NO_SPEEDUP_NO_VOICE_TRUNCATION",
+  "google_drive_verified_url": "https://drive.google.com/file/d/1A5dCoY6XcQNbPDjIoTgiwMgbGBi32EIv/view?usp=drivesdk",
+  "google_drive_size_bytes": 24459315,
+  "ffprobe_final": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 900,
+    "duration_seconds": 30,
+    "video_codec": "h264",
+    "audio_codec": "aac"
+  }
 }
