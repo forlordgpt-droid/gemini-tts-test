@@ -70,7 +70,11 @@ jobs:
               (root/'public'/'rig').mkdir(parents=True,exist_ok=True)
               for n in ('art.js','engine.js'):
                   (root/'public'/'rig'/n).write_bytes(z.read('HUNYUAN_2D/'+n))
-          PY
+          # The original rig tests are CommonJS. The movie app is ESM; set the
+          # TEST COPY'S package scope explicitly without touching the supplied ZIP,
+          # engine.js, art.js or the required Three.js/GSAP/Mediabunny pipeline.
+          printf '{"type":"commonjs"}\n' > film/hunyuan-0200-0230/native/HUNYUAN_2D/package.json
+          node --check film/hunyuan-0200-0230/native/HUNYUAN_2D/engine.js
           node film/hunyuan-0200-0230/native/HUNYUAN_2D/tests/engine.test.cjs
           command -v ffmpeg
           command -v ffprobe
