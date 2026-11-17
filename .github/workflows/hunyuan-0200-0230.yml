@@ -1,0 +1,275 @@
+name: Hunyuan Bunker 02:00-02:30 | Four Approved Images | Two KIE Clips | Three CPU Shards
+on:
+  push:
+    branches: [hunyuan-0200-0230-v21-preproduction]
+    paths: ['.github/workflows/hunyuan-0200-0230.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hunyuan-0200-0230-authorized-six-outputs
+  cancel-in-progress: false
+jobs:
+  stage_art:
+    name: Download and validate four approved SnapGen illustrations (NO paid calls)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch existing generated SnapGen outputs once; verify PNG / dimensions
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, urllib.request, struct, hashlib, pathlib
+          root=pathlib.Path('film/hunyuan-0200-0230')
+          m=json.loads((root/'IMAGE_ASSET_MANIFEST.json').read_text())
+          assert m['exact_model']=='gpt-image-2.5-lower' and len(m['images'])==4
+          art=root/'public'/'assets';art.mkdir(parents=True,exist_ok=True)
+          checks={}
+          for item in m['images']:
+              req=urllib.request.Request(item['source_url'],headers={'User-Agent':'Hunyuan-Cinematic-Assets/1.0'})
+              with urllib.request.urlopen(req,timeout=120) as r:blob=r.read()
+              if blob[:8]!=b'\x89PNG\r\n\x1a\n':raise RuntimeError('SnapGen generated file not PNG: '+item['id'])
+              w,h=struct.unpack('>II',blob[16:24])
+              if w<1000 or h<540:raise RuntimeError('Generated source resolution invalid: '+item['id'])
+              (art/item['file']).write_bytes(blob)
+              checks[item['id']]={'width':w,'height':h,'bytes':len(blob),'sha256':hashlib.sha256(blob).hexdigest(),'provider_model':m['exact_model']}
+          (art/'STAGED_ART_SHA256.json').write_text(json.dumps(checks,indent=2))
+          print('Four art sources staged, no new creative API spend:',json.dumps(checks))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_ILLUSTRATIONS
+          path: film/hunyuan-0200-0230/public/assets/
+          if-no-files-found: error
+          retention-days: 30
+
+  preflight:
+    name: Native rig, all fixed libraries, 5-second image-first visual gate & WebAudio
+    runs-on: ubuntu-latest
+    needs: stage_art
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_ILLUSTRATIONS
+          path: film/hunyuan-0200-0230/public/assets/
+      - name: Extract ORIGINAL Hunyuan art.js/engine.js, never GLB/3D actor
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,pathlib
+          root=pathlib.Path('film/hunyuan-0200-0230')
+          with zipfile.ZipFile('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              if z.testzip() is not None:raise RuntimeError('Original rig package corrupt')
+              z.extractall(root/'native')
+              (root/'public'/'rig').mkdir(parents=True,exist_ok=True)
+              for n in ('art.js','engine.js'):
+                  (root/'public'/'rig'/n).write_bytes(z.read('HUNYUAN_2D/'+n))
+          PY
+          node film/hunyuan-0200-0230/native/HUNYUAN_2D/tests/engine.test.cjs
+          command -v ffmpeg
+          command -v ffprobe
+      - name: Install pinned Three.js, GSAP, SVG/Canvas bridge, Mediabunny, Playwright, bundled fonts
+        working-directory: film/hunyuan-0200-0230
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+      - name: REAL five-second 150-frame internal scene/actor/graphics test + offline SFX
+        working-directory: film/hunyuan-0200-0230
+        env:
+          GATE: '1'
+          SHARD_INDEX: '0'
+        run: |
+          set -euo pipefail
+          npm test
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration -of json qc/gate_5s.mp4 > qc/gate_ffprobe.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open('qc/gate_ffprobe.json'))
+          v=next(s for s in a['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150),v
+          assert abs(float(a['format']['duration'])-5)<.12,a
+          print('Five-second image-first technical gate PASS; normal-speed visual review still required')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_GATE_AND_SFX
+          path: |
+            film/hunyuan-0200-0230/qc/
+            film/hunyuan-0200-0230/dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  voice:
+    name: Produce exactly two approved KIE Gemini 3.8 Flash-Lite Fola WAVs — no retry
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authorised exact-model KIE voice outputs ONLY (two sequential calls)
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KIE_API_KEY" ]; then echo 'Required GitHub KIE_API_KEY secret missing: HARD STOP'; exit 1; fi
+          python3 - <<'PY'
+          import json,subprocess,sys,pathlib
+          root=pathlib.Path('film/hunyuan-0200-0230')
+          data=json.loads((root/'VOICE_SEGMENTS.json').read_text())
+          assert data['model']=='google/gemini-3-8-flash-lite-tts' and data['voice']=='Fola'
+          assert len(data['segments'])==2 and data['count_authorized']==2 and not data['retry_authorized']
+          (root/'audio').mkdir(exist_ok=True)
+          for i,seg in enumerate(data['segments']):
+              assert seg['index']==i
+              args=[sys.executable,'gemini38_tts_kie.py','--voice','Fola','--text',seg['text'],
+                    '--output',str(root/'audio'/('segment_'+str(i)+'.wav'))]
+              subprocess.run(args,check=True)
+          PY
+          python3 film/hunyuan-0200-0230/prepare_audio.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_APPROVED_KIE_VOICE
+          path: film/hunyuan-0200-0230/audio/
+          if-no-files-found: error
+          retention-days: 30
+
+  render:
+    name: Original-rig 1920x1080 H.264 CPU shard ${{ matrix.shard }} (300 frames)
+    needs: [voice, stage_art]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_ILLUSTRATIONS
+          path: film/hunyuan-0200-0230/public/assets/
+      - name: Restore exact original Hunyuan rig
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile
+          r=pathlib.Path('film/hunyuan-0200-0230')
+          (r/'public'/'rig').mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              for n in ('art.js','engine.js'):
+                  (r/'public'/'rig'/n).write_bytes(z.read('HUNYUAN_2D/'+n))
+          PY
+      - name: Fixed Three.js and GSAP movie adapter; capture shard from absolute story clock
+        working-directory: film/hunyuan-0200-0230
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration -of json "qc/part_$SHARD_INDEX.mp4" > qc/ffprobe.json
+          python3 - <<'PY'
+          import json
+          o=json.load(open('qc/ffprobe.json'))
+          v=next(s for s in o['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',300),v
+          assert abs(float(o['format']['duration'])-10)<.12,o
+          print('Verified exact 10 seconds/300 frames, Three.js+GSAP+native rig, H.264 WebCodecs/Mediabunny')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUNYUAN_0200_0230_SHARD_${{ matrix.shard }}
+          path: film/hunyuan-0200-0230/qc/
+          if-no-files-found: warn
+          retention-days: 30
+
+  assemble:
+    name: Required FFmpeg/FFprobe joins, narration+SFX, 900-frame QA and source package
+    runs-on: ubuntu-latest
+    needs: [render,voice,preflight,stage_art]
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: HUNYUAN_0200_0230_SHARD_*
+          path: parts
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_APPROVED_KIE_VOICE
+          path: film/hunyuan-0200-0230/audio/
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_GATE_AND_SFX
+          path: gate
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_ILLUSTRATIONS
+          path: film/hunyuan-0200-0230/public/assets/
+      - name: Assemble verified shard streams plus only approved narration & OfflineAudioContext foley
+        run: |
+          set -euo pipefail
+          command -v ffmpeg
+          command -v ffprobe
+          mkdir -p delivery
+          python3 - <<'PY'
+          import pathlib
+          parts=[pathlib.Path('parts')/('HUNYUAN_0200_0230_SHARD_'+str(i))/('part_'+str(i)+'.mp4') for i in (0,1,2)]
+          assert all(p.exists() and p.stat().st_size>100000 for p in parts),parts
+          pathlib.Path('delivery/concat.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in parts))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i delivery/concat.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y -i delivery/video_only.mp4 \
+            -i film/hunyuan-0200-0230/audio/narration_30s.wav \
+            -i gate/qc/original_sfx_30s.wav \
+            -filter_complex '[1:a]volume=1.0[voice];[2:a]volume=0.22[foley];[voice][foley]amix=inputs=2:duration=first:dropout_transition=0[a]' \
+            -map 0:v:0 -map '[a]' -t 30 -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration -of json delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 > delivery/FINAL_FFPROBE.json
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4')
+          o=json.load(open('delivery/FINAL_FFPROBE.json'))
+          v=next(s for s in o['streams'] if s['codec_type']=='video')
+          a=next(s for s in o['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900),v
+          assert a['codec_name']=='aac',a
+          assert abs(float(o['format']['duration'])-30)<.13,o
+          q={'status':'TECHNICAL_PASS_VISUAL_REVIEW_REQUIRED','duration_seconds':30,'frames':900,
+            'resolution':[1920,1080],'fps':30,'source_timecode':['02:00','02:30'],
+            'images_model':'SnapGen gpt-image-2.5-lower','approved_images':4,'paid_image_credits':4,
+            'audio_provider':'KIE.ai','audio_model':'google/gemini-3-8-flash-lite-tts',
+            'approved_audio_outputs':2,'render':'Three.js + GSAP + native Hunyuan rig + WebCodecs + Mediabunny',
+            'effects':'OfflineAudioContext 30s WAV','visual_playback_inspection':'PENDING',
+            'file_bytes':p.stat().st_size}
+          pathlib.Path('delivery/QC_REPORT.json').write_text(json.dumps(q,indent=2))
+          print('TECHNICAL QC PASS; artistic inspection still required:',json.dumps(q))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 \
+            -vf 'fps=1/5,scale=640:-1,tile=3x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+          cp gate/qc/original_sfx_30s.wav film/hunyuan-0200-0230/audio/
+          cp film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip film/hunyuan-0200-0230/HUNYUAN_2D_CHARACTER_PACKAGE.zip
+          cp -r gate/dist film/hunyuan-0200-0230/dist
+          cp .github/workflows/hunyuan-0200-0230.yml film/hunyuan-0200-0230/GITHUB_ACTIONS_WORKFLOW.yml
+          (cd film && zip -qr ../delivery/HUNYUAN_BUNKER_0200_0230_SOURCE.zip hunyuan-0200-0230 \
+             -x 'hunyuan-0200-0230/native/*' 'hunyuan-0200-0230/node_modules/*' 'hunyuan-0200-0230/qc/*')
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_BUNKER_0200_0230_VIDEO_SOURCE_QA
+          path: delivery/
+          if-no-files-found: error
+          retention-days: 30
