@@ -1,0 +1,49 @@
+{
+  "project": "The Last Safe Room: approved 30s voice mix",
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-tts",
+  "approved_generation_jobs": 1,
+  "maximum_kie_credits": 5,
+  "published_pricing_credits_per_million": {
+    "text_input": 70,
+    "audio_output": 1260
+  },
+  "credit_limit_equivalent_audio_seconds_at_25_tokens_per_second": 158,
+  "intended_speakers": [
+    {
+      "speaker_id": "Speaker 1",
+      "character": "NOAH",
+      "voice_name": "Charon"
+    },
+    {
+      "speaker_id": "Speaker 2",
+      "character": "EMMA",
+      "voice_name": "Kore"
+    }
+  ],
+  "dialogue": [
+    {
+      "character": "NOAH",
+      "speaker_id": "Speaker 1",
+      "text": "Emma! The gas is moving faster. Get underground!",
+      "target_start_seconds": 10.24
+    },
+    {
+      "character": "EMMA",
+      "speaker_id": "Speaker 2",
+      "text": "Noah! It's locked!",
+      "target_start_seconds": 20.55
+    },
+    {
+      "character": "NOAH",
+      "speaker_id": "Speaker 1",
+      "text": "There's an emergency tunnel behind you!",
+      "target_start_seconds": 23.3
+    }
+  ],
+  "approved_picture_run": 44116608335,
+  "approved_picture_artifact": "LSR_30S_CORRECTED_VISUAL_MASTER_PENDING_KIE",
+  "one_paid_task_no_retries": true,
+  "extra_paid_generation": false,
+  "allow_model_substitution": false
+}
