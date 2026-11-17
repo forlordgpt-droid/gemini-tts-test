@@ -1,0 +1,52 @@
+{
+  "project": "BUNKER_SURVIVAL_EXCERPT_02_00_TO_02_30",
+  "source_story": "Bunker Survival - The Explosion {Full Movie} (2)(1).txt (ChatGPT Library)",
+  "instructions": "HUNYUAN_2D_CINEMATIC_VIDEO_MASTER_INSTRUCTIONS_V2_1_AUDITED.txt",
+  "time_range": {
+    "start_seconds": 120,
+    "end_exclusive_seconds": 150,
+    "duration_seconds": 30
+  },
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 900,
+    "aspect_ratio": "16:9"
+  },
+  "CHARACTER_MODE": "HUNYUAN_NATIVE_2D_VECTOR",
+  "CHARACTER_SOURCE": "../hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip",
+  "ENVIRONMENT_MODE": "ILLUSTRATED_2D_MULTIPLANE",
+  "BACKGROUND_STYLE": "COLOURFUL_STYLIZED_ILLUSTRATION",
+  "BACKGROUND_CREATION_MODE": "APPROVED_IMAGE_FIRST_KEYFRAMES_THEN_MULTIPLANE_ANIMATION",
+  "PHOTOREALISTIC_BACKGROUNDS": "FORBIDDEN",
+  "VOLUMETRIC_3D_CHARACTERS": "FORBIDDEN",
+  "PRIMITIVE_SVG_MAIN_BACKGROUNDS": "FORBIDDEN",
+  "CAMERA_MODE": "THREEJS_PERSPECTIVE_MULTIPLANE",
+  "ANIMATION_TIMELINE": "GSAP_PLUS_ABSOLUTE_TIME_CHARACTER_TRACKS",
+  "render_target": "GitHub Actions public CPU runners, 3 x 10-second shards; no GPU assumption",
+  "audio_provider": "kie.ai",
+  "audio_model": "google/gemini-3-8-flash-lite-tts",
+  "audio_voice_continuity": "Fola, matching existing first-120s narration where available",
+  "image_provider": "SnapGen",
+  "image_model": "gpt-image-2.5-lower",
+  "image_model_options": {
+    "aspect_ratio": "16:9"
+  },
+  "image_output_note": "720p source art; footage must still export 1920x1080 and pass full-resolution visual QC",
+  "dependencies_required": [
+    "Original Hunyuan art.js + engine.js",
+    "Three.js PerspectiveCamera",
+    "GSAP",
+    "SVG + Canvas2D",
+    "OfflineAudioContext",
+    "WebCodecs + Mediabunny",
+    "FFmpeg + FFprobe",
+    "Playwright"
+  ],
+  "paid_generation_status": "BLOCKED_UNTIL_APPROVED",
+  "completed_video_status": "NOT_RENDERED",
+  "no_paid_calls_completed": true,
+  "stop_on_required_tool_failure": true,
+  "storage": "Google Drive verified durable MP4 + source ZIP once complete"
+}
