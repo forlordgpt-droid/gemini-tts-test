@@ -1,0 +1,206 @@
+name: Emma Story5 V3 — FIRST 10s Narrated Film (ONE existing Kie Flash-Lite voice, ZERO new paid)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-narrated-first10-final.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: emma-story5-final-narration-render-20261117
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify unchanged Hunyuan V3 exact stack, originals and character rig
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Retrieve already-approved original Emma illustrations and nine actual 2.5D layers
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_CORRECTED_NARRATION_PICTURE_SOURCE
+          run-id: 44148201625
+          github-token: ${{ github.token }}
+          path: prior_source
+      - name: Retrieve successful ONE Kie.ai Gemini 3.8 Flash-Lite narration job, not regenerate
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_FIRST10_APPROVED_KIE_FLASH_LITE_NARRATOR_AND_SPEND_AUDIT
+          run-id: 44152212334
+          github-token: ${{ github.token }}
+          path: narrator
+      - name: Assemble exact story5 art and voice and prevent old story from leaking
+        run: |
+          set -euo pipefail
+          cp -a prior_source/assets prior_source/rig film/story5-v3/narrated-first10/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          d=Path('film/story5-v3/narrated-first10')
+          story=json.loads((d/'NARRATION_LOCKED_FIRST10_MANIFEST.json').read_text())
+          approved=json.loads((d/'FLASH_LITE_MODEL_SELECTION_NO_SPEND.json').read_text())
+          a=json.loads(Path('narrator/KIE_ONE_FLASH_LITE_NARRATOR_COST_AND_AUDIO_AUDIT.json').read_text())
+          src=(d/'main.js').read_text()
+          target='The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped.'
+          assert target==story['narration_first10_exact']==a['exact_narration_text']
+          assert a['status']=='SUCCESS_ONE_PAID_JOB' and a['jobs_created']==1 and a['retry_count']==0
+          assert a['model']==approved['model']==story['tts']['model']=='google/gemini-3-8-flash-lite-tts'
+          assert a['provider']=='kie.ai' and 0<=a['credits_spent_from_balance']<=5
+          assert approved['no_automatic_retries'] is True and approved['original_engine_immutable'] is True
+          assert story['narration_mode']=='SINGLE_NARRATOR_VERBATIM'
+          assert all(x not in src for x in ["id:'PHONE'", "'NOAH'", "'INCOMING CALL'"])
+          for i in range(3):
+            for layer,ext in [('far','jpg'),('mid','png'),('front','png')]:
+              file=d/'assets'/f'{layer}_{i}.{ext}'
+              assert file.is_file() and file.stat().st_size>10000,str(file)
+              with Image.open(file) as im:
+                assert im.size==(1920,1080)
+                if layer!='far':assert im.mode=='RGBA'
+          for name in ('art.js','engine.js'):assert (d/'rig'/name).is_file()
+          print('PASS 25 exact narrator words / Kie Flash-Lite voice / 9 original separate 2.5D layers / no new paid generation')
+          PY
+      - name: Prepare full narration with gentle silence trim and intelligible no-cut timing QA
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/narrated-first10/prepare_narration_audio.py
+      - name: Render NEW story5 atmospheric sounds with exact Web Audio OfflineAudioContext (NO premature phone ring)
+        run: |
+          set -euo pipefail
+          ln -s /opt/cinematic/node_modules film/story5-v3/narrated-first10/node_modules
+          node film/story5-v3/narrated-first10/export_corrected_web_audio.cjs
+          test -s sfx/story5_offline_web_audio_sfx_10.wav
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_LITE_10S_PREPARED_SOURCE_AUDIO
+          path: |
+            film/story5-v3/narrated-first10/assets/
+            film/story5-v3/narrated-first10/rig/
+            narrator/
+            delivery/VOICE_CLEAN_NARRATOR_10S.wav
+            delivery/VOICE_TIMING_QA.json
+            sfx/
+          retention-days: 30
+  render:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        start: [0, 150]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_LITE_10S_PREPARED_SOURCE_AUDIO
+          path: .
+      - name: Exact V3 doctor and original illustrated 2.5D deterministic WebCodecs shards
+        env:
+          START: ${{ matrix.start }}
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          ln -s /opt/cinematic/node_modules film/story5-v3/narrated-first10/node_modules
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project film/story5-v3/narrated-first10 --start-frame "$START" --frame-count 150 --out shard
+          test -s "shard/part_${START}_150.mp4"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STORY5_LITE_10S_RENDER_SHARD_${{ matrix.start }}
+          path: shard/
+          retention-days: 30
+  assemble:
+    needs: [prepare, render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_LITE_10S_PREPARED_SOURCE_AUDIO
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: STORY5_LITE_10S_RENDER_SHARD_*
+          path: parts
+          merge-multiple: false
+      - name: Verify shard frames and concatenate native local timestamps without frame gaps
+        run: |
+          set -euo pipefail
+          mkdir -p delivery/qc
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          pts=[Path('parts')/f'STORY5_LITE_10S_RENDER_SHARD_{i}'/f'part_{i}_150.mp4' for i in (0,150)]
+          for p in pts:
+            assert p.is_file() and p.stat().st_size>100000,p
+            info=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',str(p)]))
+            v=next(x for x in info['streams'] if x['codec_type']=='video')
+            assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150),v
+            assert abs(float(info['format']['duration'])-5)<.08
+          for f in ['delivery/VOICE_CLEAN_NARRATOR_10S.wav','sfx/story5_offline_web_audio_sfx_10.wav','delivery/VOICE_TIMING_QA.json']:
+            assert Path(f).is_file() and Path(f).stat().st_size>500,f
+          Path('shards.concat.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in pts))
+          print('PASS all 300 source picture frames in exact 5s shards; voice/sfx prepared')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i shards.concat.txt -c copy delivery/EMMA_STORY5_V3_10S_PICTURE_ONLY.mp4
+      - name: Mix exact narration above suspense SFX (no voice mask or cutoff) and export final H264 AAC 10s
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y -i delivery/EMMA_STORY5_V3_10S_PICTURE_ONLY.mp4 -i delivery/VOICE_CLEAN_NARRATOR_10S.wav -i sfx/story5_offline_web_audio_sfx_10.wav \
+            -filter_complex '[1:a]volume=1.0,apad=whole_dur=10[v];[2:a]volume=0.19[s];[v][s]amix=inputs=2:duration=longest:dropout_transition=0,alimiter=limit=0.94[final]' \
+            -map 0:v:0 -map '[final]' -t 10 -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            delivery/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4
+          python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4 --frames 300 --seconds 10 --sample-every .5 --out delivery/qc
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration -of json delivery/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4 > delivery/FFPROBE_FINAL.json
+      - name: Save actual credit debit, voice timing, Hunyuan QA, and all reusable source (Python standard ZIP)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,zipfile,hashlib
+          from pathlib import Path
+          target=Path('delivery/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4')
+          q=json.loads(Path('delivery/qc/ACTUAL_VIDEO_QA.json').read_text())
+          voice=json.loads(Path('delivery/VOICE_TIMING_QA.json').read_text())
+          paid=json.loads(Path('narrator/KIE_ONE_FLASH_LITE_NARRATOR_COST_AND_AUDIO_AUDIT.json').read_text())
+          assert q['frames']==300 and q['video']=='h264' and q['audio']=='aac'
+          assert paid['jobs_created']==1 and paid['model']=='google/gemini-3-8-flash-lite-tts' and paid['credits_spent_from_balance']<=5
+          assert voice['output_voice_seconds']<=9.84
+          report={'status':'TECHNICALLY_VERIFIED_FIRST_10S_NARRATED_REVIEW_AWAITING_OWNER_ARTISTIC_APPROVAL','story':'user story5.txt; only 0-10s','model':'google/gemini-3-8-flash-lite-tts','narrator':'Charon','narration_exact':paid['exact_narration_text'],'original_voice_seconds':paid['recorded_seconds'],'placed_voice_seconds':voice['output_voice_seconds'],'credits_spent':paid['credits_spent_from_balance'],'credits_before':paid['credits_before'],'credits_after':paid['credits_after'],'new_kie_jobs':1,'new_snapgen_jobs':0,'shard_count':2,'frames':300,'fps':30,'duration':10,'dimensions':[1920,1080],'forbidden_prior_dialogue':False,'no_phone_ring_first10':True,'owner_approval_before_10to30_required':True,'original_v3_engine_unchanged':True,'actual_mp4_sha256':hashlib.sha256(target.read_bytes()).hexdigest()}
+          Path('delivery/PRODUCTION_REPORT.json').write_text(json.dumps(report,indent=2))
+          with zipfile.ZipFile('delivery/EMMA_STORY5_V3_FIRST10_NARRATED_SOURCE.zip','w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+            for dirname in ('film/story5-v3/narrated-first10','delivery/qc','sfx','narrator'):
+              for f in sorted(Path(dirname).rglob('*')):
+                if f.is_file() and not f.name.endswith('.mp4'):z.write(f,str(f))
+          print('SUCCESS EXACT KIE FLASH-LITE NARRATED 10s, 300 frames, source packaged, spent',report['credits_spent'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STORY5_V3_FIRST10_NARRATED_COMPLETE_MP4_SOURCE_QA
+          path: delivery/
+          if-no-files-found: warn
+          retention-days: 30
