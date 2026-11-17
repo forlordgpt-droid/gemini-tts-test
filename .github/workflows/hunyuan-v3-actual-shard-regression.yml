@@ -1,0 +1,60 @@
+name: Hunyuan V3 — REAL Approved 2D Illustration 5s WebCodecs Shard Regression
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/hunyuan-v3-actual-shard-regression.yml']
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: read
+  packages: read
+jobs:
+  smoke-actual-cinema-shard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:54fa667cb18dc923f8940f9c35a289ecaa6b7a883cbcb349ec03cdf20f6626a6
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: REAL unchanged Hunyuan source/2D rig, 150-frame original scene export using prebuilt modules
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          node /opt/cinematic/engine/scripts/render_shard.cjs \
+            --project /opt/cinematic/examples/preview_30s \
+            --start-frame 0 --frame-count 150 --out test-shard
+      - name: HARD QA of exact 5s original Hunyuan independent parallax and zero-based WebCodecs PTS
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import cv2,subprocess,json,numpy as np
+          f='test-shard/part_0_150.mp4'
+          d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',f]))
+          v=next(s for s in d['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150)
+          assert abs(float(d['format']['duration'])-5)<.08
+          raw=subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','frame=best_effort_timestamp_time','-of','csv=p=0',f],text=True)
+          pts=[float(s) for s in raw.strip().splitlines() if s]
+          assert len(pts)==150 and abs(pts[0])<.04 and abs(pts[-1]-149/30)<.04,(len(pts),pts[:2],pts[-2:])
+          assert all(b>a for a,b in zip(pts,pts[1:]))
+          reader=cv2.VideoCapture(f)
+          images=[]
+          for t in (.5,2.3,4.4):
+            reader.set(cv2.CAP_PROP_POS_MSEC,t*1000)
+            ok,frame=reader.read();assert ok
+            images.append(cv2.resize(frame,(220,124)))
+          diffs=[float(np.mean(np.abs(a.astype('int16')-b.astype('int16')))) for a,b in zip(images,images[1:])]
+          assert all(d>2.0 for d in diffs),('Actual illustrated frames frozen',diffs)
+          print('PASS original premium Hunyuan 2D illustrated scene, 150 WebCodecs frames, local PTS, visible parallax',diffs)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_ACTUAL_ORIGINAL_5S_WEB_CODECS_PARALLAX_SHARD_QA
+          path: test-shard/
+          retention-days: 20
