@@ -1,0 +1,171 @@
+name: Emma Story5 — V3 First 10s Uncorrected Cinematic Review (ZERO PAID)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-first10.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: story5-v3-first10-\${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: \${{ github.actor }}
+        password: \${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify entire original V3 exact stack; no substitutions
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Copy previously approved source code without regenerating art
+        run: |
+          set -euo pipefail
+          mkdir -p film/story5-v3/first10
+          cp film/last-safe-room-10s/pilot/index.html film/story5-v3/first10/
+          cp film/last-safe-room-10s/pilot/main.js film/story5-v3/first10/
+          cp film/last-safe-room-10s/pilot/package.json film/story5-v3/first10/
+          cp film/last-safe-room-10s/pilot/prepare_layers.py film/story5-v3/first10/
+      - name: Retrieve identical approved Emma 2D art and actual alpha depth layers
+        uses: actions/download-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          run-id: 44104478064
+          github-token: \${{ github.token }}
+          path: film/story5-v3/first10
+      - name: Enforce story5 caller anonymity and no new paid images
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          root=Path('film/story5-v3/first10')
+          src=root/'main.js'
+          code=src.read_text()
+          assert "text('NOAH'," in code, 'Expected older named caller cue was not found, stop'
+          code=code.replace("text('NOAH',","text('UNKNOWN',")
+          code=code.replace("THE LAST SAFE ROOM | first 10 seconds", "EMMA STORY5 V3 | first 10 seconds")
+          src.write_text(code)
+          html=root/'index.html'
+          html.write_text(html.read_text().replace('THE LAST SAFE ROOM','EMMA STORY5 — THE SAFE ROOM'))
+          arts=json.loads(Path('film/last-safe-room-10s/SNAPGEN_APPROVED_ART.json').read_text())
+          assert arts['approved_model']=='gpt-image-2.5-lower' and len(arts['generations'])==3
+          assert sum(a['credits_used'] for a in arts['generations'])==3
+          for i in range(3):
+            for role,ext in [('far','jpg'),('mid','png'),('front','png')]:
+              f=root/'assets'/f'{role}_{i}.{ext}'
+              assert f.is_file() and f.stat().st_size>10000, str(f)
+              with Image.open(f) as im:
+                assert im.size==(1920,1080), str(f)
+                if role!='far': assert im.mode=='RGBA'
+          for name in ('art.js','engine.js'):
+            assert (root/'rig'/name).is_file()
+          guard={'project':'Emma story5 first ten seconds','source_artwork':'prior authorized Emma city illustrations','new_paid_jobs':0,'new_paid_credits':0,'tts_jobs':0,'caller_identity':'UNKNOWN','story_approval_first10':False,'story_approval_first30':False,'output':'1920x1080 30 fps 300 frames','model_lock':'gpt-image-2.5-lower','sound':'original reused WebAudio OfflineAudioContext'}
+          (root/'STORY5_ZERO_PAID_GATES.json').write_text(json.dumps(guard,indent=2))
+          print('PASS: correct illustrated Emma, nine separate depth planes, no named caller, ZERO paid jobs')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_APPROVED_EXISTING_ART_AND_SOURCE
+          path: film/story5-v3/first10/
+          retention-days: 30
+  render:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: \${{ github.actor }}
+        password: \${{ github.token }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        start_frame: [0,150]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_APPROVED_EXISTING_ART_AND_SOURCE
+          path: film/story5-v3/first10
+      - name: Use exact cached JS dependencies, no per-run installation
+        run: |
+          set -euo pipefail
+          ln -s /opt/cinematic/node_modules film/story5-v3/first10/node_modules
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Render authored 2.5D story with THREE PerspectiveCamera + GSAP + WebCodecs Mediabunny
+        env:
+          START: \${{ matrix.start_frame }}
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project film/story5-v3/first10 --start-frame "$START" --frame-count 150 --out shard
+          test -s "shard/part_\${START}_150.mp4"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_FIRST10_SHARD_\${{ matrix.start_frame }}
+          path: shard/
+          retention-days: 30
+  assemble:
+    needs: render
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: \${{ github.actor }}
+        password: \${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: STORY5_V3_FIRST10_SHARD_*
+          path: parts
+          merge-multiple: false
+      - name: Reuse already-authorized OfflineAudioContext SFX, no TTS required before first spoken line
+        uses: actions/download-artifact@v4
+        with:
+          name: LSR_10S_WEB_AUDIO
+          run-id: 44104478064
+          github-token: \${{ github.token }}
+          path: sound
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_APPROVED_EXISTING_ART_AND_SOURCE
+          path: film/story5-v3/first10
+      - name: Assemble local-PTS shards, decode every frame, inspect frozen sections and produce contact sheet
+        run: |
+          set -euo pipefail
+          mkdir -p delivery/qc
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          paths=[Path('parts')/f'STORY5_V3_FIRST10_SHARD_{x}'/f'part_{x}_150.mp4' for x in (0,150)]
+          for p in paths:
+            assert p.is_file() and p.stat().st_size>100000, str(p)
+            q=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,width,height,nb_frames','-of','json',str(p)]))
+            s=q['streams'][0]
+            assert s['codec_name']=='h264' and (s['width'],s['height'],int(s['nb_frames']))==(1920,1080,150),s
+          Path('parts.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in paths))
+          assert Path('sound/sfx_10.wav').is_file(),'No approved SFX; stop'
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i parts.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y -i delivery/video_only.mp4 -i sound/sfx_10.wav -map 0:v:0 -map 1:a:0 -af 'afade=t=out:st=9.7:d=0.3' -t 10 -c:v copy -c:a aac -b:a 192k -movflags +faststart delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4
+          python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4 --frames 300 --seconds 10 --sample-every 0.5 --out delivery/qc
+          sha256sum delivery/EMMA_STORY5_V3_FIRST10_UNCORRECTED.mp4 > delivery/VIDEO_SHA256.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report={'status':'TECHNICAL_PASS_UNCORRECTED_FIRST10_USER_VISUAL_APPROVAL_REQUIRED','story':'story5.txt, scene 1','artwork':'3 previously approved Emma city illustrations','new_paid_image_jobs':0,'new_paid_tts_jobs':0,'new_paid_credits':0,'shards':2,'fps':30,'frames':300,'approval_before_30s':True}
+          Path('delivery/PRODUCTION_REPORT.json').write_text(json.dumps(report,indent=2))
+          PY
+          zip -q -r delivery/EMMA_STORY5_FIRST10_REUSABLE_SOURCE.zip film/story5-v3/first10
+          echo 'SUCCESS: first TEN seconds only; no further production authorized'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_FIRST10_UNCORRECTED_DRAFT_AND_SOURCE
+          path: delivery/
+          retention-days: 30
