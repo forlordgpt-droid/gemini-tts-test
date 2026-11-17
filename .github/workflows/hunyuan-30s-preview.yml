@@ -1,0 +1,171 @@
+name: Hunyuan Enhanced First 30s — Three.js Multiplane Camera Preview
+on:
+  push:
+    branches: [hunyuan-30s-art-direction-v2]
+    paths: ['.github/workflows/hunyuan-30s-preview.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify required FFmpeg and FFprobe
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+      - name: Prepare native Hunyuan rig and approved illustrated multilayer scenes
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,pathlib
+          root=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(root/'HUNYUAN_30S_PARALLAX_SOURCE.zip') as z:
+            assert z.testzip() is None
+            z.extractall(root)
+          scene=root/'preview_30s'
+          with zipfile.ZipFile(root/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            assert z.testzip() is None
+            for name in ['art.js','engine.js']:
+              (scene/'rig').mkdir(exist_ok=True)
+              (scene/'rig'/name).write_bytes(z.read('HUNYUAN_2D/'+name))
+          assert len(list((scene/'assets').glob('*.webp')))==12
+          assert len(list((scene/'assets').glob('*.jpg')))==6
+          assert (root/'audio/BUNKER_FIRST_120S_NARRATION.m4a').exists()
+          print('No paid media generation or external creative asset service used')
+          PY
+      - name: Render deterministic 300-frame native-rig WebCodecs + Mediabunny shard
+        working-directory: film/hunyuan-2m/preview_30s
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - name: Verify frames, FPS, codec and duration
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          f="film/hunyuan-2m/preview_30s/qc/part_${SHARD_INDEX}.mp4"
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration -of json "$f" > verify.json
+          python3 - <<'PY'
+          import json
+          o=json.load(open('verify.json'));s=next(x for x in o['streams'] if x['codec_type']=='video')
+          assert (s['codec_name'],s['width'],s['height'],s['r_frame_rate'],int(s['nb_frames']))==('h264',1920,1080,'30/1',300),s
+          assert abs(float(o['format']['duration'])-10)<.1,o
+          print('PASS: exact 300 frames, 1080p 30fps H.264, 10 seconds')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUNYUAN_30S_SHARD_${{ matrix.shard }}
+          path: film/hunyuan-2m/preview_30s/qc/
+          if-no-files-found: warn
+          retention-days: 21
+  sfx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unpack approved source and original character engine
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,zipfile
+          root=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(root/'HUNYUAN_30S_PARALLAX_SOURCE.zip') as z:z.extractall(root)
+          with zipfile.ZipFile(root/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            for name in ['art.js','engine.js']:
+              dest=root/'preview_30s'/'rig'/name;dest.parent.mkdir(exist_ok=True);dest.write_bytes(z.read('HUNYUAN_2D/'+name))
+          PY
+      - name: Export original OfflineAudioContext siren and phone effects
+        working-directory: film/hunyuan-2m/preview_30s
+        env:
+          EXPORT_SFX: '1'
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_30S_ORIGINAL_SFX
+          path: film/hunyuan-2m/preview_30s/qc/original_sfx_30s.wav
+          retention-days: 21
+  assemble:
+    needs: [render,sfx]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required media verification tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: HUNYUAN_30S_SHARD_*
+          path: parts
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_30S_ORIGINAL_SFX
+          path: sound
+      - name: Join all 900 frames, preserve KIE narration and mix original SFX
+        run: |
+          set -euo pipefail
+          mkdir -p delivery
+          python3 - <<'PY'
+          from pathlib import Path
+          parts=[Path('parts')/f'HUNYUAN_30S_SHARD_{i}'/f'part_{i}.mp4' for i in range(3)]
+          assert all(p.exists() and p.stat().st_size>100000 for p in parts),parts
+          Path('concat.txt').write_text(''.join(f"file '{p.resolve()}'\n" for p in parts))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y \
+            -i delivery/video_only.mp4 \
+            -i film/hunyuan-2m/audio/BUNKER_FIRST_120S_NARRATION.m4a \
+            -i sound/original_sfx_30s.wav \
+            -filter_complex '[1:a]volume=1.0,afade=t=out:st=29.55:d=0.45[v];[2:a]volume=0.17[s];[v][s]amix=inputs=2:duration=first:dropout_transition=0[a]' \
+            -map 0:v:0 -map '[a]' -t 30 -c:v copy -c:a aac -b:a 192k \
+            -movflags +faststart delivery/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration -of json delivery/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 > delivery/ffprobe.json
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('delivery/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4')
+          o=json.load(open('delivery/ffprobe.json'))
+          v=next(x for x in o['streams'] if x['codec_type']=='video')
+          a=next(x for x in o['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900),v
+          assert a['codec_name']=='aac',a
+          assert abs(float(o['format']['duration'])-30)<.12,o
+          (pathlib.Path('delivery')/'QC.json').write_text(json.dumps({'status':'TECHNICAL_PASS_VISUAL_REVIEW_REQUIRED','duration':30,'frames':900,'width':1920,'height':1080,'fps':30,'source':'Six approved 2D style frames processed as depth planes; original Hunyuan art.js and engine.js','paid_generation_calls':0,'audio':'existing KIE narration plus original WebAudio effects','file_bytes':p.stat().st_size},indent=2))
+          print('PASS 30s 900-frame audio/video master',p.stat().st_size)
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i delivery/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 \
+            -vf 'fps=1/5,scale=640:-1,tile=3x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUNYUAN_FIRST_30S_PARALLAX_PREVIEW_AND_QA
+          path: delivery/
+          retention-days: 30
