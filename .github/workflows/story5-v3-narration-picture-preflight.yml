@@ -1,0 +1,99 @@
+name: Emma Story5 V3 — Narrated Picture Preflight (ZERO CREDITS, no TTS)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-narration-picture-preflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mandatory V3 doctor for immutable original engine and exact tools
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Reuse approved Emma art and 9 unique separated 1080p depth layers
+        uses: actions/download-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          run-id: 44104478064
+          github-token: ${{ github.token }}
+          path: film/story5-v3/narrated-first10
+      - name: Fail-closed narration text, visual timing, credit guard
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from PIL import Image
+          d=Path('film/story5-v3/narrated-first10')
+          m=json.loads((d/'NARRATION_LOCKED_FIRST10_MANIFEST.json').read_text())
+          src=(d/'main.js').read_text()
+          assert m['narration_mode']=='SINGLE_NARRATOR_VERBATIM'
+          assert m['tts']['paid_generation_disabled'] is True and m['tts']['authorized_credits']==0
+          assert m['image_reuse']['new_jobs']==0
+          assert m['narration_first10_exact'].startswith('The entire city had been evacuated.')
+          assert m['narration_first10_exact'].endswith('But Emma was still trapped.')
+          assert len(m['picture']['shots'])==3
+          for forbidden in ["id:'PHONE'","'NOAH'","'INCOMING CALL'"]:
+            assert forbidden not in src, forbidden
+          for i in range(3):
+            for role,ext in [('far','jpg'),('mid','png'),('front','png')]:
+              f=d/'assets'/f'{role}_{i}.{ext}'
+              assert f.is_file() and f.stat().st_size>10000, str(f)
+              with Image.open(f) as im:
+                assert im.size==(1920,1080)
+                if role!='far': assert im.mode=='RGBA'
+          for name in ['art.js','engine.js']:
+            assert (d/'rig'/name).is_file(),name
+          print('PASS narration mode, correct first10 shot timing, nine genuine image layers, 0 credits')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_CORRECTED_NARRATION_PICTURE_SOURCE
+          path: film/story5-v3/narrated-first10
+          retention-days: 30
+  visual-smoke:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        start: [0,135,245]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_CORRECTED_NARRATION_PICTURE_SOURCE
+          path: film/story5-v3/narrated-first10
+      - name: Exercise each story-specific 2.5D shot without narration charge or picture downgrade
+        env:
+          SHOT_START: ${{ matrix.start }}
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          ln -s /opt/cinematic/node_modules film/story5-v3/narrated-first10/node_modules
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project film/story5-v3/narrated-first10 --start-frame "$SHOT_START" --frame-count 12 --out shot_preflight
+          test -s "shot_preflight/part_${SHOT_START}_12.mp4"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STORY5_V3_NARRATOR_VISUAL_SMOKE_${{ matrix.start }}
+          path: shot_preflight/
+          retention-days: 30
