@@ -1,0 +1,122 @@
+{
+  "project_id": "emma_story5_v3_10to30",
+  "story_source": "user-supplied story5.txt",
+  "output_window": {
+    "start_seconds": 10,
+    "end_seconds": 30,
+    "frames": 600,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "user_authorization": {
+    "exact_request": "ok go ahead i approve the credit spend; go ahead",
+    "tts_jobs_max": 1,
+    "tts_credits_max": 5,
+    "image_jobs_max": 4,
+    "image_credits_max": 4,
+    "stage_total_credits_max": 9,
+    "no_automatic_paid_retries": true,
+    "provider_hard_enforceable_credit_cap": false
+  },
+  "approved_first10": {
+    "github_run_id": 44152826592,
+    "artifact": "STORY5_V3_FIRST10_NARRATED_COMPLETE_MP4_SOURCE_QA",
+    "video_filename": "EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4",
+    "sha256": "58ac34e41bf2397891abd7d78c5cff1fc9e9d1862fe1a4ce2da11a6c48efb48f",
+    "mutate": false
+  },
+  "narration": {
+    "provider": "kie.ai",
+    "model": "google/gemini-3-8-flash-lite-tts",
+    "voice": "Charon",
+    "mode": "SINGLE_NARRATOR_VERBATIM",
+    "text": "She ran past abandoned cars, desperately searching for somewhere safe. Then her phone rang. A mysterious caller warned her to hide underground. Emma rushed into an empty subway station, but the main gate was locked. Suddenly, she heard heavy footsteps approaching from the darkness. With no time to think, she escaped through a maintenance tunnel.",
+    "word_count": 55,
+    "approved_new_jobs": 1,
+    "max_credits": 5,
+    "published_credit_per_million_input_tokens": 70,
+    "published_credit_per_million_audio_tokens": 840
+  },
+  "images": {
+    "provider": "SnapGen",
+    "model": "gpt-image-2.5-lower",
+    "approved_new_jobs_max": 4,
+    "approved_new_credits_max": 4,
+    "new_jobs_completed": 1,
+    "new_paid_credits": 1,
+    "new_uuid": "a1c54b02-e2bb-11f1-87a3-32bcf30a2274",
+    "new_art_url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/a1c54b02-e2bb-11f1-87a3-32bcf30a2274/20261117_191900_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T191923Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d45d4313fcd8f55b011eb285723ad16ec45959c5b09bdd62a33c8a1b8c03fcb4",
+    "existing_prepared_github_run_id": 44113871109,
+    "existing_prepared_artifact": "LSR_30S_CONTINUATION_PREPARED",
+    "existing_reuse_scene_indices": [
+      1,
+      2,
+      3
+    ],
+    "reuse_count": 3,
+    "discard_existing_scene0_reason": "Different story4 contains a collapsing man not in story5.txt"
+  },
+  "shot_outline": [
+    {
+      "start": 10,
+      "end": 13.6,
+      "image": 0,
+      "story": "Emma runs past abandoned cars; no named caller"
+    },
+    {
+      "start": 13.6,
+      "end": 15,
+      "image": 0,
+      "story": "Her phone rings; UI says UNKNOWN; avoid hearing conversation"
+    },
+    {
+      "start": 15,
+      "end": 18.9,
+      "image": 1,
+      "story": "Narrator reports mysterious caller warning, Emma runs down subway steps"
+    },
+    {
+      "start": 18.9,
+      "end": 22.8,
+      "image": 2,
+      "story": "Emma finds the main gate locked"
+    },
+    {
+      "start": 22.8,
+      "end": 25.75,
+      "image": 3,
+      "story": "Footsteps approach from darkness; Emma turns toward service tunnel"
+    },
+    {
+      "start": 25.75,
+      "end": 30,
+      "image": 3,
+      "story": "Emma escapes through maintenance tunnel"
+    }
+  ],
+  "forbidden": [
+    "Noah character",
+    "direct dialogue invented",
+    "collapsing man",
+    "metallic banging replacing footsteps",
+    "unchanged opening rerender",
+    "different image/TTS models",
+    "3D people",
+    "slideshow Ken Burns"
+  ],
+  "original_v3_immutable": true,
+  "mandatory_engines": [
+    "Three.js PerspectiveCamera",
+    "GSAP",
+    "Pillow",
+    "OpenCV",
+    "WebAudio OfflineAudioContext",
+    "WebCodecs",
+    "Mediabunny",
+    "FFmpeg/FFprobe",
+    "Playwright",
+    "GitHub Actions parallel 5s shards"
+  ],
+  "stage_stop": "30-second full approval gate"
+}
