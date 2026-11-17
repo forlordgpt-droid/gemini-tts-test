@@ -1,0 +1,60 @@
+name: The Last Safe Room — Download Approved SnapGen Originals (NO GENERATION)
+on:
+  push:
+    branches: [last-safe-room-10s-cinematic-20261117]
+    paths:
+      - .github/workflows/last-safe-room-fetch-illustrations.yml
+      - film/last-safe-room-10s/SNAPGEN_APPROVED_ART.json
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fetch-approved-existing-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install approved image processing library
+        run: python3 -m pip install --disable-pip-version-check --break-system-packages Pillow
+      - name: Download exactly the already-generated approved SnapGen assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageOps,ImageDraw
+          import io,json,urllib.request,hashlib
+          m=json.load(open('film/last-safe-room-10s/SNAPGEN_APPROVED_ART.json'))
+          assert m['approved_model']=='gpt-image-2.5-lower'
+          assert len(m['generations'])<=3
+          assert sum(x['credits_used'] for x in m['generations'])<=3
+          dst=Path('ready_art')
+          dst.mkdir(exist_ok=True)
+          cards=[]
+          for item in m['generations']:
+            assert item['index'] in (0,1,2)
+            req=urllib.request.Request(item['url'],headers={'User-Agent':'cinematic-review/1.0'})
+            with urllib.request.urlopen(req,timeout=120) as f:
+              data=f.read()
+            assert len(data)>100000
+            image=Image.open(io.BytesIO(data))
+            image.load()
+            assert abs(image.width/image.height-16/9)<.02,(image.size,item['index'])
+            outfile=dst/('raw_'+str(item['index'])+'.png')
+            image.convert('RGB').save(outfile,compress_level=4)
+            print('Downloaded approved asset index',item['index'],'pixels',image.size,'bytes',len(data),'sha256',hashlib.sha256(data).hexdigest())
+            card=ImageOps.fit(image.convert('RGB'),(640,360),method=Image.Resampling.LANCZOS)
+            cards.append((item['index'],card))
+          contact=Image.new('RGB',(640*len(cards),390),'#07121d')
+          d=ImageDraw.Draw(contact)
+          for i,(index,im) in enumerate(cards):
+            contact.paste(im,(i*640,30))
+            d.text((i*640+10,8),'APPROVED SNAPGEN ART #'+str(index+1),fill='white')
+          contact.save(dst/'FIRST_ORIGINAL_ART_REVIEW.jpg',quality=90)
+          (dst/'manifest.json').write_text(json.dumps({'model':m['approved_model'],'approved_creations':len(cards),'total_credits_used':sum(i['credits_used'] for i in m['generations'])},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LAST_SAFE_ROOM_RAW_APPROVED_ILLUSTRATIONS
+          path: ready_art/
+          retention-days: 25
