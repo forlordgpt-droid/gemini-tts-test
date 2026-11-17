@@ -2,7 +2,11 @@
 // Fixes the previous frozen-second-half bug by deliberately separating:
 // (1) ABSOLUTE narrative time for GSAP sampling, from
 // (2) LOCAL 0-based segment timestamps for WebCodecs MP4 frames.
-import {Output,Mp4OutputFormat,BufferTarget,CanvasSource,Quality} from 'mediabunny';
+// The scene's esbuild bundle imports the SINGLE original pinned Mediabunny instance.
+// Shared exporter uses that SAME instance, never bundles a second copy.
+const mb=window.__hunyuanV3Mediabunny;
+if(!mb||!['Output','Mp4OutputFormat','BufferTarget','CanvasSource','Quality'].every(k=>typeof mb[k]==='function'))throw Error('Hunyuan V3 single-instance Mediabunny API not injected: STOP; no substitution');
+const {Output,Mp4OutputFormat,BufferTarget,CanvasSource,Quality}=mb;
 window.HunyuanV3Export=async ({start_frame,frame_count,fps=30,quality_bitrate=8500000})=>{
  const stage=document.getElementById('stage');
  if(!(stage instanceof HTMLCanvasElement)||stage.width!==1920||stage.height!==1080)
