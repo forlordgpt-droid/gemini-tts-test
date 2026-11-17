@@ -1,0 +1,20 @@
+HUNYUAN V3 — COPY THIS COMMAND TO ANY LLM CONNECTED TO MY GITHUB AND GOOGLE DRIVE
+
+Use my GitHub repository forlordgpt-droid/gemini-tts-test, branch hunyuan-cinematic-engine-v3-20261117.
+Read film/cinematic-engine-v3/AGENTS.md then read these TWO exact unchanged files IN FULL:
+  film/cinematic-engine-v3/authoritative/MANDATORY_CINEMATIC_ANIMATION_INSTRUCTIONS.txt
+  film/cinematic-engine-v3/authoritative/HUNYUAN_30S_CINEMATIC_REPLICATION_BLUEPRINT.txt
+Also study the original approved HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 and the source HUNYUAN_30S_PARALLAX_SOURCE.zip and original 2D HUNYUAN_2D_CHARACTER_PACKAGE.zip (including art.js and engine.js). All are embedded/archived within the version-locked Hunyuan V3 environment.
+
+Use the already-published prebuilt container, by immutable digest:
+ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:54fa667cb18dc923f8940f9c35a289ecaa6b7a883cbcb349ec03cdf20f6626a6
+
+DO NOT INSTALL dependencies again on each GitHub CPU runner.
+Preserve ALL image-first premium 2D illustration, true independently layered 2.5D parallax, visible Three.js PerspectiveCamera/GSAP choreography, expressive original 2D rig character actions where appropriate, meaningful modern SVG/Canvas motion graphics, living environments, synchronized audio, real frame/normal-speed visual QA and Google Drive delivery.
+Never create photorealistic/3D human footage, basic SVG backgrounds, static slideshows or simple whole-image Ken Burns zooms.
+Do not substitute models or libraries. Only SnapGen GPT Image 2.5 Lower and Kie.ai Gemini 3.8 Flash TTS when I explicitly approve provider, model, quantity and maximum credits for THIS project.
+Production sequence: (1) uncorrected first 10s sample and visual approval, (2) first complete 30s and visual approval, (3) remaining story. Never auto-continue past either approval gate.
+For a 15-minute film, plan 27,000 frames / 90 independent 10-second shards with no more than ~8 active GitHub public CPU runners by default, automatic checkpoint reuse, clean local video PTS per shard, and source + QC archiving.
+The prebuilt environment and reference packs help with speed, but you MUST author story-specific rich illustrated assets and camera/actor/effect choreography with the user-provided script. Do not treat passing technical tests as proof of beautiful cinema.
+
+If required reference or exact tool fails, STOP rather than substitute. Never secretly spend credits.
