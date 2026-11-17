@@ -1,0 +1,21 @@
+{
+  "name": "hunyuan-cinematic-engine-v3",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "scripts": {
+    "doctor": "python3 engine/scripts/doctor.py --check",
+    "browser-smoke": "node engine/scripts/browser_smoke.cjs",
+    "validate-story": "python3 engine/scripts/orchestrator.py validate",
+    "plan-shards": "python3 engine/scripts/orchestrator.py plan"
+  },
+  "dependencies": {
+    "three": "0.187.0",
+    "gsap": "3.15.1",
+    "mediabunny": "1.66.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright": "1.65.1"
+  }
+}
