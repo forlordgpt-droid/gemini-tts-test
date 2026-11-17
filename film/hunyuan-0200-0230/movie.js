@@ -62,7 +62,8 @@ function extractLayers(img,artId){
  // Nearby chroma/texture is softly propagated, never transparent empty holes.
  const soft=surface(w,h),sc=soft.getContext('2d');
  sc.filter='blur(32px)';sc.drawImage(img,-16,-16,w+32,h+32);
- sc.globalCompositeOperation='destination-in';sc.drawImage(mm,0,0);sc.drawImage(nm,0,0);sc.globalCompositeOperation='source-over';
+ const union=surface(w,h),uc=union.getContext('2d');uc.drawImage(mm,0,0);uc.drawImage(nm,0,0);
+ sc.globalCompositeOperation='destination-in';sc.drawImage(union,0,0);sc.globalCompositeOperation='source-over';
  fc.drawImage(soft,0,0);
  const mid=surface(w,h),mc=mid.getContext('2d');mc.drawImage(img,0,0,w,h);
  mc.globalCompositeOperation='destination-in';mc.drawImage(mm,0,0);mc.globalCompositeOperation='source-over';
