@@ -1,0 +1,105 @@
+name: Emma Story5 V3 Final 30–60 — Verify 24 True Illustrated 2.5D Planes (ZERO NEW PAID)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-final-eight-2p5d-depth-qa.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  verify-painted-depth-planes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mandatory original V3 immutable reference doctor
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Reuse all 8 already paid original illustrated artworks; no new image generation
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_FINAL_30TO60_ALL_EIGHT_ORIGINAL_ILLUSTRATIONS_AND_CONTACT
+          run-id: 44186025399
+          github-token: ${{ github.token }}
+          path: film/story5-v3/final-30to60
+      - name: Reuse native Hunyuan original 2D rig from previously verified V3 source (not Emma)
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_10TO30_PREPARED_VISUAL_AND_VOICE_INPUTS
+          run-id: 44160332296
+          github-token: ${{ github.token }}
+          path: prior_prepared
+      - name: Copy exact rig, validate all 8 source images and approved total AI spend
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil,json
+          from PIL import Image
+          d=Path('film/story5-v3/final-30to60');source=Path('prior_prepared')
+          src=source/'film/story5-v3/continuation-10to30/rig'
+          if not src.is_dir():src=source/'rig'
+          if not src.is_dir():raise RuntimeError('Original approved Hunyuan rig is missing; stop and do not substitute')
+          dest=d/'rig';dest.mkdir(parents=True,exist_ok=True)
+          for filename in ['art.js','engine.js']:
+            f=src/filename
+            assert f.is_file() and f.stat().st_size>1000,f
+            shutil.copy2(f,dest/filename)
+          m=json.loads((d/'FINAL_EIGHT_NEW_SNAPGEN_ILLUSTRATIONS_VERIFIED.json').read_text())
+          p=json.loads((d/'FINAL_30TO60_APPROVED_PRODUCTION_MANIFEST.json').read_text())
+          assert m['completed_new_jobs']==m['approved_max_new_jobs']==8
+          assert m['charged_credits']==p['credit_plan']['image_credit_budget_max']==8
+          assert p['approve_first30']['do_not_change'] is True
+          for i in range(8):
+            art=d/'raw'/f'raw_{i}.png'
+            assert art.is_file() and art.stat().st_size>100000,art
+            with Image.open(art) as im: assert 1.75<im.width/im.height<1.81
+          print('PASS original rig + 8 original paid story5 images, no new API charge')
+          PY
+      - name: Pillow and OpenCV native GrabCut guided actor + independent near/far props, auditable alpha QA
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/final-30to60/prepare_eight_true_2p5d_layers.py
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          import json
+          d=Path('film/story5-v3/final-30to60')
+          qa=json.loads((d/'qc/FULL_EIGHT_2P5D_MASK_QA.json').read_text())
+          assert qa['layers_per_scene']==3 and qa['total_separate_depth_planes']==24
+          assert len(qa['scenes'])==8
+          for i in range(8):
+            for layer,ext in [('far','jpg'),('mid','png'),('front','png')]:
+              f=d/'assets'/f'{layer}_{i}.{ext}'
+              assert f.is_file() and f.stat().st_size>10000,f
+              with Image.open(f) as im:
+                assert im.size==(1920,1080),im.size
+                if layer!='far':assert im.mode=='RGBA'
+          board=Image.new('RGB',(1440,920),'#071020');draw=ImageDraw.Draw(board)
+          for i in range(8):
+            f=d/'qc'/f'SCENE_{i}_DEPTH_MASK_QA.jpg'
+            with Image.open(f) as im:
+              thumb=im.convert('RGB').crop((0,20,640,380)).resize((350,198))
+              x=(i%4)*360;y=(i//4)*460
+              board.paste(thumb,(x,y+30))
+              draw.text((x+8,y+7),f'APPROVED SCENE {i}: 3 PHYSICAL DEPTHS',fill='#d8e8f6')
+          board.save(d/'qc/EIGHT_FINAL_ILLUSTRATED_PLANES_QA_CONTACT.jpg',quality=89)
+          print('PASS 24 1080p parallax layers from 8 original paid 2D illustrations, no extra paid calls')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_FINAL_30TO60_EIGHT_ILLUSTRATED_SCENES_24_TRUE_DEPTH_PLANES
+          path: |
+            film/story5-v3/final-30to60/assets/
+            film/story5-v3/final-30to60/raw/
+            film/story5-v3/final-30to60/rig/
+            film/story5-v3/final-30to60/qc/
+          retention-days: 30
