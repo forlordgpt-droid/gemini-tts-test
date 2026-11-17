@@ -1,0 +1,69 @@
+name: Emma Story5 V3 Final 30–60 — Retrieve 8 Already-Paid Illustrations and Contact QA (NO NEW PAID)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-final-eight-original-illustrations-prep.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  validate-eight-original-2d-artworks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable original Hunyuan V3 reference package and exact software
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Download ONLY the 8 already-generated SnapGen GPT Image 2.5 Lower source images, no generation API
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          import urllib.request,io,json,hashlib
+          p=Path('film/story5-v3/final-30to60')
+          manifest=json.loads((p/'FINAL_EIGHT_NEW_SNAPGEN_ILLUSTRATIONS_VERIFIED.json').read_text())
+          budget=json.loads((p/'FINAL_30TO60_APPROVED_PRODUCTION_MANIFEST.json').read_text())
+          assert manifest['provider']=='SnapGen' and manifest['model']=='gpt-image-2.5-lower'
+          assert len(manifest['images'])==8 and manifest['charged_credits']==8
+          assert budget['credit_plan']['new_image_jobs_max']==8 and budget['credit_plan']['image_credit_budget_max']==8
+          assert sorted(x['index'] for x in manifest['images'])==list(range(8))
+          assert all(x['model']=='gpt-image-2.5-lower' and x['credits_used']==1 and x['status']=='completed' for x in manifest['images'])
+          raw=p/'raw';q=p/'qc';raw.mkdir(parents=True,exist_ok=True);q.mkdir(parents=True,exist_ok=True)
+          thumb=Image.new('RGB',(1920,1160),(6,14,25));d=ImageDraw.Draw(thumb)
+          details=[]
+          for im in manifest['images']:
+            i=im['index']
+            req=urllib.request.Request(im['url'],headers={'User-Agent':'Hunyuan-V3-original-art-archive/1.0'})
+            with urllib.request.urlopen(req,timeout=120) as r:source=r.read()
+            if len(source)<100000:raise RuntimeError('Missing generated image; STOP no image replacement '+str(i))
+            art=Image.open(io.BytesIO(source));art.load()
+            assert 1.75<art.width/art.height<1.81,(i,art.size)
+            assert art.width>=1000 and art.height>=550,(i,art.size)
+            dest=raw/f'raw_{i}.png'
+            art.convert('RGB').save(dest,compress_level=4)
+            x=(i%4)*480;y=(i//4)*580
+            thumb.paste(art.convert('RGB').resize((480,270),Image.Resampling.LANCZOS),(x,y+38))
+            label=im['visual_story'][:70]
+            d.text((x+8,y+12),f'SCENE {i}  {label}',fill='#faf1da')
+            details.append({'index':i,'uuid':im['uuid'],'model':im['model'],'credits_paid':1,'source_bytes':len(source),'source_sha256':hashlib.sha256(source).hexdigest(),'resolution':list(art.size),'saved_source_path':str(dest)})
+            print('CHECKED PAID PREVIOUSLY 2D IMAGE',i,art.size,'bytes',len(source),flush=True)
+          thumb.save(q/'EIGHT_FINAL_30TO60_IMAGES_CONTACT_SHEET.jpg',quality=90)
+          (q/'ORIGINAL_EIGHT_SOURCE_SHA256_AND_SPEND.json').write_text(json.dumps({'status':'PASS_ALL_EIGHT_PREPAID_ARTWORKS','image_model':'gpt-image-2.5-lower','new_paid_jobs_in_this_workflow':0,'credits_previously_spent':8,'assets':details},indent=2))
+          print('PASS all eight 2D final-story images and credit provenance; no NEW paid API calls')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_FINAL_30TO60_ALL_EIGHT_ORIGINAL_ILLUSTRATIONS_AND_CONTACT
+          path: |
+            film/story5-v3/final-30to60/raw/
+            film/story5-v3/final-30to60/qc/
+          retention-days: 30
