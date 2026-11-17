@@ -1,0 +1,47 @@
+{
+  "status": "PLANNED_ONLY_NO_PAID_API_CALLED",
+  "provider": "kie.ai",
+  "exact_model": "google/gemini-3-8-flash-tts",
+  "model_change_forbidden": true,
+  "pricing_2026_11_17": {
+    "input_credits_per_1000000_tokens": 70,
+    "audio_output_credits_per_1000000_tokens": 1260,
+    "actual_total_unavailable_before_usage": true
+  },
+  "prior_approval": "User approved TTS in principle but requested separate exact cost confirmation; no maximum authorized yet",
+  "require_explicit_approval_before_tasks": true,
+  "planned_jobs": 3,
+  "locked_dialogue": [
+    {
+      "index": 0,
+      "speaker": "Noah",
+      "voice_name": "Fenrir",
+      "start_second": 10.15,
+      "end_target": 13.5,
+      "style": "Adult American man, urgently shouting over a phone from a dangerous place, very fast but clearly articulated, concerned and intense",
+      "text": "Emma! The gas is moving faster. Get underground!",
+      "phone_bandpass": true
+    },
+    {
+      "index": 1,
+      "speaker": "Emma",
+      "voice_name": "Zephyr",
+      "start_second": 20.45,
+      "end_target": 22.4,
+      "style": "Breathless American woman, frightened and desperate, shouting urgently inside a concrete subway station, quick clear words",
+      "text": "Noah! It's locked!",
+      "phone_bandpass": false
+    },
+    {
+      "index": 2,
+      "speaker": "Noah",
+      "voice_name": "Fenrir",
+      "start_second": 22.95,
+      "end_target": 25.35,
+      "style": "Adult American man over phone, urgent whisper escalating to sharp instruction, tense and realistic",
+      "text": "There's an emergency tunnel behind you!",
+      "phone_bandpass": true
+    }
+  ],
+  "guidance": "When separately authorized, create each WAV with Kie exact Flash TTS, no Flash-Lite; trim silence, preserve all dialogue, schedule with FFmpeg amix against original approved 0–10 sound and 10–30 OfflineAudioContext SFX. Verify intelligible and uncropped voices. If costs/voice features exceed approval, stop."
+}
