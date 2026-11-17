@@ -7,7 +7,7 @@ Read film/cinematic-engine-v3/AGENTS.md then read these TWO exact unchanged file
 Also study the original approved HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 and the source HUNYUAN_30S_PARALLAX_SOURCE.zip and original 2D HUNYUAN_2D_CHARACTER_PACKAGE.zip (including art.js and engine.js). All are embedded/archived within the version-locked Hunyuan V3 environment.
 
 Use the already-published prebuilt container, by immutable digest:
-ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:54fa667cb18dc923f8940f9c35a289ecaa6b7a883cbcb349ec03cdf20f6626a6
+ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
 
 DO NOT INSTALL dependencies again on each GitHub CPU runner.
 Preserve ALL image-first premium 2D illustration, true independently layered 2.5D parallax, visible Three.js PerspectiveCamera/GSAP choreography, expressive original 2D rig character actions where appropriate, meaningful modern SVG/Canvas motion graphics, living environments, synchronized audio, real frame/normal-speed visual QA and Google Drive delivery.
