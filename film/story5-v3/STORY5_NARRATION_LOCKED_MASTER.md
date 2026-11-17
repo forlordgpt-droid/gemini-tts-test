@@ -1,6 +1,8 @@
 # STORY5 — NARRATION-LOCKED MASTER (AUTHORITATIVE CORRECTION)
 Production: Hunyuan Cinematic Engine V3
-Status: AWAITING NARRATOR TTS BUDGET APPROVAL; NO NEW PAID JOBS AUTHORIZED.
+Status: BLOCKED AFTER EXACT KIE TTS PROVIDER TIMEOUT; 1 authorized paid request consumed, ZERO credits debited according to independent read-only balance check. NO paid retries authorized. Corrected 2.5D art/camera preflight passed, narrated MP4 NOT rendered.
+Kie task: `50214fd411ae5bd5c280faf60a3f809d` (failed with `generate task timeout.`). Paid run: https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44149119360 ; read-only audit: https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44149522287 .
+Authorization consumed: a separate explicit approval is required for another paid submission. Do not create a new request from existing manifest or rerun the workflow.
 Date: 2026-11-17
 Original source: attached `story5.txt`
 Source genre: **narrated cinematic thriller**, NOT a dialogue screenplay.
