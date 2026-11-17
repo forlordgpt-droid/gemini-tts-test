@@ -1,0 +1,239 @@
+name: Last Safe Room — 30s Film Visual Assembly (NO NEW TTS CHARGE)
+on:
+  push:
+    branches: [last-safe-room-full-30s-20261117]
+    paths: ['.github/workflows/last-safe-room-30s-film.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow and OpenCV as exclusively required
+        run: python3 -m pip install --disable-pip-version-check --break-system-packages Pillow opencv-python-headless
+      - name: Download exactly the four approved NEW SnapGen GPT Image 2.5 Lower images and rig
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import io,json,urllib.request,zipfile,hashlib
+          base=Path('film/last-safe-room-30s');pilot=base/'pilot'
+          raw=pilot/'raw';raw.mkdir(parents=True,exist_ok=True)
+          m=json.loads((base/'APPROVED_NEW_FOUR_SNAPGEN_IMAGES.json').read_text())
+          assert m['model']=='gpt-image-2.5-lower'
+          assert len(m['images'])==4
+          assert sorted(i['index'] for i in m['images'])==[0,1,2,3]
+          assert sum(i['credits_used'] for i in m['images'])==4
+          assert m['maximum_approved_new_credits']==4
+          for im in m['images']:
+            request=urllib.request.Request(im['url'],headers={'User-Agent':'illustrated-cinema/1.0'})
+            with urllib.request.urlopen(request,timeout=100) as response:data=response.read()
+            assert len(data)>100000
+            art=Image.open(io.BytesIO(data));art.load()
+            assert abs(art.width/art.height-16/9)<.025,(art.size,im['index'])
+            dest=raw/('raw_'+str(im['index'])+'.png')
+            art.convert('RGB').save(dest,compress_level=4)
+            print('APPROVED GPT IMAGE 2.5 LOWER',im['index'],art.size,hashlib.sha256(data).hexdigest())
+          with zipfile.ZipFile('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            assert z.testzip() is None
+            for name in ('art.js','engine.js'):
+              dest=pilot/'rig'/name
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes(z.read('HUNYUAN_2D/'+name))
+          print('PASS no paid generation or Kie TTS API used by this workflow')
+          PY
+      - name: Generate and audit all independent 2.5D plates from approved story art
+        working-directory: film/last-safe-room-30s/pilot
+        run: |
+          set -euo pipefail
+          python3 prepare_layers.py
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          for i in range(4):
+            for layer,ext in (('far','jpg'),('mid','png'),('front','png')):
+              f=Path('assets')/(layer+'_'+str(i)+'.'+ext)
+              assert f.exists() and f.stat().st_size>10000,f
+              im=Image.open(f)
+              assert im.size==(1920,1080),(f,im.size)
+              if layer!='far':assert im.mode=='RGBA',(f,im.mode)
+          print('PASS 12 independently rendered 1080p parallax plates from exactly 4 originals')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_PREPARED
+          path: |
+            film/last-safe-room-30s/pilot/assets/
+            film/last-safe-room-30s/pilot/raw/
+            film/last-safe-room-30s/pilot/rig/
+            film/last-safe-room-30s/pilot/qc/
+          retention-days: 30
+
+  render:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_PREPARED
+          path: film/last-safe-room-30s/pilot
+      - name: Render deterministic 150-frame 1080p Three.js PerspectiveCamera GSAP Mediabunny WebCodecs shard
+        working-directory: film/last-safe-room-30s/pilot
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - name: Verify each parallel shard exactly 5 seconds 150 frames H264
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration -of json "film/last-safe-room-30s/pilot/qc/part_$SHARD_INDEX.mp4" > verify.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('verify.json'));v=next(s for s in d['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150),v
+          assert abs(float(d['format']['duration'])-5)<.12
+          print('PASS 150 frames / 5.00s / 1920x1080 30fps H264')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LSR_30S_SHARD_${{ matrix.shard }}
+          path: film/last-safe-room-30s/pilot/qc/
+          retention-days: 25
+
+  sound:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_PREPARED
+          path: film/last-safe-room-30s/pilot
+      - name: Generate original 20s environment and tunnel metal audio with OfflineAudioContext
+        working-directory: film/last-safe-room-30s/pilot
+        env:
+          EXPORT_SFX: '1'
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_WEB_AUDIO
+          path: film/last-safe-room-30s/pilot/qc/sfx_20.wav
+          retention-days: 25
+
+  assemble:
+    needs: [render,sound]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_10S_RAW_APPROVAL_VIDEO_AND_SOURCE
+          run-id: 44104478064
+          github-token: ${{ github.token }}
+          path: original_approved
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: LSR_30S_SHARD_*
+          path: shards
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_WEB_AUDIO
+          path: sound
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_30S_CONTINUATION_PREPARED
+          path: film/last-safe-room-30s/pilot
+      - name: Assemble locked approved first10 and subsequent 600 frames without new TTS
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          mkdir -p delivery
+          first="original_approved/LAST_SAFE_ROOM_FIRST_10S_UNCORRECTED_DRAFT.mp4"
+          test -s "$first"
+          ffmpeg -hide_banner -loglevel error -y -i "$first" -map 0:v:0 -an -c:v copy delivery/approved_first10_video.mp4
+          python3 - <<'PY'
+          from pathlib import Path
+          paths=[Path('delivery/approved_first10_video.mp4')]
+          paths.extend(Path('shards')/('LSR_30S_SHARD_'+str(i))/('part_'+str(i)+'.mp4') for i in range(4))
+          assert all(p.is_file() and p.stat().st_size>100000 for p in paths),paths
+          Path('concat.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in paths))
+          print('Locked first10 master + 4 x 5s approved continuation shards')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y -i "$first" -vn -ar 24000 -ac 1 delivery/approved_first10_audio.wav
+          ffmpeg -hide_banner -loglevel error -y -i delivery/approved_first10_audio.wav -i sound/sfx_20.wav \
+            -filter_complex '[0:a]atrim=0:10,asetpts=PTS-STARTPTS[a];[1:a]atrim=0:20,asetpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=0:a=1[s]' \
+            -map '[s]' -c:a pcm_s16le delivery/sfx_only_30.wav
+          ffmpeg -hide_banner -loglevel error -y -i delivery/video_only.mp4 -i delivery/sfx_only_30.wav \
+            -map 0:v:0 -map 1:a:0 -t 30 -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration -of json \
+            delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4 > delivery/ffprobe.json
+          python3 - <<'PY'
+          import json,pathlib
+          d=json.load(open('delivery/ffprobe.json'))
+          v=next(s for s in d['streams'] if s['codec_type']=='video')
+          a=next(s for s in d['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900),v
+          assert a['codec_name']=='aac'
+          assert abs(float(d['format']['duration'])-30)<.12,d
+          f=pathlib.Path('delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4')
+          pathlib.Path('delivery/QC.json').write_text(json.dumps({
+            'status':'TECHNICAL_VISUAL_PREVIEW_PASS_KIE_TTS_APPROVAL_REQUIRED',
+            'duration':30,'frames':900,'width':1920,'height':1080,'fps':30,
+            'approved_first10_reused':'unchanged video stream from success 44104478064',
+            'new_images':4,'new_model':'gpt-image-2.5-lower','new_snapgen_credits':4,
+            'voices':'NOT GENERATED. Variable-priced Kie Gemini 3.8 Flash TTS requires separate budget approval',
+            'original_effects':'WebAudio OfflineAudioContext','render_shards':4,
+            'stack':['Three.js PerspectiveCamera','GSAP','Hunyuan art.js + engine.js',
+              'SVG/Canvas2D','Pillow','OpenCV','OfflineAudioContext','WebCodecs','Mediabunny',
+              'FFmpeg','FFprobe','Playwright','GitHub Actions'],
+            'bytes':f.stat().st_size
+          },indent=2))
+          print('TECHNICAL 900 FRAMES PASS; DIALOGUE MISSING PENDING APPROVAL')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i delivery/LAST_SAFE_ROOM_30S_VISUAL_PREVIEW_PENDING_KIE_VOICES.mp4 \
+            -vf 'fps=1/3,scale=640:-1,tile=5x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+          zip -q -r delivery/LAST_SAFE_ROOM_30S_CINEMATIC_PROJECT_SOURCE.zip film/last-safe-room-30s
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LSR_30S_VISUAL_PREVIEW_AND_SOURCE_PENDING_KIE
+          path: delivery/
+          retention-days: 30
