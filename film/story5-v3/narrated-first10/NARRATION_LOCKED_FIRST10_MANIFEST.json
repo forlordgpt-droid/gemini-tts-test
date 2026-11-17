@@ -3,7 +3,7 @@
   "source": "user supplied story5.txt",
   "authoritative_story": "film/story5-v3/STORY5_NARRATION_LOCKED_MASTER.md",
   "milestone": "FIRST10_ONLY",
-  "approval_user": "The one approved Kie 3.8 Flash TTS job has been consumed; the provider returned generate task timeout; read-only audit confirmed 0 credits debited. NO RETRY AUTHORIZED.",
+  "approval_user": "User selected Kie.ai Gemini 3.8 Flash-Lite TTS as the replacement model for story5, but has not yet approved a NEW paid Lite task count and spending cap. Both previous Flash approvals consumed, both timed out; 0 observed credits charged.",
   "title": "Emma: The Safe Room",
   "narration_mode": "SINGLE_NARRATOR_VERBATIM",
   "scene_1_00_to_15": "Entire city evacuated, toxic yellow gas, Emma trapped and running, phone rings ONLY near second 15",
@@ -13,9 +13,9 @@
   "voice_direction": "One suspenseful, natural cinematic narrator, ominous but human, brisk clear 155–165 words per minute, precise verbatim reading, no intro, no invented dialogue, short natural pauses, no trailing outro",
   "tts": {
     "provider": "kie.ai",
-    "model": "google/gemini-3-8-flash-tts",
+    "model": "google/gemini-3-8-flash-lite-tts",
     "proposed_jobs": 1,
-    "estimated_credits_per_job": "about 0.4–1.0",
+    "estimated_credits_per_job": "approximately 0.2-0.4 credits for a roughly 10-second narrator clip, usage-dependent",
     "proposed_max_credits": 5,
     "hard_cap_enforceable_by_provider": false,
     "authorized_credits": 0,
@@ -31,7 +31,24 @@
     "observed_credit_debit": 0,
     "new_approval_required_for_any_paid_retry": true,
     "last_paid_run": "https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44149119360",
-    "readonly_cost_audit": "https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44149522287"
+    "readonly_cost_audit": "https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44149522287",
+    "prior_flash_model": "google/gemini-3-8-flash-tts",
+    "prior_flash_attempt_ids": [
+      "50214fd411ae5bd5c280faf60a3f809d",
+      "e023925f74d68ac373714f1ee9b78074"
+    ],
+    "prior_flash_attempts": 2,
+    "prior_flash_total_credits_charged": 0,
+    "story5_user_explicit_model_selection": true,
+    "story_specific_override": "Kie Flash-Lite for Emma story5 narration, original engine/locked settings remain immutable",
+    "requested_but_not_spend_approved": true,
+    "pricing_credits_per_million_input_tokens": 70,
+    "pricing_credits_per_million_audio_output_tokens": 840,
+    "new_proposed_paid_jobs": 1,
+    "next_paid_request_requires_explicit_budget_approval": true,
+    "new_lite_jobs_submitted": 0,
+    "user_acknowledged_no_hard_cap_for_lite": false,
+    "last_failed_model": "google/gemini-3-8-flash-tts"
   },
   "image_reuse": {
     "provider": "SnapGen",
