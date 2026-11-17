@@ -1,0 +1,77 @@
+name: The Last Safe Room — Source and Required Stack Preflight (No Paid Calls)
+on:
+  push:
+    branches: [last-safe-room-10s-cinematic-20261117]
+    paths: ['.github/workflows/last-safe-room-source-preflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate original source packages without changing models
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p preflight
+          python3 - <<'PY'
+          import json, zipfile, pathlib, hashlib
+          base=pathlib.Path('film/hunyuan-2m')
+          out={}
+          for key, fname in [('native_2d','HUNYUAN_2D_CHARACTER_PACKAGE.zip'),('original_cinematic_source','HUNYUAN_30S_PARALLAX_SOURCE.zip')]:
+            p=base/fname
+            assert p.is_file(), f'Required original missing: {p}'
+            with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              names=z.namelist()
+              if key=='native_2d':
+                assert 'HUNYUAN_2D/art.js' in names
+                assert 'HUNYUAN_2D/engine.js' in names
+              else:
+                assert any(n.endswith('package.json') for n in names)
+                assert any(n.endswith('.webp') for n in names)
+              out[key]={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size,'files':names}
+          pathlib.Path('preflight/MANIFEST.json').write_text(json.dumps(out,indent=2))
+          print('PASS: Original rig and original cinematic source found and ZIP-validated')
+          PY
+          ffprobe -version | head -1
+          ffmpeg -version | head -1
+      - name: Inspect original rendering libraries and validate browser support
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,pathlib
+          root=pathlib.Path('film/hunyuan-2m')
+          with zipfile.ZipFile(root/'HUNYUAN_30S_PARALLAX_SOURCE.zip') as z:
+            z.extractall(root)
+          with zipfile.ZipFile(root/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            for name in ('art.js','engine.js'):
+              p=root/'preview_30s'/'rig'/name
+              p.parent.mkdir(parents=True,exist_ok=True)
+              p.write_bytes(z.read('HUNYUAN_2D/'+name))
+          print('Source unpacked; no asset generation or TTS call')
+          PY
+          cd film/hunyuan-2m/preview_30s
+          node -v
+          cat package.json
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - name: Upload reference ZIPs and inspection manifest
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LAST_SAFE_ROOM_SOURCE_PREFLIGHT
+          path: |
+            film/hunyuan-2m/HUNYUAN_30S_PARALLAX_SOURCE.zip
+            film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip
+            preflight/MANIFEST.json
+          retention-days: 15
