@@ -1,0 +1,19 @@
+{
+  "approved_model": "gpt-image-2.5-lower",
+  "approved_credits_max": 3,
+  "story": "The Last Safe Room first 10 seconds",
+  "generations": [
+    {
+      "index": 0,
+      "uuid": "cdfbd366-e28f-11f1-9a31-deb8e1af7995",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/cdfbd366-e28f-11f1-9a31-deb8e1af7995/20261117_140514_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T140554Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=74024b2047f9df9a39902853cfdfc41090ef58c18088681c9e1bc799c120912b"
+    },
+    {
+      "index": 1,
+      "uuid": "0c316c5e-e290-11f1-ad4b-6eb3a28d6463",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/0c316c5e-e290-11f1-ad4b-6eb3a28d6463/20261117_140708_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T140717Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=70a8899ba21b86dcac9a4c7377bad3ccf63c0de3b9f683fd076b104271bf3a9c"
+    }
+  ]
+}
