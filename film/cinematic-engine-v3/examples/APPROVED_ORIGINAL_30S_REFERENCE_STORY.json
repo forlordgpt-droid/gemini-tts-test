@@ -1,0 +1,212 @@
+{
+  "project_id": "hunyuan_reference_original_30s",
+  "kind": "REFERENCE_FIXTURE_NOT_A_NEW_STORY",
+  "story_source": "Original approved Hunyuan 30-second movie, immutable commit 716740ba4fb50b2d0c1ff3f033973d34a0209b34",
+  "duration_seconds": 30,
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "video_codec": "h264",
+    "audio_codec": "aac"
+  },
+  "image_provider": "SnapGen",
+  "image_model": "gpt-image-2.5-lower",
+  "tts_provider": "kie.ai",
+  "tts_model": "google/gemini-3-8-flash-tts",
+  "camera": "Three.js PerspectiveCamera",
+  "animation": "GSAP paused absolute-time",
+  "character_rig": "original native Hunyuan 2D art.js + engine.js",
+  "approvals": {
+    "first10_approved": true,
+    "first30_approved": true,
+    "reference_fixture_only": true
+  },
+  "paid_media": {
+    "default_disabled": true,
+    "image_generation_approved": false,
+    "tts_generation_approved": false
+  },
+  "shots": [
+    {
+      "id": "S01",
+      "start_frame": 0,
+      "end_frame": 150,
+      "story_beat": "Sleeping Hunyuan during a peaceful 06:41 morning",
+      "art_direction": "painterly bedroom with detailed bed, warm amber lamp, teal foliage and distant city",
+      "character_action": "original native Hunyuan 2D sleep pose, breathing",
+      "lighting": "indigo dusk to warm amber",
+      "transition": "cross-story motivated cut into coffee desk",
+      "sound_cues": "soft room air and lamp hum",
+      "motion_graphics_purpose": "quiet 06:41 time capsule",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_0.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_0.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_0.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": -0.58,
+          "y": 0.07,
+          "z": 10.25
+        },
+        "end": {
+          "x": 0.46,
+          "y": -0.07,
+          "z": 9.56
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    },
+    {
+      "id": "S02",
+      "start_frame": 150,
+      "end_frame": 300,
+      "story_beat": "Cup and personal routine before danger",
+      "art_direction": "coffee steam, notebook, desk ornaments and sunny room depth",
+      "character_action": "Hunyuan remains in room but camera favors steam and routine props",
+      "lighting": "dawn teal and warm practical desk lamp",
+      "transition": "match-cut from sleeping room to coffee mug",
+      "sound_cues": "steam/warm room ambience",
+      "motion_graphics_purpose": "short 09:00 meeting cue",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_1.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_1.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_1.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": 0.58,
+          "y": -0.04,
+          "z": 10.1
+        },
+        "end": {
+          "x": -0.46,
+          "y": 0.05,
+          "z": 9.42
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    },
+    {
+      "id": "S03",
+      "start_frame": 300,
+      "end_frame": 450,
+      "story_beat": "The last ordinary moments, curtains drifting",
+      "art_direction": "illustrated sheer curtains passing near lens and rich window/city",
+      "character_action": "Hunyuan native subtle sleepy performance",
+      "lighting": "dawn blue-green, slight darker shadows",
+      "transition": "foreground curtain wipe revealing room",
+      "sound_cues": "low tension ambience",
+      "motion_graphics_purpose": "THE LAST NORMAL MORNING capsule",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_2.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_2.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_2.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": -0.48,
+          "y": 0.13,
+          "z": 10.18
+        },
+        "end": {
+          "x": 0.34,
+          "y": -0.07,
+          "z": 9.45
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    },
+    {
+      "id": "S04",
+      "start_frame": 450,
+      "end_frame": 600,
+      "story_beat": "Eerie siren colors interrupt sleep",
+      "art_direction": "rich bedroom artwork with visibly colored siren light and sound ribbons",
+      "character_action": "native Hunyuan head lifts and startled expression",
+      "lighting": "cyan/magenta siren light versus cobalt shadows",
+      "transition": "push reframe onto reaction",
+      "sound_cues": "alarm siren original OfflineAudioContext",
+      "motion_graphics_purpose": "small SIREN DETECTED label",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_3.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_3.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_3.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": 0.34,
+          "y": 0.1,
+          "z": 10.05
+        },
+        "end": {
+          "x": -0.48,
+          "y": -0.12,
+          "z": 9.24
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    },
+    {
+      "id": "S05",
+      "start_frame": 600,
+      "end_frame": 750,
+      "story_beat": "Phone vibration intensifies warning",
+      "art_direction": "close desk and glowing phone framed against dramatic room",
+      "character_action": "native Hunyuan reacting; point/head gesture",
+      "lighting": "orange practical lamp + red pulse",
+      "transition": "low push past lamp toward phone",
+      "sound_cues": "phone vibration buzz/rings",
+      "motion_graphics_purpose": "NOT A TEST with rings and phone UI",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_4.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_4.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_4.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": -0.28,
+          "y": 0.07,
+          "z": 10.05
+        },
+        "end": {
+          "x": 0.45,
+          "y": -0.07,
+          "z": 9.27
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    },
+    {
+      "id": "S06",
+      "start_frame": 750,
+      "end_frame": 900,
+      "story_beat": "Emergency alert reveal creates immediate action",
+      "art_direction": "large foreground red phone UI; Hunyuan and detailed room recede at side",
+      "character_action": "native Hunyuan afraid/reaction and gaze direction",
+      "lighting": "restricted emergency crimson plus warm/cool contrast",
+      "transition": "snap push to phone then composed reveal",
+      "sound_cues": "alert signal, reverb and accelerating tension",
+      "motion_graphics_purpose": "EMERGENCY ALERT and SEEK SHELTER IMMEDIATELY",
+      "layers": {
+        "foreground": "/opt/cinematic/examples/preview_30s/assets/front_5.webp",
+        "midground": "/opt/cinematic/examples/preview_30s/assets/mid_5.webp",
+        "background": "/opt/cinematic/examples/preview_30s/assets/far_5.jpg"
+      },
+      "camera": {
+        "start": {
+          "x": 0.32,
+          "y": 0.1,
+          "z": 9.89
+        },
+        "end": {
+          "x": -0.28,
+          "y": -0.04,
+          "z": 9.16
+        }
+      },
+      "image_source": "EXISTING ORIGINAL APPROVED - NO GENERATION REQUIRED"
+    }
+  ]
+}
