@@ -1,4 +1,5 @@
 name: Hunyuan Enhanced First 30s — Three.js Multiplane Camera Preview
+# QA revision: align all actual perspective-depth planes and preserve approved sleeping backgrounds.
 on:
   push:
     branches: [hunyuan-30s-art-direction-v2]
