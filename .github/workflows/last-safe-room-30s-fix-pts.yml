@@ -54,7 +54,7 @@ jobs:
           for ts in (0.5,5.5,9.5,10.5,11.5,14.5,15.5,18.5,20.5,23.5,27.,29.):
             cap.set(cv2.CAP_PROP_POS_MSEC,ts*1000)
             ok,frame=cap.read()
-            assert ok, ('Can't decode',ts)
+            assert ok, ('decode failed',ts)
             xs[ts]=cv2.resize(frame,(160,90))
           t=[10.5,11.5,14.5,15.5,18.5,20.5,23.5,27.,29.]
           deltas=[{'from':a,'to':b,'mean_abs_pixel_change':float(np.mean(np.abs(xs[a].astype(np.int16)-xs[b].astype(np.int16))))} for a,b in zip(t,t[1:])]
