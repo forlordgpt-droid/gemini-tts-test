@@ -1,4 +1,5 @@
 name: Hunyuan Bunker — Full First 120 Seconds (12 Parallel CPU Shards)
+# Art-direction pass 2: foot-contact blocking corrected after original 120s contact-sheet review.
 on:
   push:
     paths:
