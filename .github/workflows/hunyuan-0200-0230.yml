@@ -1,4 +1,4 @@
-name: Hunyuan Bunker 02:00-02:30 | Four Approved Images | Two KIE Clips | Three CPU Shards
+name: Hunyuan Bunker 02:00-02:30 | Existing Approved Assets ONLY | Three CPU Shards
 # Reuse original KIE task 73a3af873fb9eeb935d7335e6bb5a1ad; never resubmit segment 0.
 # Director visual gate correction: licensed font preload, wider kinetic label,
 # original-rig anchored foreground eye-shield glove, no new paid generation.
@@ -9,10 +9,9 @@ name: Hunyuan Bunker 02:00-02:30 | Four Approved Images | Two KIE Clips | Three 
 # All required production libraries unchanged; no extra paid generation.
 # Encoder repaired: Mediabunny 1.25 CanvasSource bitrate parameter tested on 2 full-resolution frames.
 # Safe cancellation: previous run still hung in five-second test, BEFORE any paid KIE step.
+# Archived reproducible 3-shard workflow. Manual dispatch only; all approved
+# KIE tasks already exist, so no future automatic paid API request is permitted.
 on:
-  push:
-    branches: [hunyuan-0200-0230-v21-preproduction]
-    paths: ['.github/workflows/hunyuan-0200-0230.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -151,22 +150,18 @@ jobs:
           assert data['model']=='google/gemini-3-8-flash-lite-tts' and data['voice']=='Fola'
           assert len(data['segments'])==2 and data['count_authorized']==2 and not data['retry_authorized']
           (root/'audio').mkdir(exist_ok=True)
+          approved_tasks=[
+              '73a3af873fb9eeb935d7335e6bb5a1ad',
+              'be36a266dd54291568fc8717ee66ff73'
+          ]
           for i,seg in enumerate(data['segments']):
               assert seg['index']==i
-              output=str(root/'audio'/('segment_'+str(i)+'.wav'))
-              if i==0:
-                  # Task created on previously canceled GitHub run 44060161064.
-                  # Absolutely no new paid request for segment 0.
-                  args=[sys.executable,'gemini38_tts_kie.py','--voice','Fola',
-                        '--task-id','73a3af873fb9eeb935d7335e6bb5a1ad',
-                        '--output',output]
-              elif i==1:
-                  # Only remaining authorized new KIE job (exact model + Fola).
-                  args=[sys.executable,'gemini38_tts_kie.py','--voice','Fola',
-                        '--text',seg['text'],'--output',output]
-              subprocess.run(args,check=True)
+              subprocess.run([sys.executable,'gemini38_tts_kie.py',
+                  '--voice','Fola','--task-id',approved_tasks[i],
+                  '--output',str(root/'audio'/('segment_'+str(i)+'.wav'))],
+                  check=True)
           PY
-          python3 film/hunyuan-0200-0230/prepare_audio.py
+          python3 film/hunyuan-0200-0230/prepare_audio_repaired.py
       - uses: actions/upload-artifact@v4
         with:
           name: HUNYUAN_0200_0230_APPROVED_KIE_VOICE
