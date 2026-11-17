@@ -1,0 +1,21 @@
+{
+  "project": "EMMA STORY5 — corrected 10s single narrated pilot",
+  "authorization": "User's newest 'i approve' explicitly authorizes ONE additional paid Kie task after confirmed first task timeout",
+  "previous_failed_task_id": "50214fd411ae5bd5c280faf60a3f809d",
+  "previous_failed_task_state": "fail",
+  "previous_failed_task_error": "generate task timeout.",
+  "previous_credit_debit": 0,
+  "previous_successful_read_only_audit_run": 44149522287,
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-tts",
+  "new_jobs_approved": 1,
+  "new_max_credit_spend": 5,
+  "hard_charge_cap_enforceable_by_provider": false,
+  "user_acknowledged_no_hard_cap": true,
+  "automatic_paid_retries": false,
+  "spending_approval_scope": "this story5 25-word narrator opening only",
+  "images_generated_new": 0,
+  "first_10s_source": "The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped.",
+  "job_one_time_workflow": "story5-v3-one-approved-retry-kie-narrator.yml",
+  "when_job_fails": "STOP; no further paid requests, report status and delta"
+}
