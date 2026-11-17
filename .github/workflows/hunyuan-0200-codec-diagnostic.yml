@@ -1,4 +1,5 @@
 name: Hunyuan H264 two-frame CPU diagnostic (NO PAID SERVICES)
+# Also capture real shot near 5s for 2D-eye-shield and embedded modern font proof.
 # Pinned mediabunny 1.25 CanvasSource requires bitrate rather than quality.
 on:
   push:
@@ -50,6 +51,7 @@ jobs:
           name: HUNYUAN_0200_0230_H264_DIAGNOSTIC
           path: |
             film/hunyuan-0200-0230/smoke-frame.png
+            film/hunyuan-0200-0230/smoke-frame-shield.png
             film/hunyuan-0200-0230/smoke-qc.json
           retention-days: 14
           if-no-files-found: warn
