@@ -1,0 +1,31 @@
+name: Hunyuan V3 — Export Final Unchanged Film Reference and Engine Source Pack
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/hunyuan-v3-offline-source.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  archive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 44029412483
+          name: HUNYUAN_FIRST_30S_PARALLAX_PREVIEW_AND_QA
+          github-token: ${{ github.token }}
+          path: film/cinematic-engine-v3/reference_input
+      - name: Build final 100% unchanged reference bundle with all V3 scripts and locked digest
+        run: |
+          set -euo pipefail
+          python3 film/cinematic-engine-v3/scripts/package_release.py
+          test -s release/HUNYUAN_CINEMATIC_ENGINE_V3_SOURCE_AND_UNCHANGED_REFERENCES.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_V3_FINAL_OFFLINE_ENGINE_AUTHORITATIVE_INSTRUCTIONS_ORIGINAL_VIDEO_RIG
+          path: release/HUNYUAN_CINEMATIC_ENGINE_V3_SOURCE_AND_UNCHANGED_REFERENCES.zip
+          retention-days: 30
