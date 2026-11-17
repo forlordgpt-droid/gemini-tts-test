@@ -1,0 +1,21 @@
+{
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-lite-tts",
+  "voice": "Fola",
+  "count_authorized": 2,
+  "retry_authorized": false,
+  "segments": [
+    {
+      "index": 0,
+      "story_start": 120,
+      "story_end": 134,
+      "text": "Entire series, so listen carefully. Do not turn around. The flash of a nuclear detonation can cause permanent flash blindness, even retinal burns, from miles away. Your eyes are the first thing you must protect."
+    },
+    {
+      "index": 1,
+      "story_start": 134,
+      "story_end": 150,
+      "text": "The blast wave hasn't arrived yet because light travels almost instantly, but pressure and sound do not. They move at roughly three hundred and forty meters per second. If the explosion is three kilometers away, you have around nine seconds between the flash and the shockwave. Nine seconds."
+    }
+  ]
+}
