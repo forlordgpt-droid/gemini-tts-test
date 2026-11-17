@@ -1,5 +1,7 @@
 # Hunyuan — First 30 Seconds: Enhanced Art Direction Review
 
+> **Cost authorization:** The owner approved this visual direction only, NOT further paid asset generation. Follow [PAID_ASSET_APPROVAL_POLICY.md](../PAID_ASSET_APPROVAL_POLICY.md). The six already-generated style images and existing Hunyuan/KIE assets may be reused; no paid calls are permitted without explicit provider/model/quantity/credit approval.
+
 Status: **six generated style-frame concepts, for review only**. Not the animated 30-second video. The native Hunyuan `art.js` and `engine.js` remain authoritative for character animation; do not replace them with an AI-generated cutout. Individual concepts may slightly vary character proportions and must be corrected against the original model sheet during production.
 
 ## Review assets
