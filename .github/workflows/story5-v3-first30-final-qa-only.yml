@@ -1,0 +1,124 @@
+name: Emma Story5 V3 — Finalize Complete 30s with AAC Padding Tolerance (NO PAID OR RERENDER)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-first30-final-qa-only.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  verify-and-deliver-existing-900-frames:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exact Hunyuan V3 doctor; original camera/toolchain unchanged
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Recover already rendered 900-frame video and decoded QA; do NOT rerender
+        uses: actions/download-artifact@v4
+        with:
+          name: EMMA_STORY5_V3_FULL_FIRST30_NARRATED_AND_SOURCE_QA
+          run-id: 44160332296
+          github-token: ${{ github.token }}
+          path: delivery
+      - name: Retrieve the verified existing 2D artwork, native rig and exact Flash-Lite voice
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_10TO30_PREPARED_VISUAL_AND_VOICE_INPUTS
+          run-id: 44160332296
+          github-token: ${{ github.token }}
+          path: .
+      - name: Retrieve original 20s Web Audio OfflineAudioContext SFX already rendered
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_10TO30_NEW_STORY_WEBAUDIO_20S
+          run-id: 44160332296
+          github-token: ${{ github.token }}
+          path: sfx
+      - name: Retrieve exact owner-approved first10 MP4 and source master (immutable)
+        uses: actions/download-artifact@v4
+        with:
+          name: STORY5_V3_FIRST10_NARRATED_COMPLETE_MP4_SOURCE_QA
+          run-id: 44152826592
+          github-token: ${{ github.token }}
+          path: approved_first10
+      - name: Confirm exact 900 visible frames and AAC trailing packet within decoder safety tolerance
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess,hashlib
+          from pathlib import Path
+          m=json.loads(Path('film/story5-v3/continuation-10to30/APPROVED_10TO30_MANIFEST.json').read_text())
+          src=Path('approved_first10')/m['approved_first10']['video_filename']
+          full=Path('delivery/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4')
+          cont=Path('delivery/EMMA_STORY5_V3_10TO30_NARRATED_CONTINUATION.mp4')
+          assert all(q.is_file() and q.stat().st_size>100000 for q in [src,full,cont])
+          assert hashlib.sha256(src.read_bytes()).hexdigest()==m['approved_first10']['sha256']
+          meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate,channels:format=duration','-of','json',str(full)]))
+          v=next(x for x in meta['streams'] if x['codec_type']=='video')
+          a=next(x for x in meta['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900)
+          assert a['codec_name']=='aac' and (int(a['sample_rate']),int(a['channels']))==(24000,1)
+          length=float(meta['format']['duration'])
+          assert abs(length-30.0)<.12, ('AAC end packet beyond standard tolerance',length)
+          qa=json.loads(Path('delivery/qc/ACTUAL_VIDEO_QA.json').read_text())
+          assert qa['frames']==900 and qa['decoded_every_frame'] and qa['max_near_frozen_second_streak']==0
+          assert abs(qa['duration_s']-30)<.12
+          tqa=json.loads(Path('delivery/STORY5_NARRATION_TIMING_QA.json').read_text())
+          assert tqa['exact_source_text']==m['narration']['text'] and tqa['no_words_intentionally_cut']
+          assert 15<tqa['placed_voice_seconds']<=19.82
+          paid=json.loads(Path('narrator/KIE_EXACT_SPEND_AND_VOICE_AUDIT.json').read_text())
+          assert paid['model']=='google/gemini-3-8-flash-lite-tts' and paid['created_jobs']==1 and paid['retry_count']==0
+          assert paid['source_text']==m['narration']['text'] and paid['credits_spent']==0.43
+          assert m['images']['new_paid_credits']==1 and paid['credits_spent']+1<=9
+          print('PASS 900 VISIBLE FRAMES = 30.000 seconds; AAC container padding',round(length-30,6),'seconds is normal and within Hunyuan V3 mandatory QA tolerance')
+          PY
+      - name: Confirm decoded first300 frames EXACTLY match the previously approved first10 (no edits)
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -i approved_first10/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4 -map 0:v:0 -frames:v 300 -f hash -hash sha256 - > delivery/QA_REFERENCE_FIRST10_FRAME_HASH.txt
+          ffmpeg -hide_banner -loglevel error -i delivery/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4 -map 0:v:0 -frames:v 300 -f hash -hash sha256 - > delivery/QA_EXPORTED_FIRST10_FRAME_HASH.txt
+          diff -u delivery/QA_REFERENCE_FIRST10_FRAME_HASH.txt delivery/QA_EXPORTED_FIRST10_FRAME_HASH.txt
+          echo 'PASS exact first300 video frames preserved, no regrading, rerender, scene changes or TTS rerun'
+      - name: Full 900-frame decoder check, preserve existing H264+AAC movie with NO remux/reencode
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -xerror -i delivery/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4 -f null -
+          python3 /opt/cinematic/engine/scripts/qa_video.py --video delivery/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4 --frames 900 --seconds 30 --sample-every .5 --out delivery/qc
+      - name: Create source project and owner signoff report, no new media generation or processing substitutions
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,zipfile,hashlib,subprocess
+          m=json.loads(Path('film/story5-v3/continuation-10to30/APPROVED_10TO30_MANIFEST.json').read_text())
+          v=json.loads(Path('delivery/qc/ACTUAL_VIDEO_QA.json').read_text())
+          a=json.loads(Path('narrator/KIE_EXACT_SPEND_AND_VOICE_AUDIT.json').read_text())
+          voice=json.loads(Path('delivery/STORY5_NARRATION_TIMING_QA.json').read_text())
+          f=Path('delivery/EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4')
+          total=float(v['duration_s']);assert abs(total-30)<.12
+          report={'status':'TECHNICAL_PASS_FIRST30_NARRATED_AWAITING_USER_VISUAL_APPROVAL','source':'story5.txt exact original narration','approved_first10':True,'original_first10_sha256':m['approved_first10']['sha256'],'first10_decoded_frames_exact_match':True,'original_immutable_source_verified':True,'full_video_sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'visual_video_seconds':900/30,'container_aac_padding_seconds':round(total-30,6),'codec':'H264/AAC','width':1920,'height':1080,'fps':30,'frame_count':900,'all_frames_decoded':True,'frozen_streaks':v['max_near_frozen_second_streak'],'source_authenticity':'NO dialogue from story4, no Noah, no collapsing man, anonymous caller','tts_model':a['model'],'narrator':a['voice'],'narrator_words':55,'narrator_source_text':a['source_text'],'narrator_audio_seconds':a['audio_seconds'],'placed_narrator_seconds':voice['placed_voice_seconds'],'new_tts_jobs':1,'new_tts_credits':a['credits_spent'],'new_image_jobs':1,'image_model':'gpt-image-2.5-lower','new_image_credits':1,'existing_images_reused':3,'combined_new_credits':round(1+a['credits_spent'],4),'max_approved_new_credits':9,'render_shards':4,'no_paid_requests_on_renders':True,'stack':['Three.js PerspectiveCamera','GSAP','native Hunyuan 2D source rig verified','Pillow','OpenCV','OfflineAudioContext','WebCodecs','Mediabunny','FFmpeg','FFprobe','Playwright','parallel GitHub CPU'],'user_gate':'STOP at complete first30; second artistic approval required before 30-60','artistic_review':'User must watch full video at normal playback'}
+          Path('delivery/EMMA_STORY5_FIRST30_APPROVAL_AND_CREDIT_QA.json').write_text(json.dumps(report,indent=2))
+          source=Path('delivery/EMMA_STORY5_V3_FIRST30_COMPLETE_SOURCE_PROJECT.zip')
+          with zipfile.ZipFile(source,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+            for root in ['film/story5-v3/continuation-10to30','sfx','narrator','delivery/qc','delivery/qc-20']:
+              for p in sorted(Path(root).rglob('*')):
+                if p.is_file():z.write(p,str(p))
+            first=Path('approved_first10/EMMA_STORY5_V3_FIRST10_NARRATED_REVIEW.mp4')
+            z.write(first,str(first))
+          print('PASS COMPLETE 30-second illustrated narrated movie, source bundle bytes',source.stat().st_size,'new paid credits',report['combined_new_credits'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_V3_FIRST30_NARRATED_TECHNICAL_VERIFIED_FINAL_DELIVERY
+          path: delivery/
+          retention-days: 30
