@@ -12,7 +12,7 @@ async function waitServer(){for(let i=0;i<180;i++){if(server.exitCode!==null)thr
  await waitServer();
  browser=await chromium.launch({channel:'chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1920,height:1080},acceptDownloads:true,deviceScaleFactor:1});
- page.on('pageerror',e=>errors.push('PAGE '+e.message));page.on('console',m=>{if(m.type()==='error')errors.push('CONSOLE '+m.text());});
+ page.on('pageerror',e=>errors.push('PAGE '+e.message));page.on('console',m=>{if(m.type()==='error')errors.push('CONSOLE '+m.text());else if(m.text().includes('[ENCODE_PROGRESS]'))console.log(m.text());});
  page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
  await page.goto('http://127.0.0.1:5196/?shard='+shard+'&frames='+frames,{waitUntil:'networkidle',timeout:90000});
  await page.waitForFunction('window.__HUNYUAN_READY===true || !!window.__HUNYUAN_ERROR',null,{timeout:120000});
@@ -35,7 +35,11 @@ async function waitServer(){for(let i=0;i<180;i++){if(server.exitCode!==null)thr
  for(let i=0;i<times.length;i++){await page.evaluate(t=>window.renderAt(t),times[i]);await page.locator('#stage').screenshot({path:path.join(out,'frame_'+shard+'_'+i+'.png'),animations:'disabled'});}
  if(!onlySfx){
   const downloadPromise=page.waitForEvent('download',{timeout:25*60*1000});
-  await page.click('#export');const d=await downloadPromise;
+  await page.click('#export');
+  await page.waitForFunction('window.__EXPORT_DONE===true || !!window.__EXPORT_ERROR',null,{timeout:25*60*1000});
+  const exportError=await page.evaluate(()=>window.__EXPORT_ERROR);
+  if(exportError)throw Error('REQUIRED Mediabunny/WebCodecs export failed: '+exportError);
+  const d=await downloadPromise;
   const fn=gate?'gate_5s.mp4':'part_'+shard+'.mp4';await d.saveAs(path.join(out,fn));
   if(fs.statSync(path.join(out,fn)).size<20000)throw Error('Encoded MP4 too small');
  }
