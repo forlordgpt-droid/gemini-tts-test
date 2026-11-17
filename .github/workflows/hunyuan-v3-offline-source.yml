@@ -1,4 +1,5 @@
 name: Hunyuan V3 — Export Final Unchanged Film Reference and Engine Source Pack
+# Repackage VERIFIED single-instance Mediabunny V3 build and immutable pinned GHCR digest.
 on:
   push:
     branches: [hunyuan-cinematic-engine-v3-20261117]
