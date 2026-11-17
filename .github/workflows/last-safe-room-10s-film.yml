@@ -1,4 +1,5 @@
 name: Last Safe Room — Exactly 10s Raw Cinematic Review
+# QA re-run: Playwright static test server now handles favicon 204 without false-positive console errors.
 on:
   push:
     branches: [last-safe-room-10s-cinematic-20261117]
