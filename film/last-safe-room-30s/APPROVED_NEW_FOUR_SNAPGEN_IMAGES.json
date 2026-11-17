@@ -1,0 +1,40 @@
+{
+  "model": "gpt-image-2.5-lower",
+  "aspect_ratio": "16:9",
+  "approved_new_jobs": 4,
+  "maximum_approved_new_credits": 4,
+  "paid_new_jobs_completed": 4,
+  "credits_spent_new": 4,
+  "failed_high_traffic_attempts_charged": 0,
+  "original_approved_first10_google_drive_id": "1QrXAUlrgQFwdtuHKo8N1k7JcIDJpr-Lp",
+  "images": [
+    {
+      "index": 0,
+      "story": "10–15 sec subway entrance and collapsing man",
+      "uuid": "f80e9ff4-e298-11f1-9c9d-be5a834c96dc",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/f80e9ff4-e298-11f1-9c9d-be5a834c96dc/20261117_151149_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T151218Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=07975f54435a2be4e9f8f25d59f80596b03e23bc774ef9ff922ade215ddc29de"
+    },
+    {
+      "index": 1,
+      "story": "15–19 sec Emma descending subway stairs",
+      "uuid": "52db0f1c-e299-11f1-8eb4-3eb79ec86ca4",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/52db0f1c-e299-11f1-8eb4-3eb79ec86ca4/20261117_151329_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T151332Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=07cfa0d8cd61f8a47b38fab09f005db2e0a621a9d5f5b1df99831e109796b979"
+    },
+    {
+      "index": 2,
+      "story": "19–25 sec Emma pulls locked security gate",
+      "uuid": "273d9220-e29a-11f1-a985-1eb11695d15d",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/273d9220-e29a-11f1-a985-1eb11695d15d/20261117_152051_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T152107Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=2c2bf8f2f9db1d1ecaef61c0988a4b0d268351c63bd698dace97d819100730a5"
+    },
+    {
+      "index": 3,
+      "story": "25–30 sec tunnel reveal and metallic banging",
+      "uuid": "0932e708-e29a-11f1-b166-0e9e067203ff",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/0932e708-e29a-11f1-b166-0e9e067203ff/20261117_151924_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T152109Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=1484ea5f6da48dcd0d9a138095d7c63a447cb901318093dc9ccf5727b9ec641c"
+    }
+  ]
+}
