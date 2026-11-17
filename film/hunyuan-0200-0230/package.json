@@ -1,0 +1,21 @@
+{
+  "name": "hunyuan-bunker-0200-0230",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5196",
+    "build": "vite build",
+    "test": "node playwright-render.cjs"
+  },
+  "dependencies": {
+    "three": "0.180.0",
+    "gsap": "3.13.0",
+    "mediabunny": "1.25.0",
+    "@fontsource/inter": "5.2.0",
+    "@fontsource/space-grotesk": "5.2.0"
+  },
+  "devDependencies": {
+    "vite": "7.1.11",
+    "playwright": "1.56.1"
+  }
+}
