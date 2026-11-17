@@ -1,0 +1,211 @@
+name: Last Safe Room — Exactly 10s Raw Cinematic Review
+on:
+  push:
+    branches: [last-safe-room-10s-cinematic-20261117]
+    paths: ['.github/workflows/last-safe-room-10s-film.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: LAST_SAFE_ROOM_RAW_APPROVED_ILLUSTRATIONS
+          run-id: 44101478748
+          github-token: ${{ github.token }}
+          path: film/last-safe-room-10s/pilot/raw
+      - name: Rename only the three approved source files
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,json
+          base=Path('film/last-safe-room-10s/pilot')
+          manifest=json.load(open('film/last-safe-room-10s/SNAPGEN_APPROVED_ART.json'))
+          assert manifest['approved_model']=='gpt-image-2.5-lower'
+          assert len(manifest['generations'])==3
+          assert sum(i['credits_used'] for i in manifest['generations'])==3
+          assert all((base/'raw'/('raw_'+str(i)+'.png')).exists() for i in range(3))
+          with zipfile.ZipFile('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+            assert z.testzip() is None
+            for name in ('art.js','engine.js'):
+              dest=base/'rig'/name;dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes(z.read('HUNYUAN_2D/'+name))
+          print('PASS exactly 3 approved original illustrations; no generation calls')
+          PY
+      - name: Required Pillow + OpenCV multilayer extraction
+        working-directory: film/last-safe-room-10s/pilot
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --break-system-packages Pillow opencv-python-headless
+          python3 prepare_layers.py
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          for i in range(3):
+            for kind,ext in (('far','jpg'),('mid','png'),('front','png')):
+              f=Path('assets')/(kind+'_'+str(i)+'.'+ext)
+              assert f.is_file() and f.stat().st_size>10000
+              im=Image.open(f);assert im.size==(1920,1080),(f,im.size)
+              if kind!='far':assert im.mode=='RGBA'
+          print('PASS nine independent 1920x1080 illustrated depth planes')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          path: |
+            film/last-safe-room-10s/pilot/raw/
+            film/last-safe-room-10s/pilot/assets/
+            film/last-safe-room-10s/pilot/rig/
+            film/last-safe-room-10s/pilot/qc/
+          retention-days: 30
+
+  render:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          path: film/last-safe-room-10s/pilot
+      - name: Install mandatory tools, render deterministic 5s Three.js GSAP WebCodecs Mediabunny shard
+        working-directory: film/last-safe-room-10s/pilot
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - name: FFprobe hard gate: exactly 150 H264 frames at 1080p
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration -of json "film/last-safe-room-10s/pilot/qc/part_$SHARD_INDEX.mp4" > verify.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('verify.json'));v=next(s for s in d['streams'] if s['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150),v
+          assert abs(float(d['format']['duration'])-5)<.12
+          print('PASS 150 frames exact / 1080p / H264 / 30fps')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LSR_10S_SHARD_${{ matrix.shard }}
+          path: film/last-safe-room-10s/pilot/qc/
+          retention-days: 25
+
+  sound:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          path: film/last-safe-room-10s/pilot
+      - name: Compose 10s sound with required WebAudio OfflineAudioContext
+        working-directory: film/last-safe-room-10s/pilot
+        env:
+          EXPORT_SFX: '1'
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+          npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSR_10S_WEB_AUDIO
+          path: film/last-safe-room-10s/pilot/qc/sfx_10.wav
+          retention-days: 25
+
+  assemble:
+    needs: [render,sound]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: LSR_10S_SHARD_*
+          path: parts
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_10S_WEB_AUDIO
+          path: sound
+      - uses: actions/download-artifact@v4
+        with:
+          name: LSR_PREPARED_10S_PLANES
+          path: film/last-safe-room-10s/pilot
+      - name: Assemble exactly 300 frames and verify audio-video; NO visual corrections
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          mkdir -p delivery
+          python3 - <<'PY'
+          from pathlib import Path
+          p=[Path('parts')/('LSR_10S_SHARD_'+str(i))/('part_'+str(i)+'.mp4') for i in (0,1)]
+          assert all(q.exists() and q.stat().st_size>100000 for q in p),p
+          Path('concat.txt').write_text(''.join("file '"+str(q.resolve())+"'\n" for q in p))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y -i delivery/video_only.mp4 -i sound/sfx_10.wav \
+            -map 0:v:0 -map 1:a:0 -af 'afade=t=out:st=9.70:d=0.30' -t 10 \
+            -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            delivery/LAST_SAFE_ROOM_FIRST_10S_UNCORRECTED_DRAFT.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration -of json \
+            delivery/LAST_SAFE_ROOM_FIRST_10S_UNCORRECTED_DRAFT.mp4 > delivery/ffprobe.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.load(open('delivery/ffprobe.json'))
+          v=next(s for s in d['streams'] if s['codec_type']=='video')
+          a=next(s for s in d['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',300),v
+          assert a['codec_name']=='aac'
+          assert abs(float(d['format']['duration'])-10)<.12
+          f=Path('delivery/LAST_SAFE_ROOM_FIRST_10S_UNCORRECTED_DRAFT.mp4')
+          Path('delivery/QC.json').write_text(json.dumps({
+             'status':'TECHNICAL_PASS_RAW_FIRST_DRAFT_VISUAL_APPROVAL_REQUIRED',
+             'duration_seconds':10,'frames':300,'width':1920,'height':1080,'fps':30,
+             'image_provider':'SnapGen','model':'gpt-image-2.5-lower','image_count':3,'credits_spent':3,
+             'no_narration':'First 10 seconds contains no dialogue; no Kie TTS call',
+             'tools':['Three.js PerspectiveCamera','GSAP','Original Hunyuan art.js + engine.js',
+                      'SVG/Canvas2D','Pillow','OpenCV','OfflineAudioContext',
+                      'WebCodecs','Mediabunny','FFmpeg','FFprobe','Playwright','GitHub Actions'],
+             'parallel_render_shards':2,'bytes':f.stat().st_size},indent=2))
+          print('PASS 10s 300 frames, 3 images, 3 total SnapGen credits')
+          PY
+          ffmpeg -hide_banner -loglevel error -y -i delivery/LAST_SAFE_ROOM_FIRST_10S_UNCORRECTED_DRAFT.mp4 \
+            -vf 'fps=1,scale=640:-1,tile=5x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+          zip -q -r delivery/LAST_SAFE_ROOM_10S_SOURCE_PROJECT.zip film/last-safe-room-10s
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSR_10S_RAW_APPROVAL_VIDEO_AND_SOURCE
+          path: delivery/
+          retention-days: 30
