@@ -1,3 +1,6 @@
+> **UPDATE — SECOND USER-APPROVED KIE TASK CONSUMED, NO CREDIT DEBIT.**
+> A new explicit authorization covered exactly one retry of the same Kie.ai `google/gemini-3-8-flash-tts` single-narrator job. GitHub run [44150369902](https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44150369902) successfully passed engine/model/secret preflight, submitted task `e023925f74d68ac373714f1ee9b78074`, but Kie returned `fail: generate task timeout.`
+> Read-only audit [44150684304](https://github.com/forlordgpt-droid/gemini-tts-test/actions/runs/44150684304) confirms account balance 109.32 before and after, **0 credits debited**, and no audio recoverable from the failed task. The original and second authorization are both CONSUMED. **NO further paid TTS requests are authorized; no 10-second narrated MP4 was rendered.** Do not rerun a paid workflow, change models, or reuse story4 dialogue.
 # STORY5 — NARRATION-LOCKED MASTER (AUTHORITATIVE CORRECTION)
 Production: Hunyuan Cinematic Engine V3
 Status: BLOCKED AFTER EXACT KIE TTS PROVIDER TIMEOUT; 1 authorized paid request consumed, ZERO credits debited according to independent read-only balance check. NO paid retries authorized. Corrected 2.5D art/camera preflight passed, narrated MP4 NOT rendered.
