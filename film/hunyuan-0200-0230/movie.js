@@ -231,7 +231,7 @@ async function exportSegment(){
  document.getElementById('export').disabled=true;
  try{
   if(typeof VideoEncoder==='undefined')throw Error('REQUIRED WebCodecs VideoEncoder absent; no fallback');
-  const cfg={codec:'avc1.420028',width:W,height:H,bitrate:6500000,framerate:FPS,hardwareAcceleration:'prefer-software'};
+  const cfg={codec:'avc1.420028',width:W,height:H,bitrate:5000000,framerate:FPS};
   const supported=await VideoEncoder.isConfigSupported(cfg);
   if(!supported.supported)throw Error('CPU H.264 WebCodecs unavailable; no fallback');
   const params=new URLSearchParams(location.search),shard=Number(params.get('shard')||0),frames=Number(params.get('frames')||300);
