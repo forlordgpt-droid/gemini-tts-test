@@ -25,8 +25,8 @@ if(!src.startsWith(project+path.sep)||!fs.existsSync(src))throw Error('Missing s
 // authoritative native 2D Hunyuan source and imports Mediabunny ONCE.
 const sceneCode=fs.readFileSync(src,'utf8');
 const entry=path.join(project,'.v3_merged_story_entry.js');
-const v3SharedImport="import {Output as __v3Output, Mp4OutputFormat as __v3Mp4, BufferTarget as __v3Buffer, CanvasSource as __v3Canvas, Quality as __v3Quality} from 'mediabunny';\\n";
-const exportApi="\\nwindow.__hunyuanV3Mediabunny={Output:__v3Output,Mp4OutputFormat:__v3Mp4,BufferTarget:__v3Buffer,CanvasSource:__v3Canvas,Quality:__v3Quality};\\n";
+const v3SharedImport="import {Output as __v3Output, Mp4OutputFormat as __v3Mp4, BufferTarget as __v3Buffer, CanvasSource as __v3Canvas, Quality as __v3Quality} from 'mediabunny';\n";
+const exportApi="\nwindow.__hunyuanV3Mediabunny={Output:__v3Output,Mp4OutputFormat:__v3Mp4,BufferTarget:__v3Buffer,CanvasSource:__v3Canvas,Quality:__v3Quality};\n";
 fs.writeFileSync(entry,v3SharedImport+sceneCode+exportApi);
 cp.execFileSync(bundler,[entry,'--bundle','--format=esm','--outfile='+path.join(project,'app.js')],{
  env:{...process.env,NODE_PATH:'/opt/cinematic/node_modules'},stdio:'pipe'
