@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     container:
-      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:54fa667cb18dc923f8940f9c35a289ecaa6b7a883cbcb349ec03cdf20f6626a6
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
       options: --ipc=host
       credentials:
         username: ${{ github.actor }}
