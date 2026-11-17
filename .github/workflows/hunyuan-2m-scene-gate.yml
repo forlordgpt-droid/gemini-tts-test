@@ -37,6 +37,41 @@ jobs:
               dest.parent.mkdir(parents=True,exist_ok=True)
               dest.write_bytes(z.read('HUNYUAN_2D/'+name))
           assert (root/'scene_test/rig/art.js').exists()
+          # Chrome's automatic /favicon.ico request must not invalidate a successful render.
+          html_path=root/'scene_test'/'index.html'
+          html=html_path.read_text()
+          assert html.count('</head>')==1
+          html_path.write_text(html.replace('</head>','<link rel="icon" href="data:,"></head>'))
+
+          # Browser SVG images are first rasterized to Canvas2D before upload to
+          # THREE.CanvasTexture, matching the proven native character renderer.
+          # This resolves layers rendering as the WebGL clear-color only.
+          main_path=root/'scene_test'/'main.js'
+          main=main_path.read_text()
+          before='const tex=new THREE.Texture(img);tex.needsUpdate=true;tex.colorSpace=THREE.SRGBColorSpace;return tex;'
+          after="""const layerCanvas=document.createElement('canvas');layerCanvas.width=W;layerCanvas.height=H;
+ const context=layerCanvas.getContext('2d',{alpha:true});
+ context.drawImage(img,0,0,W,H);
+ const tex=new THREE.CanvasTexture(layerCanvas);tex.colorSpace=THREE.SRGBColorSpace;return tex;"""
+          assert main.count(before)==1, 'Unexpected source version: refusing unsafe patch'
+          main_path.write_text(main.replace(before,after))
+
+          # Make the scene gate actually check the illustrated environment;
+          # character-only footage on a flat clear-color backdrop must fail.
+          test_path=root/'scene_test'/'test-playwright.cjs'
+          test=test_path.read_text()
+          sentinel="await page.evaluate(()=>window.renderFrame(1.5));const first=await canvas.screenshot();"
+          probe="""const backdrop=await page.evaluate(()=>{
+ const stage=document.getElementById('stage');
+ const copy=document.createElement('canvas');copy.width=stage.width;copy.height=stage.height;
+ const ctx=copy.getContext('2d');ctx.drawImage(stage,0,0);
+ return [[120,210],[1510,330],[420,620]].map(([x,y])=>Array.from(ctx.getImageData(x,y,1,1).data).slice(0,3));
+});
+console.log('Illustrated background RGB probes:',JSON.stringify(backdrop));
+if(backdrop.every(rgb=>rgb[0]===29&&rgb[1]===44&&rgb[2]===82))throw Error('Illustrated environment missing: frame is only WebGL clear-color');
+"""
+          assert test.count(sentinel)==1, 'Cannot locate browser test insertion point'
+          test_path.write_text(test.replace(sentinel,probe+sentinel))
           PY
       - name: Install Three.js GSAP Mediabunny Playwright and export browser
         working-directory: film/hunyuan-2m/scene_test
