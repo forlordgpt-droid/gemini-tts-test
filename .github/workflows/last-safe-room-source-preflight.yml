@@ -40,6 +40,8 @@ jobs:
           pathlib.Path('preflight/MANIFEST.json').write_text(json.dumps(out,indent=2))
           print('PASS: Original rig and original cinematic source found and ZIP-validated')
           PY
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
           ffprobe -version | head -1
           ffmpeg -version | head -1
       - name: Inspect original rendering libraries and validate browser support
