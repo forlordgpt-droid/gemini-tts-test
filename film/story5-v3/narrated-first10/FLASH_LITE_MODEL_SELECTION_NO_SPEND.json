@@ -22,13 +22,16 @@
   "estimated_credits_per_job": "approximately 0.2 to 0.4 for a ~10-second spoken opening; final duration/token count may differ",
   "proposed_credit_ceiling": 5,
   "provider_hard_cap_enforceable": false,
-  "approved_new_paid_jobs": 0,
-  "approved_credit_ceiling": 0,
-  "paid_generation_enabled": false,
+  "approved_new_paid_jobs": 1,
+  "approved_credit_ceiling": 5,
+  "paid_generation_enabled": true,
   "no_automatic_retries": true,
-  "any_paid_request_requires_explicit_approval_of_job_count_and_limit": true,
+  "any_paid_request_requires_explicit_approval_of_job_count_and_limit": false,
   "media_generation_cost_committed_for_flash_lite": 0,
   "no_image_generation": true,
   "approved_illustrations_reused": true,
-  "note": "Do not run a paid workflow, change original engine/rig, or substitute another model until this story-specific paid approval is explicit."
+  "note": "This approval authorizes exactly one createTask in an enforced run_number=1 and run_attempt=1 workflow. No other paid request is permitted.",
+  "user_acknowledged_no_hard_cap": true,
+  "authorization_record": "User explicitly answered yes to one new Kie Gemini 3.8 Flash-Lite task, 5-credit proposed cap, and provider cannot hard-enforce cap",
+  "authorization_scope": "Exactly one Flash-Lite TTS request for Emma story5 first 10 seconds; no retries; no other paid assets"
 }
