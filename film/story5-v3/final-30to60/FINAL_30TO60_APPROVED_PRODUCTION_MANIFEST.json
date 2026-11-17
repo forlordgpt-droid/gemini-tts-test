@@ -1,0 +1,127 @@
+{
+  "project": "EMMA_STORY5_HUNYUAN_V3_FINAL_30TO60",
+  "date": "2026-11-17",
+  "source": "original user-supplied story5.txt",
+  "story_mode": "VERBATIM_SINGLE_NARRATOR_NOT_DIALOGUE",
+  "start_sec": 30,
+  "end_sec": 60,
+  "fps": 30,
+  "new_frames": 900,
+  "total_frames": 1800,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "source_narration_30_45": "Deep underground, Emma discovered a steel door marked SAFE ROOM. She rushed inside and locked it behind her. Something immediately slammed against the door. Then everything went silent. For the first time, she thought she was safe.",
+  "source_narration_45_60": "But a security monitor suddenly switched on. It showed the mysterious caller standing outside the subway. Then a recorded message began playing. The voice warned that the safe room was actually a trap. Before Emma could escape, another door behind her slowly opened. And someone whispered her name.",
+  "source_narration_30_60": "Deep underground, Emma discovered a steel door marked SAFE ROOM. She rushed inside and locked it behind her. Something immediately slammed against the door. Then everything went silent. For the first time, she thought she was safe. But a security monitor suddenly switched on. It showed the mysterious caller standing outside the subway. Then a recorded message began playing. The voice warned that the safe room was actually a trap. Before Emma could escape, another door behind her slowly opened. And someone whispered her name.",
+  "words": 85,
+  "narration_voice": "Charon",
+  "provider": "kie.ai",
+  "tts_model": "google/gemini-3-8-flash-lite-tts",
+  "approve_first30": {
+    "user_feedback": "i love it, i approve the next credit to spend so dont bother to ak me again and do the rest of the story and give me the final video",
+    "github_final_success_run": 44161708574,
+    "github_artifact": "STORY5_V3_FIRST30_NARRATED_TECHNICAL_VERIFIED_FINAL_DELIVERY",
+    "video_filename": "EMMA_STORY5_V3_FIRST30_NARRATED_PREVIEW.mp4",
+    "verified_sha256": "f427bd3e7a2eee05ec890e4b38aba56e9c7c796d9dd8bf87f12cf9c31a987cd6",
+    "do_not_change": true
+  },
+  "credit_plan": {
+    "user_authorized": "explicitly approved next credits for remaining story without repeat request",
+    "snapgen_provider": "SnapGen",
+    "snapgen_model": "gpt-image-2.5-lower",
+    "new_image_jobs_max": 8,
+    "estimate_per_image_credit": 1,
+    "image_credit_budget_max": 8,
+    "kie_provider": "kie.ai",
+    "kie_model": "google/gemini-3-8-flash-lite-tts",
+    "new_tts_jobs_max": 1,
+    "estimate_tts_credits_under": 2,
+    "tts_credit_budget_max": 4,
+    "stage_new_credits_cap": 12,
+    "no_auto_paid_retry": true,
+    "provider_enforces_hard_spend_limit": false,
+    "no_model_substitutions": true
+  },
+  "continuity": "Emma: adult young woman, hazel eyes, low dark brown ponytail, olive skin, coral/rust-red utility jacket with navy trim, charcoal pants, black boots. Atmosphere painterly saturated graphic novel not photoreal or 3D.",
+  "shots": [
+    {
+      "image": 0,
+      "start": 30,
+      "end": 34,
+      "shot": "DEEP TUNNEL / steel heavy SAFE ROOM door, Emma finds it"
+    },
+    {
+      "image": 1,
+      "start": 34,
+      "end": 38,
+      "shot": "SAFE ROOM ENTRY / Emma pulls huge door shut and physically locks bolt"
+    },
+    {
+      "image": 2,
+      "start": 38,
+      "end": 42,
+      "shot": "OUTSIDE IMPACT / something slams steel door, Emma recoils, dust and shock"
+    },
+    {
+      "image": 3,
+      "start": 42,
+      "end": 45,
+      "shot": "FALSE RELIEF / wide quiet bunker, Emma attempts breathing in apparent safety"
+    },
+    {
+      "image": 4,
+      "start": 45,
+      "end": 49,
+      "shot": "MONITOR WAKES / dead security monitor turns on, cyan reflection face"
+    },
+    {
+      "image": 5,
+      "start": 49,
+      "end": 53,
+      "shot": "UNKNOWN CALLER / screen shows figure outside subway, ID unknown"
+    },
+    {
+      "image": 6,
+      "start": 53,
+      "end": 56,
+      "shot": "TRAP WARNING / prerecorded warning reported by NARRATOR, monitor red alerts"
+    },
+    {
+      "image": 7,
+      "start": 56,
+      "end": 60,
+      "shot": "REAR DOOR / dark doorway slowly opens behind Emma, unknown whispers her name, cut black"
+    }
+  ],
+  "forbidden": [
+    "Noah or past screenplay dialogue",
+    "invented diegetic caller dialogue",
+    "photorealistic or 3D humans",
+    "flat 2D vector city",
+    "slideshow Ken Burns",
+    "new media at previous approved 0–30",
+    "unapproved new models",
+    "additional paid retries"
+  ],
+  "mandatory_stack": [
+    "Three.js 0.187.0",
+    "GSAP 3.15.1",
+    "Pillow 12.0.0",
+    "OpenCV 4.12.0",
+    "Web Audio OfflineAudioContext",
+    "WebCodecs/Mediabunny 1.66.0",
+    "FFmpeg/FFprobe",
+    "Playwright 1.65.1",
+    "Original Hunyuan 2D art.js & engine.js only for rig verification"
+  ],
+  "reference_character_uuids": [
+    "a1c54b02-e2bb-11f1-87a3-32bcf30a2274",
+    "273d9220-e29a-11f1-a985-1eb11695d15d",
+    "0932e708-e29a-11f1-b166-0e9e067203ff"
+  ],
+  "paid_tts_jobs_created": 0,
+  "paid_image_jobs_created": 0,
+  "gate": "FINAL COMPLETE 60-SECOND VIDEO DELIVER TO USER, NO FURTHER APPROVAL BEFORE FINISHING"
+}
