@@ -239,7 +239,7 @@ async function exportSegment(){
   const params=new URLSearchParams(location.search),shard=Number(params.get('shard')||0),frames=Number(params.get('frames')||300);
   if(![150,300].includes(frames)||![0,1,2].includes(shard))throw Error('Invalid shard or frame count');
   const output=new Output({format:new Mp4OutputFormat(),target:new BufferTarget()});
-  const source=new CanvasSource(canvas,{codec:'avc',quality:new Quality('high')});
+  const source=new CanvasSource(canvas,{codec:'avc',bitrate:6500000});
   output.addVideoTrack(source,{frameRate:FPS});await output.start();
   for(let i=0;i<frames;i++){
    await renderAt((shard*300+i)/FPS);
