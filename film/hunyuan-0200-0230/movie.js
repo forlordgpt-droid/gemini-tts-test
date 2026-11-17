@@ -116,14 +116,19 @@ function shotAt(t){
 }
 function poseSvg(s,local){
  const pose=s.actor.poseAt(local);
- // Cinematic action correction added to original procedural 2D rig; no static asset.
+ let shieldStrength=0;
+ // Preserve the supplied native 2D engine; extend the original SVG performance.
  if(s.shield){
-  const p=clamp((local-.15)/.72);const strength=smooth(p);
-  const target=[[44,-284],[52,-344],[6,-394]];
+  const p=clamp((local-.15)/.72),strength=smooth(p);
+  const target=[[44,-284],[53,-341],[47,-372]];
   pose.arms[1]=pose.arms[1].map((xy,i)=>[xy[0]+(target[i][0]-xy[0])*strength,xy[1]+(target[i][1]-xy[1])*strength]);
-  pose.openHand=true;pose.headTilt=-6*strength;pose.emotion='afraid';
+  pose.openHand=true;pose.headTilt=-6*strength;pose.emotion='afraid';shieldStrength=strength;
  }
- return window.HunyuanArt.svg(window.HunyuanArt.render(pose),900,600);
+ // The original rig draws the head over the reaching arm, which correctly
+ // occludes the wrist. An anchored 2D foreground hand matte now covers the eye
+ // rather than leaving the protective gesture hidden behind the face.
+ const eyeShield=shieldStrength>0 ? `<g data-part="eye-protection-foreground-glove" transform="translate(${pose.x} ${pose.y}) scale(${pose.scale})" opacity="${shieldStrength.toFixed(3)}"><path d="M 23 -389 Q 37 -400 60 -390 Q 70 -385 71 -375 L 66 -360 Q 57 -353 42 -356 L 23 -366 Q 17 -378 23 -389 Z" fill="#242527" stroke="#211d1b" stroke-width="3" stroke-linejoin="round"/><path d="M 30 -385 L 43 -372 M 40 -390 L 54 -377" fill="none" stroke="#55555a" stroke-width="2.8" stroke-linecap="round"/></g>` : '';
+ return window.HunyuanArt.svg(window.HunyuanArt.render(pose)+eyeShield,900,600);
 }
 async function paintActor(s,local){
  const svg=poseSvg(s,local),url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
@@ -165,9 +170,9 @@ function drawGraphics(t){
  // Guarded, short professionally typeset story graphics, not caption spam.
  if(t>=3.7&&t<6.4){
   const a=graphicReveal(t,3.7,6.4);graphicCtx.globalAlpha=a;
-  graphicCtx.fillStyle='rgba(8,24,48,.62)';graphicCtx.fillRect(115,135,620,116);
+  graphicCtx.fillStyle='rgba(8,24,48,.62)';graphicCtx.fillRect(115,135,940,116);
   graphicCtx.fillStyle='#eb8b61';graphicCtx.fillRect(115,135,9,116);
-  textOut('DO NOT TURN AROUND',159,194,62);
+  textOut('DO NOT TURN AROUND',159,194,58);
  }
  if(t>=9.1&&t<11.7){
   graphicCtx.globalAlpha=graphicReveal(t,9.1,11.7);
@@ -286,6 +291,10 @@ document.getElementById('sfx').addEventListener('click',()=>window.generateSfxWa
 async function initialize(){
  if(typeof window.HunyuanWorld2D!=='function'||!window.HunyuanArt)throw Error('Required original Hunyuan rig art.js/engine.js missing');
  await document.fonts.ready;
+ // Font files used only by Canvas2D are not necessarily fetched by CSS
+ // before painting. Force their licensed, pinned bold/medium faces to load.
+ await Promise.all([document.fonts.load('700 62px "Space Grotesk"'),document.fonts.load('600 34px "Inter"')]);
+ if(!document.fonts.check('700 62px "Space Grotesk"')||!document.fonts.check('600 34px "Inter"'))throw Error('Mandatory licensed cinematic fonts failed to load');
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,powerPreference:'low-power'});
  renderer.setSize(W,H,false);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
  scene=new THREE.Scene();scene.background=new THREE.Color(0x162531);
