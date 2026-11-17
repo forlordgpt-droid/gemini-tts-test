@@ -1,0 +1,54 @@
+name: Hunyuan H264 two-frame CPU diagnostic (NO PAID SERVICES)
+on:
+  push:
+    branches: [hunyuan-0200-0230-v21-preproduction]
+    paths: ['.github/workflows/hunyuan-0200-codec-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  two-frame-webcodecs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Stage ONLY four already-purchased SnapGen images and original Hunyuan 2D rig
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,urllib.request,zipfile
+          root=Path('film/hunyuan-0200-0230')
+          assets=root/'public'/'assets';assets.mkdir(parents=True,exist_ok=True)
+          data=json.loads((root/'IMAGE_ASSET_MANIFEST.json').read_text())
+          assert len(data['images'])==4
+          for row in data['images']:
+              with urllib.request.urlopen(row['source_url'],timeout=120) as r:img=r.read()
+              assert img[:8]==b'\x89PNG\r\n\x1a\n'
+              (assets/row['file']).write_bytes(img)
+          with zipfile.ZipFile('film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              rig=root/'public'/'rig';rig.mkdir(parents=True,exist_ok=True)
+              for f in ('art.js','engine.js'):(rig/f).write_bytes(z.read('HUNYUAN_2D/'+f))
+          print('Four previously approved assets and original rig staged with zero generation calls')
+          PY
+      - name: Test exact original Three.js/GSAP/Playwright/WebCodecs/Mediabunny stack on two real 1080p frames
+        working-directory: film/hunyuan-0200-0230
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node smoke-diagnostic.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUNYUAN_0200_0230_H264_DIAGNOSTIC
+          path: |
+            film/hunyuan-0200-0230/smoke-frame.png
+            film/hunyuan-0200-0230/smoke-qc.json
+          retention-days: 14
+          if-no-files-found: warn
