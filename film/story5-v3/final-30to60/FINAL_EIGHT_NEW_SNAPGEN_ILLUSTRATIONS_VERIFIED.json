@@ -1,0 +1,101 @@
+{
+  "project": "EMMA_STORY5_HUNYUAN_V3_FINAL_30TO60",
+  "model": "gpt-image-2.5-lower",
+  "aspect_ratio": "16:9",
+  "provider": "SnapGen",
+  "completed_new_jobs": 8,
+  "charged_credits": 8,
+  "approved_max_new_jobs": 8,
+  "approved_image_credits_cap": 8,
+  "all_successful": true,
+  "source": "Model connected SnapGen generated results 2026-11-17, source URLs temporary; download originals once, preserve in source ZIP",
+  "images": [
+    {
+      "index": 0,
+      "uuid": "8fb417ca-e2d1-11f1-a267-72be60fd1723",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/8fb417ca-e2d1-11f1-a267-72be60fd1723/20261117_215708_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T215757Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=58f1297e9f9de92753d48517dc5d588d4d57880584deb640da35b287abc46263",
+      "visual_story": "30–34 steel safe-room door deep tunnel",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 1,
+      "uuid": "9144456a-e2d1-11f1-bf63-8a42bf2b6d69",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/9144456a-e2d1-11f1-bf63-8a42bf2b6d69/20261117_215627_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T215759Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=89295c56001aea6bf7a4868d6f269b98bb44abc048f576e92cac515ff4c5b3a2",
+      "visual_story": "34–38 locks safety-room steel bolt",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 2,
+      "uuid": "930a6fdc-e2d1-11f1-bbeb-d2ae64291107",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/930a6fdc-e2d1-11f1-bbeb-d2ae64291107/20261117_215558_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T215801Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=6dcfc04df937c779cc46c7caccd67b3b0c57f3cbf89a3f651662d48292c71069",
+      "visual_story": "38–42 impact, dust, recoil",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 3,
+      "uuid": "94344a7c-e2d1-11f1-b8f1-7ee52e45ccfc",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/94344a7c-e2d1-11f1-b8f1-7ee52e45ccfc/20261117_215715_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T215803Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8ba774803a6b0c30630578568d77dff3d67a9a8a117a0e36b88ed8ab3083c270",
+      "visual_story": "42–45 quiet false relief bunker",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 4,
+      "uuid": "0b95fb2e-e2d2-11f1-ba95-3ab41037da9a",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/0b95fb2e-e2d2-11f1-ba95-3ab41037da9a/20261117_220026_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T220051Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ee644296d2816e9a8d1253841bb55ef7629970c5fcc93e84596d3bb49e1d4324",
+      "visual_story": "45–49 security monitor lights up",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 5,
+      "uuid": "0dc25168-e2d2-11f1-8ce8-62df052b1e8e",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/0dc25168-e2d2-11f1-8ce8-62df052b1e8e/20261117_215920_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T220053Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=73fef6eb3c0a64de5468f243ca7670324c93e7c7766b4bbdbe93a70d36f35ae8",
+      "visual_story": "49–53 caller silhouette outside subway on monitor",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 6,
+      "uuid": "0f6fe37c-e2d2-11f1-909e-3a2b39fe1441",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/0f6fe37c-e2d2-11f1-909e-3a2b39fe1441/20261117_220033_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T220055Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=2144e70dc910e6b37dabb2f86c190e2fb1b195e0dd197f7bacad841e86693592",
+      "visual_story": "53–56 pre-recorded trap warning red security alarms",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    },
+    {
+      "index": 7,
+      "uuid": "10ec1c16-e2d2-11f1-8ce8-62df052b1e8e",
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/10ec1c16-e2d2-11f1-8ce8-62df052b1e8e/20261117_220025_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T220057Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ca334cc70c833f27415c3bb69696f2ef4785cfac045b91bab468e015056618ca",
+      "visual_story": "56–60 rear dark door opens cut black",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "status": "completed",
+      "reference_character": "Emma as approved first30"
+    }
+  ],
+  "require_verify": [
+    "Every source is 16:9 painterly 2D original and >100kB",
+    "Only original Emma and unspecified mysterious caller in security feed",
+    "No old dialogue, no 3D",
+    "Pillow/OpenCV far mid near inpainting layers at 1920×1080",
+    "Stop if image retrieval fails, no paid replacement"
+  ]
+}
