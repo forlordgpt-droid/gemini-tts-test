@@ -1,0 +1,37 @@
+{
+  "text_files": [
+    {
+      "path": "authoritative/HUNYUAN_30S_CINEMATIC_REPLICATION_BLUEPRINT.txt",
+      "sha256": "5a00372da9b55f29123c452ad17299471163ee71a6940cd704e76750b577465e",
+      "bytes": 15124,
+      "git_blob_sha1": "67b36a44f6df0cb4059a40365f2c2ff8696cfcab"
+    },
+    {
+      "path": "authoritative/MANDATORY_CINEMATIC_ANIMATION_INSTRUCTIONS.txt",
+      "sha256": "3567254c70db3a7fef7c2f6406cd3b96dba862c75c1c484f8d41060487255da2",
+      "bytes": 4608,
+      "git_blob_sha1": "25f5a5a610972e20a637b04b083b151a771b6e7e"
+    }
+  ],
+  "references": [
+    {
+      "filename": "HUNYUAN_2D_CHARACTER_PACKAGE.zip",
+      "sha256": "f75c7d8fefc6fb1885acc16e8513380a891e0d59c32471e5f9458eda04767630",
+      "bytes": 1005362
+    },
+    {
+      "filename": "HUNYUAN_30S_PARALLAX_SOURCE.zip",
+      "sha256": "2c507e35a989ab373a4ba343ff9aa5308eb02b5aaa500ddba61c11d92c803ae1",
+      "bytes": 2635652
+    },
+    {
+      "filename": "HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4",
+      "sha256": "f1aa6abf0c89b972ba842f7398561830d12b4e12599cd2fbde82dd11ace7f1e0",
+      "bytes": 30117152,
+      "source_run_id": 44029412483,
+      "source_artifact": "HUNYUAN_FIRST_30S_PARALLAX_PREVIEW_AND_QA"
+    }
+  ],
+  "approved_reference_commit": "716740ba4fb50b2d0c1ff3f033973d34a0209b34",
+  "notes": "Verbatim immutable references. DO NOT change file bytes, style requirements, required models or required tools to pass checks."
+}
