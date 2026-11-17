@@ -1,0 +1,67 @@
+{
+  "project": "EMMA STORY5 NARRATED FIRST10",
+  "source": "user supplied story5.txt",
+  "authoritative_story": "film/story5-v3/STORY5_NARRATION_LOCKED_MASTER.md",
+  "milestone": "FIRST10_ONLY",
+  "approval_user": "Approved preparation of corrected narration-driven draft; no quantified spending limit approved after preflight disclosure",
+  "title": "Emma: The Safe Room",
+  "narration_mode": "SINGLE_NARRATOR_VERBATIM",
+  "scene_1_00_to_15": "Entire city evacuated, toxic yellow gas, Emma trapped and running, phone rings ONLY near second 15",
+  "narration_first10_exact": "The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped.",
+  "words": 25,
+  "narrator_voice": "Charon",
+  "voice_direction": "One suspenseful, natural cinematic narrator, ominous but human, brisk clear 155–165 words per minute, precise verbatim reading, no intro, no invented dialogue, short natural pauses, no trailing outro",
+  "tts": {
+    "provider": "kie.ai",
+    "model": "google/gemini-3-8-flash-tts",
+    "proposed_jobs": 1,
+    "estimated_credits_per_job": "about 0.4–1.0",
+    "proposed_max_credits": 5,
+    "hard_cap_enforceable_by_provider": false,
+    "authorized_credits": 0,
+    "paid_generation_disabled": true
+  },
+  "image_reuse": {
+    "provider": "SnapGen",
+    "model": "gpt-image-2.5-lower",
+    "existing_jobs": 3,
+    "new_jobs": 0,
+    "new_credits": 0,
+    "source_artifact_run": 44104478064,
+    "source_artifact": "LSR_PREPARED_10S_PLANES"
+  },
+  "picture": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "seconds": 10,
+    "shots": [
+      {
+        "id": "EVACUATED_CITY",
+        "start": 0,
+        "end": 3.15,
+        "image": 0
+      },
+      {
+        "id": "LETHAL_GAS",
+        "start": 3.15,
+        "end": 7.45,
+        "image": 1
+      },
+      {
+        "id": "EMMA_TRAPPED",
+        "start": 7.45,
+        "end": 10,
+        "image": 2
+      }
+    ]
+  },
+  "constraints": [
+    "No phone ringing before 10s",
+    "No story4 named caller or direct dialogue",
+    "No speech omitted or invented",
+    "No paid calls or retries without budget authorization",
+    "Use original mandated Hunyuan V3 exact toolchain",
+    "Review first10 before 30s"
+  ]
+}
