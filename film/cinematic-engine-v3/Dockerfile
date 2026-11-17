@@ -24,6 +24,16 @@ COPY film/hunyuan-2m/HUNYUAN_30S_PARALLAX_SOURCE.zip /opt/cinematic/references/H
 # This is the real, already-approved video downloaded from GitHub Actions run #44029412483
 # before docker build. It is not regenerated and permanently lives inside the GHCR image.
 COPY film/cinematic-engine-v3/reference_input/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4 /opt/cinematic/references/HUNYUAN_FIRST_30S_PARALLAX_PREVIEW.mp4
+# The actual approved scene source and ORIGINAL authored 2D rig are exercised by
+# the browser regression, rather than making a generic flat-background sample.
+RUN mkdir -p /opt/cinematic/examples/preview_30s/rig \
+    && cd /opt/cinematic/examples \
+    && unzip -q /opt/cinematic/references/HUNYUAN_30S_PARALLAX_SOURCE.zip \
+    && unzip -p /opt/cinematic/references/HUNYUAN_2D_CHARACTER_PACKAGE.zip HUNYUAN_2D/art.js > /opt/cinematic/examples/preview_30s/rig/art.js \
+    && unzip -p /opt/cinematic/references/HUNYUAN_2D_CHARACTER_PACKAGE.zip HUNYUAN_2D/engine.js > /opt/cinematic/examples/preview_30s/rig/engine.js \
+    && /opt/cinematic/node_modules/.bin/esbuild /opt/cinematic/examples/preview_30s/main.js \
+      --bundle --format=esm --outfile=/opt/cinematic/examples/preview_30s/app.js \
+      --node-path:/opt/cinematic/node_modules
 # Source instructions are copied UNCHANGED; SHA256 checks must pass or build fails.
 RUN python3 /opt/cinematic/engine/scripts/doctor.py --check
 ENTRYPOINT ["/usr/bin/tini","--"]
