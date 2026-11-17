@@ -1,0 +1,66 @@
+{
+  "format": "v2.1",
+  "source_provider": "SnapGen",
+  "exact_model": "gpt-image-2.5-lower",
+  "aspect_ratio": "16:9",
+  "source_resolution": "720p",
+  "approved_count": 4,
+  "actual_count": 4,
+  "actual_snapgen_credits_used": 4,
+  "no_retries": true,
+  "generated_at": "2026-11-17",
+  "images": [
+    {
+      "id": "field_wide",
+      "uuid": "c19220ac-e263-11f1-8d62-8e444038f153",
+      "file": "field_wide.png",
+      "source_url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/c19220ac-e263-11f1-8d62-8e444038f153/20261117_085030_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T085038Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8861ae1691fbde271a155cae6dea8c68dfbf8be686492e0b16d094c46984203b",
+      "source_url_expires_in_days": 7,
+      "source_state": "GENERATED_PROVIDER_READY",
+      "layer_ids": [
+        "field_wide_FAR_CLEAN",
+        "field_wide_MID_GRAVEL",
+        "field_wide_FG_FENCE_GRASS"
+      ]
+    },
+    {
+      "id": "field_medium",
+      "uuid": "004437fe-e264-11f1-8eb4-3eb79ec86ca4",
+      "file": "field_medium.png",
+      "source_url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/004437fe-e264-11f1-8eb4-3eb79ec86ca4/20261117_085151_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T085337Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e6fd18be810f1eee2d8b66beae161e7ee31df9c81f8b9625c844716d1f69972e",
+      "source_url_expires_in_days": 7,
+      "source_state": "GENERATED_PROVIDER_READY",
+      "layer_ids": [
+        "field_medium_FAR_CLEAN",
+        "field_medium_MID_GRAVEL",
+        "field_medium_FG_FENCE_GRASS"
+      ]
+    },
+    {
+      "id": "field_distance",
+      "uuid": "6ae5cb4a-e264-11f1-988b-1671f56c5e89",
+      "file": "field_distance.png",
+      "source_url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/6ae5cb4a-e264-11f1-988b-1671f56c5e89/20261117_085444_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T085454Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e9869e812460cc1a0806f504671d3f01b482e3a9a1db9a3a1bbbbb3cd6704d32",
+      "source_url_expires_in_days": 7,
+      "source_state": "GENERATED_PROVIDER_READY",
+      "layer_ids": [
+        "field_distance_FAR_CLEAN",
+        "field_distance_MID_GRAVEL",
+        "field_distance_FG_FENCE_GRASS"
+      ]
+    },
+    {
+      "id": "manhole_approach",
+      "uuid": "98cbae58-e264-11f1-af8a-c2c692883dee",
+      "file": "manhole_approach.png",
+      "source_url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/98cbae58-e264-11f1-af8a-c2c692883dee/20261117_085644_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261117%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261117T085856Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8229aaa0311ccb2e4b21a1a151fcadbdbcb6b3f3df30653642b060e07a8b27a3",
+      "source_url_expires_in_days": 7,
+      "source_state": "GENERATED_PROVIDER_READY",
+      "layer_ids": [
+        "manhole_approach_FAR_CLEAN",
+        "manhole_approach_MID_GRAVEL",
+        "manhole_approach_FG_FENCE_GRASS"
+      ]
+    }
+  ]
+}
