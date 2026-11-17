@@ -1,0 +1,68 @@
+name: Emma Story5 — Second explicitly approved SINGLE Kie 3.8 Flash narrator task
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-one-approved-retry-kie-narrator.yml']
+  workflow_dispatch:
+concurrency:
+  group: story5-kie-second-explicitly-authorized-one-job-20261117
+  cancel-in-progress: false
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  narration-once:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify unchanged original V3 engine and mandatory exact toolchain
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Confirm once-only explicit credit approval, exact narrator words and no retries
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os
+          m=json.load(open('film/story5-v3/narrated-first10/NARRATION_LOCKED_FIRST10_MANIFEST.json'))
+          assert m['narration_mode']=='SINGLE_NARRATOR_VERBATIM'
+          assert m['tts']['model']=='google/gemini-3-8-flash-tts'
+          assert m['tts']['provider']=='kie.ai'
+          assert m['tts']['approved_generation_jobs']==0
+          assert m['tts']['authorized_credits']==0
+          assert m['tts']['paid_generation_disabled'] is True
+          assert m['tts']['last_task_id']=='50214fd411ae5bd5c280faf60a3f809d'
+          assert m['tts']['last_task_state']=='fail'
+          assert m['tts']['observed_credit_debit']==0
+          a=json.load(open('film/story5-v3/narrated-first10/SECOND_PAID_ATTEMPT_USER_AUTHORIZATION.json'))
+          assert (a['provider'],a['model'])==('kie.ai','google/gemini-3-8-flash-tts')
+          assert a['new_jobs_approved']==1 and a['new_max_credit_spend']==5
+          assert a['hard_charge_cap_enforceable_by_provider'] is False
+          assert a['user_acknowledged_no_hard_cap'] is True
+          assert a['automatic_paid_retries'] is False
+          assert m['image_reuse']['new_jobs']==0
+          assert os.environ.get('GITHUB_RUN_NUMBER')=='1'
+          assert os.environ.get('GITHUB_RUN_ATTEMPT')=='1'
+          print('PASS: second one-off user approval for ONE new Kie Gemini 3.8 Flash TTS job max proposed 5, no hard cap, no retries, exact narrated story only')
+          PY
+      - name: Submit ONE paid Kie 3.8 Flash narration request, then poll SAME task and audit credits
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/narrated-first10/generate_one_kie_narrator_second_authorization.py
+      - name: Preserve narrator WAV, actual credit audit, request manifest and paid task ID
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_FIRST10_SECOND_AUTHORIZED_KIE_NARRATOR_AUDIT
+          path: story5_second_authorized_narrator/
+          if-no-files-found: warn
+          retention-days: 30
