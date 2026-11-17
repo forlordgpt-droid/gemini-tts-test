@@ -1,0 +1,67 @@
+name: Story5 V3 — ONE USER-APPROVED Kie Gemini 3.8 Flash-Lite Narration Request
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-one-approved-flash-lite-narration.yml']
+  workflow_dispatch:
+concurrency:
+  group: story5-narration-flash-lite-20261117-one-authorized-job
+  cancel-in-progress: false
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  exactly-one-paid-lite-request:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Immutable Hunyuan V3 doctor and exact library verification
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Fail closed unless Lite model and separate user-approved one-job five-credit plan exactly match
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,ast
+          p='film/story5-v3/narrated-first10/'
+          m=json.load(open(p+'NARRATION_LOCKED_FIRST10_MANIFEST.json'))
+          a=json.load(open(p+'FLASH_LITE_MODEL_SELECTION_NO_SPEND.json'))
+          t='The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped.'
+          assert m['narration_first10_exact']==t==a['narration_first10_exact']
+          assert m['narration_mode']=='SINGLE_NARRATOR_VERBATIM' and m['narrator_voice']=='Charon'
+          assert m['tts']['model']==a['model']=='google/gemini-3-8-flash-lite-tts'
+          assert a['provider']=='kie.ai' and a['approved_new_paid_jobs']==1 and a['approved_credit_ceiling']==5
+          assert a['paid_generation_enabled'] is True and a['user_acknowledged_no_hard_cap'] is True
+          assert a['no_automatic_retries'] is True and a['no_image_generation'] is True
+          assert m['tts']['approved_lite_jobs_for_one_time_run']==1
+          assert m['tts']['authorized_lite_credit_ceiling_for_one_time_run']==5
+          assert m['tts']['new_lite_jobs_submitted']==0
+          assert m['tts']['paid_generation_disabled'] is True, 'Original Flash authorization must stay consumed'
+          assert os.environ['GITHUB_RUN_NUMBER']=='1' and os.environ['GITHUB_RUN_ATTEMPT']=='1'
+          script=p+'generate_one_kie_flash_lite_after_explicit_paid_approval.py'
+          ast.parse(open(script).read())
+          assert open(script).read().count('job=api("/api/v1/jobs/createTask",payload)')==1
+          print('APPROVED only 1 Kie Flash-Lite TTS request, estimated 0.2-0.4 credits, max budget 5 (not hard-enforceable), no automatic paid retries')
+          PY
+      - name: Submit exactly ONE new Kie Flash-Lite TTS request, poll same task, audit balance; no paid retries
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 film/story5-v3/narrated-first10/generate_one_kie_flash_lite_after_explicit_paid_approval.py
+      - name: Preserve task ID, source text, exact model, audio and credit audit even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: STORY5_FIRST10_APPROVED_KIE_FLASH_LITE_NARRATOR_AND_SPEND_AUDIT
+          path: story5_first10_flash_lite_narrator/
+          if-no-files-found: warn
+          retention-days: 30
