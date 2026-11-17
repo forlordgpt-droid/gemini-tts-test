@@ -1,7 +1,8 @@
 name: Hunyuan Bunker 02:00-02:30 | Four Approved Images | Two KIE Clips | Three CPU Shards
 # 2026-11-17: Auto-repair iteration: bundled Inter/Space Grotesk 5.3.0 CSS exports;
 # fixed Mediabunny Uint8Array output validation and browser fail-fast diagnostics.
-# 2026-11-17: full Chromium channel (not shell) and H.264 Baseline 4.0 1920x1080 required.
+# 2026-11-17: full Chromium and H.264 Baseline 4.0. Restored Playwright 1.65.1,
+# verified WebCodecs preflight config (auto CPU encoder) and codec diagnostics.
 # All required production libraries unchanged; no extra paid generation.
 on:
   push:
