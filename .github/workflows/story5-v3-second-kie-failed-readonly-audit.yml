@@ -1,0 +1,63 @@
+name: Emma Story5 — Read-only SECOND TTS failure credit audit (NO GENERATION)
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/story5-v3-second-kie-failed-readonly-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  read-only-account-task-status:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check existing failed task and credit balance with only GET calls (never POST)
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,urllib.request,urllib.parse,json,wave,hashlib
+          from pathlib import Path
+          target=Path('story5_second_failed_kie_readonly_audit');target.mkdir(exist_ok=True)
+          task_id='e023925f74d68ac373714f1ee9b78074'
+          key=os.environ.get('KIE_API_KEY','').strip()
+          assert len(key)>15, 'Missing Kie secret; no paid call'
+          def GET(p):
+            req=urllib.request.Request('https://api.kie.ai'+p,headers={'Authorization':'Bearer '+key,'Accept':'application/json'},method='GET')
+            with urllib.request.urlopen(req,timeout=45) as resp: ans=json.load(resp)
+            assert ans.get('code')==200,ans.get('msg')
+            return ans['data']
+          balance=float(GET('/api/v1/chat/credit'))
+          obj=GET('/api/v1/jobs/recordInfo?'+urllib.parse.urlencode({'taskId':task_id}))
+          state=obj.get('state')
+          record={'audit':'READ_ONLY_KIE_EXISTING_TASK','task_id':task_id,'provider':'kie.ai','model':'google/gemini-3-8-flash-tts','original_approved_jobs':1,'new_jobs':0,'http_methods_used':['GET','GET'],'credits_before':109.32,'credits_after':balance,'observed_credit_debit':round(max(0,109.32-balance),4),'last_task_state':state,'fail_reason':obj.get('failMsg') or obj.get('failCode'),'retry_allowed':False,'paid_api_called':False}
+          result=obj.get('resultJson') or obj.get('response') or {}
+          if isinstance(result,str):result=json.loads(result)
+          urls=result.get('resultUrls') or []
+          if state=='success' and urls:
+            with urllib.request.urlopen(urls[0],timeout=120) as rsp: audio=rsp.read()
+            assert audio[:4]==b'RIFF' and audio[8:12]==b'WAVE'
+            file=target/'EMMA_STORY5_FIRST10_KIE_GEMINI38_FLASH_NARRATOR.wav'
+            file.write_bytes(audio)
+            with wave.open(str(file)) as w:record['salvaged_audio_duration_seconds']=round(w.getnframes()/w.getframerate(),3)
+            record['salvaged_existing_job']=True
+            record['wav_sha256']=hashlib.sha256(audio).hexdigest()
+          else:record['salvaged_existing_job']=False
+          (target/'KIE_READ_ONLY_FAILURE_AND_CREDIT_AUDIT.json').write_text(json.dumps(record,indent=2))
+          print('KIE_READ_ONLY_AUDIT',json.dumps(record),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: STORY5_SECOND_KIE_FAILED_TASK_READONLY_CREDIT_AUDIT
+          path: story5_second_failed_kie_readonly_audit/
+          retention-days: 30
