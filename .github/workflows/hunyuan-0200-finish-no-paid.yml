@@ -1,0 +1,133 @@
+name: Hunyuan Bunker 02:00-02:30 Final Assembly (EXISTING ASSETS ONLY)
+on:
+  push:
+    branches: [hunyuan-0200-0230-v21-preproduction]
+    paths: ['.github/workflows/hunyuan-0200-finish-no-paid.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  finish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required FFmpeg and FFprobe
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg zip
+          command -v ffprobe
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_SHARD_0
+          path: parts/0
+          run-id: 44061396315
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_SHARD_1
+          path: parts/1
+          run-id: 44061396315
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_SHARD_2
+          path: parts/2
+          run-id: 44061396315
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_GATE_AND_SFX
+          path: gate
+          run-id: 44061396315
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_ILLUSTRATIONS
+          path: film/hunyuan-0200-0230/public/assets
+          run-id: 44061396315
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_TWO_EXISTING_KIE_WAVS
+          path: film/hunyuan-0200-0230/audio
+          run-id: 44062820919
+          github-token: ${{ github.token }}
+      - name: Build exact 30s AAC narration from silent-gap edits only
+        run: |
+          set -euo pipefail
+          test -s film/hunyuan-0200-0230/audio/segment_0.wav
+          test -s film/hunyuan-0200-0230/audio/segment_1.wav
+          python3 film/hunyuan-0200-0230/prepare_audio_repaired.py
+          mkdir -p delivery/qc film/hunyuan-0200-0230/public/rig
+          cp gate/qc/original_sfx_30s.wav film/hunyuan-0200-0230/audio/
+          cp film/hunyuan-2m/HUNYUAN_2D_CHARACTER_PACKAGE.zip film/hunyuan-0200-0230/
+          python3 - <<'PY'
+          import zipfile,pathlib,json
+          root=pathlib.Path('film/hunyuan-0200-0230')
+          with zipfile.ZipFile(root/'HUNYUAN_2D_CHARACTER_PACKAGE.zip') as z:
+              if z.testzip() is not None:raise RuntimeError('Corrupt original rig')
+              for n in ('art.js','engine.js'):(root/'public'/'rig'/n).write_bytes(z.read('HUNYUAN_2D/'+n))
+          assert len(list((root/'public'/'assets').glob('*.png')))==4
+          q=json.loads((root/'audio'/'AUDIO_QC.json').read_text())
+          assert q['new_generation_requests']==0 and q['duration_seconds']==30
+          assert q['spoken_audio_ends_at_seconds']<=30
+          files=[pathlib.Path('parts')/str(i)/f'part_{i}.mp4' for i in (0,1,2)]
+          assert all(p.exists() and p.stat().st_size>1000000 for p in files)
+          pathlib.Path('delivery/concat.txt').write_text(''.join("file '"+str(p.resolve())+"'\n" for p in files))
+          PY
+      - name: Join pre-existing GitHub CPU shards and approved KIE speech, then verify
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i delivery/concat.txt -c copy delivery/video_only.mp4
+          ffmpeg -hide_banner -loglevel error -y \
+            -i delivery/video_only.mp4 \
+            -i film/hunyuan-0200-0230/audio/narration_30s.wav \
+            -i film/hunyuan-0200-0230/audio/original_sfx_30s.wav \
+            -filter_complex '[1:a]volume=1.0[v];[2:a]volume=0.18[s];[v][s]amix=inputs=2:duration=first:dropout_transition=0[a]' \
+            -map 0:v:0 -map '[a]' -t 30 -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate,channels:format=duration,size -of json \
+            delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 > delivery/qc/FFPROBE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path('delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4')
+          f=json.loads(Path('delivery/qc/FFPROBE.json').read_text())
+          v=next(s for s in f['streams'] if s['codec_type']=='video')
+          a=next(s for s in f['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900)
+          assert a['codec_name']=='aac' and abs(float(f['format']['duration'])-30)<.1
+          q={'status':'TECHNICALLY_VALID_ARTISTIC_LISTENING_REVIEW_RECOMMENDED',
+             'scope':'Bunker Survival 02:00–02:30','width':1920,'height':1080,'fps':30,'frames':900,'duration_s':30,
+             'video':'H264 via WebCodecs/Mediabunny using 3 GitHub CPU runners','audio':'KIE Gemini 3.8 Flash-Lite Fola + original WebAudio SFX',
+             'new_paid_generation_calls':0,'existing_kie_task_ids':['73a3af873fb9eeb935d7335e6bb5a1ad','be36a266dd54291568fc8717ee66ff73'],
+             'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size}
+          Path('delivery/qc/QC_REPORT.json').write_text(json.dumps(q,indent=2))
+          print(json.dumps(q))
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 -f null -
+          ffmpeg -hide_banner -loglevel error -y -i delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 \
+            -vf 'fps=1/5,scale=640:-1,tile=3x2' -frames:v 1 delivery/CONTACT_SHEET.jpg
+          cp parts/0/frame_0_0.png delivery/qc/FRAME_00.png
+          cp parts/0/frame_0_1.png delivery/qc/FRAME_05.png
+          cp parts/1/frame_1_0.png delivery/qc/FRAME_10.png
+          cp parts/1/frame_1_1.png delivery/qc/FRAME_15.png
+          cp parts/2/frame_2_0.png delivery/qc/FRAME_20.png
+          cp parts/2/frame_2_1.png delivery/qc/FRAME_25.png
+          cp parts/2/frame_2_2.png delivery/qc/FRAME_29_967.png
+          cp delivery/qc/QC_REPORT.json film/hunyuan-0200-0230/QC_REPORT.json
+          cp delivery/HUNYUAN_BUNKER_02_00_TO_02_30_16X9.mp4 film/hunyuan-0200-0230/
+          (cd film && zip -qr ../delivery/HUNYUAN_BUNKER_0200_0230_SOURCE.zip hunyuan-0200-0230 \
+             -x 'hunyuan-0200-0230/dist/*' 'hunyuan-0200-0230/node_modules/*' \
+                '*.woff' '*.woff2' '*.ttf' '*.otf')
+          rm -f delivery/video_only.mp4
+          ls -lh delivery/*.mp4 delivery/*.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUNYUAN_0200_0230_FINAL_AND_SOURCE_NO_NEW_PAID
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: error
