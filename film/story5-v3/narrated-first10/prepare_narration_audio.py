@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Quality-gated trim/resample of single *already generated* mandatory Kie narrator WAV.
+"""Quality-gated trim/resample of single *already generated* user-selected Kie Flash-Lite narrator WAV.
 No speech generation, no substitutions, no removal of spoken words.
 """
 import json,subprocess,sys,wave
 from pathlib import Path
 import numpy as np
 
-src=Path("narrator/EMMA_STORY5_FIRST10_KIE_GEMINI38_FLASH_NARRATOR.wav")
-audit_file=Path("narrator/KIE_ONE_NARRATOR_COST_AND_AUDIO_AUDIT.json")
+src=Path("narrator/EMMA_STORY5_FIRST10_KIE_GEMINI38_FLASH_LITE_NARRATOR.wav")
+audit_file=Path("narrator/KIE_ONE_FLASH_LITE_NARRATOR_COST_AND_AUDIO_AUDIT.json")
 out=Path("delivery/VOICE_CLEAN_NARRATOR_10S.wav")
 if not (src.is_file() and audit_file.is_file()):raise RuntimeError("Missing exact Kie WAV and credit audit: STOP, do not request new paid audio")
 a=json.loads(audit_file.read_text())
 assert a["status"]=="SUCCESS_ONE_PAID_JOB" and a["jobs_created"]==1 and a["retry_count"]==0,a
-assert a["provider"]=="kie.ai" and a["model"]=="google/gemini-3-8-flash-tts",a
+assert a["provider"]=="kie.ai" and a["model"]=="google/gemini-3-8-flash-lite-tts",a
 assert a["credits_spent_from_balance"]<=5,a
 spoken="The entire city had been evacuated. A deadly yellow gas was spreading through the streets, killing anyone who breathed it. But Emma was still trapped."
 assert a["exact_narration_text"]==spoken
