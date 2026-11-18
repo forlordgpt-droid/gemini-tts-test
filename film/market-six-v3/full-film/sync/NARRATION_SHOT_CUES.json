@@ -1,0 +1,565 @@
+{
+  "project": "MARKET_SIX_FULL_FILM_NARRATION_LOCKED_SCENE_CUES",
+  "version": "v2",
+  "source": "ORIGINAL_STORY_SPOKEN_TURNS.json",
+  "policy": "Each corresponding already-paid illustration becomes visible at the precise original Gemini Flash narration phrase; audio and illustrations must not be regenerated",
+  "exact_tts": "google/gemini-3-8-flash-tts",
+  "exact_images": "gpt-image-2.5-lower",
+  "min_shot_seconds": 1.2,
+  "chapters": {
+    "1": [
+      {
+        "shot_key": "CH01_B01",
+        "cue": "Clara grips your arm"
+      },
+      {
+        "shot_key": "CH01_B02",
+        "cue": "Her brother Jonah is counting the last sealed water bottles"
+      },
+      {
+        "shot_key": "CH01_B03",
+        "cue": "On the radio a broken voice repeats one warning"
+      },
+      {
+        "shot_key": "CH01_B04",
+        "cue": "You look at the latch"
+      },
+      {
+        "shot_key": "CH01_B05",
+        "cue": "One hundred days earlier you walked into this store for bread"
+      }
+    ],
+    "2": [
+      {
+        "shot_key": "CH02_B01",
+        "cue": "It's 4:17 in the afternoon"
+      },
+      {
+        "shot_key": "CH02_B02",
+        "cue": "Then every phone in the store begins screaming"
+      },
+      {
+        "shot_key": "CH02_B03",
+        "cue": "River barrier failure"
+      },
+      {
+        "shot_key": "CH02_B04",
+        "cue": "In the parking lot water rushes between the cars"
+      },
+      {
+        "shot_key": "CH02_B05",
+        "cue": "A delivery truck tips onto its side"
+      },
+      {
+        "shot_key": "CH02_B06",
+        "cue": "The bridge that leads out of town disappears beneath brown water"
+      },
+      {
+        "shot_key": "CH02_B07",
+        "cue": "Behind you a woman shouts for her child"
+      },
+      {
+        "shot_key": "CH02_B08",
+        "cue": "Seconds later the glass doors explode inward"
+      },
+      {
+        "shot_key": "CH02_B09",
+        "cue": "You climb the stairs to the stockroom mezzanine"
+      }
+    ],
+    "3": [
+      {
+        "shot_key": "CH03_B01",
+        "cue": "The grid is down"
+      },
+      {
+        "shot_key": "CH03_B02",
+        "cue": "Before dawn the freezers begin warming"
+      },
+      {
+        "shot_key": "CH03_B03",
+        "cue": "You stare at meat milk and frozen food"
+      },
+      {
+        "shot_key": "CH03_B04",
+        "cue": "Unopened cans"
+      },
+      {
+        "shot_key": "CH03_B05",
+        "cue": "Dry beans Rice Sealed crackers"
+      },
+      {
+        "shot_key": "CH03_B06",
+        "cue": "You gather batteries first aid supplies blankets and a hand crank radio"
+      },
+      {
+        "shot_key": "CH03_B07",
+        "cue": "Then you smell smoke near the loading bay"
+      },
+      {
+        "shot_key": "CH03_B08",
+        "cue": "You shut it down and move away"
+      },
+      {
+        "shot_key": "CH03_B09",
+        "cue": "@end-2.4"
+      }
+    ],
+    "4": [
+      {
+        "shot_key": "CH04_B01",
+        "cue": "By day five the taps are dry"
+      },
+      {
+        "shot_key": "CH04_B02",
+        "cue": "You count roughly six hundred liters of sealed drinking water"
+      },
+      {
+        "shot_key": "CH04_B03",
+        "cue": "At a basic planning allowance of four liters per person per day"
+      },
+      {
+        "shot_key": "CH04_B04",
+        "cue": "So you set up clean containers for rainwater"
+      },
+      {
+        "shot_key": "CH04_B05",
+        "cue": "You refuse to use the muddy floodwater outside"
+      },
+      {
+        "shot_key": "CH04_B06",
+        "cue": "You label every bottle every meal every battery"
+      },
+      {
+        "shot_key": "CH04_B07",
+        "cue": "And each morning you write the date on the manager's whiteboard"
+      },
+      {
+        "shot_key": "CH04_B08",
+        "cue": "But by the eleventh morning the numbers on that board"
+      },
+      {
+        "shot_key": "CH04_B09",
+        "cue": "@end-2.3"
+      }
+    ],
+    "5": [
+      {
+        "shot_key": "CH05_B01",
+        "cue": "Three cans of beans are gone"
+      },
+      {
+        "shot_key": "CH05_B02",
+        "cue": "At first you blame yourself"
+      },
+      {
+        "shot_key": "CH05_B03",
+        "cue": "Then two packets of biscuits disappear"
+      },
+      {
+        "shot_key": "CH05_B04",
+        "cue": "The lower loading bay is still blocked by flood debris"
+      },
+      {
+        "shot_key": "CH05_B05",
+        "cue": "You walk slowly down aisle six"
+      },
+      {
+        "shot_key": "CH05_B06",
+        "cue": "Your flashlight catches a shoeprint beside the shelves"
+      },
+      {
+        "shot_key": "CH05_B07",
+        "cue": "I don't want to hurt you"
+      },
+      {
+        "shot_key": "CH05_B08",
+        "cue": "The ceiling makes a soft metallic click"
+      },
+      {
+        "shot_key": "CH05_B09",
+        "cue": "That night you barricade your sleeping space"
+      }
+    ],
+    "6": [
+      {
+        "shot_key": "CH06_B01",
+        "cue": "You remember the small solar charged battery"
+      },
+      {
+        "shot_key": "CH06_B02",
+        "cue": "You angle the camera toward aisle six"
+      },
+      {
+        "shot_key": "CH06_B03",
+        "cue": "On the floor you spread a narrow line of flour"
+      },
+      {
+        "shot_key": "CH06_B04",
+        "cue": "At 2:14 a m a figure steps into view"
+      },
+      {
+        "shot_key": "CH06_B05",
+        "cue": "The figure hesitates sees the camera and runs"
+      },
+      {
+        "shot_key": "CH06_B06",
+        "cue": "You follow the disturbed flour to a locked maintenance stairwell"
+      },
+      {
+        "shot_key": "CH06_B07",
+        "cue": "You pull it open expecting an attacker"
+      },
+      {
+        "shot_key": "CH06_B08",
+        "cue": "Instead you hear someone coughing in the dark"
+      },
+      {
+        "shot_key": "CH06_B09",
+        "cue": "Please don't send us outside"
+      }
+    ],
+    "7": [
+      {
+        "shot_key": "CH07_B01",
+        "cue": "Her name is Clara"
+      },
+      {
+        "shot_key": "CH07_B02",
+        "cue": "She cleaned this store at night"
+      },
+      {
+        "shot_key": "CH07_B03",
+        "cue": "They came here when the flood warning began"
+      },
+      {
+        "shot_key": "CH07_B04",
+        "cue": "Instead you notice the cracked skin on Jonah's lips"
+      },
+      {
+        "shot_key": "CH07_B05",
+        "cue": "You offer him clean water slowly"
+      },
+      {
+        "shot_key": "CH07_B06",
+        "cue": "Clara apologizes for taking food"
+      },
+      {
+        "shot_key": "CH07_B07",
+        "cue": "Then you do the calculation that every survivor hates"
+      },
+      {
+        "shot_key": "CH07_B08",
+        "cue": "You divide the shelf space into shared supplies"
+      },
+      {
+        "shot_key": "CH07_B09",
+        "cue": "For the first time in weeks someone says goodnight"
+      }
+    ],
+    "8": [
+      {
+        "shot_key": "CH08_B01",
+        "cue": "The names are not imaginary friends"
+      },
+      {
+        "shot_key": "CH08_B02",
+        "cue": "Eight survivors including an older woman who can barely walk"
+      },
+      {
+        "shot_key": "CH08_B03",
+        "cue": "Clara has been leaving supplies by an old covered passage"
+      },
+      {
+        "shot_key": "CH08_B04",
+        "cue": "You would have stopped me"
+      },
+      {
+        "shot_key": "CH08_B05",
+        "cue": "You stand at the upstairs window and see a white cloth"
+      },
+      {
+        "shot_key": "CH08_B06",
+        "cue": "Here is the problem with rationing"
+      },
+      {
+        "shot_key": "CH08_B07",
+        "cue": "You shut the ledger"
+      },
+      {
+        "shot_key": "CH08_B08",
+        "cue": "Protect the three of you or find a way to help eight strangers"
+      },
+      {
+        "shot_key": "CH08_B09",
+        "cue": "Then the white cloth stops moving"
+      }
+    ],
+    "9": [
+      {
+        "shot_key": "CH09_B01",
+        "cue": "For nine days you watch the depot"
+      },
+      {
+        "shot_key": "CH09_B02",
+        "cue": "Some mornings the white cloth appears"
+      },
+      {
+        "shot_key": "CH09_B03",
+        "cue": "You try the radio the rooftop flashlight"
+      },
+      {
+        "shot_key": "CH09_B04",
+        "cue": "Then through binoculars you see a man collapse near the glass"
+      },
+      {
+        "shot_key": "CH09_B05",
+        "cue": "Clara wants to run straight across the flooded road"
+      },
+      {
+        "shot_key": "CH09_B06",
+        "cue": "Floodwater can hide open drains"
+      },
+      {
+        "shot_key": "CH09_B07",
+        "cue": "You study the building plans instead"
+      },
+      {
+        "shot_key": "CH09_B08",
+        "cue": "Behind the supermarket is an elevated service walkway"
+      },
+      {
+        "shot_key": "CH09_B09",
+        "cue": "Three short bursts Followed by a word written on cardboard"
+      }
+    ],
+    "10": [
+      {
+        "shot_key": "CH10_B01",
+        "cue": "By day fifty the survivors from the depot are inside the supermarket"
+      },
+      {
+        "shot_key": "CH10_B02",
+        "cue": "You only bring them over when the elevated route is checked"
+      },
+      {
+        "shot_key": "CH10_B03",
+        "cue": "Eleven people now share your shelter"
+      },
+      {
+        "shot_key": "CH10_B04",
+        "cue": "It's about rules"
+      },
+      {
+        "shot_key": "CH10_B05",
+        "cue": "One person cooks in a safe ventilated area"
+      },
+      {
+        "shot_key": "CH10_B06",
+        "cue": "Another manages waste and sanitation"
+      },
+      {
+        "shot_key": "CH10_B07",
+        "cue": "Clara takes charge of first aid"
+      },
+      {
+        "shot_key": "CH10_B08",
+        "cue": "You organize water and food"
+      },
+      {
+        "shot_key": "CH10_B09",
+        "cue": "But that evening you catch a survivor slipping two sealed bottles beneath a mattress"
+      }
+    ],
+    "11": [
+      {
+        "shot_key": "CH11_B01",
+        "cue": "Twelve days"
+      },
+      {
+        "shot_key": "CH11_B02",
+        "cue": "That is how long the sealed water will last eleven people"
+      },
+      {
+        "shot_key": "CH11_B03",
+        "cue": "You gather the group and tell them the truth"
+      },
+      {
+        "shot_key": "CH11_B04",
+        "cue": "Then you show them the rain collection system"
+      },
+      {
+        "shot_key": "CH11_B05",
+        "cue": "Rainwater can carry contamination from roofs"
+      },
+      {
+        "shot_key": "CH11_B06",
+        "cue": "So you use clean catchment materials"
+      },
+      {
+        "shot_key": "CH11_B07",
+        "cue": "When the next storm breaks water pounds onto the roof"
+      },
+      {
+        "shot_key": "CH11_B08",
+        "cue": "Slowly the gauges begin to rise"
+      },
+      {
+        "shot_key": "CH11_B09",
+        "cue": "And then the hand crank radio wakes up"
+      }
+    ],
+    "12": [
+      {
+        "shot_key": "CH12_B01",
+        "cue": "A second flood crest"
+      },
+      {
+        "shot_key": "CH12_B02",
+        "cue": "This may be an old recording but the rain gauge outside is climbing"
+      },
+      {
+        "shot_key": "CH12_B03",
+        "cue": "You move clean water dry food blankets and medicines away from the ground floor"
+      },
+      {
+        "shot_key": "CH12_B04",
+        "cue": "You put the sleeping area above the expected waterline"
+      },
+      {
+        "shot_key": "CH12_B05",
+        "cue": "Jonah helps by pushing a cart stacked with sealed biscuits"
+      },
+      {
+        "shot_key": "CH12_B06",
+        "cue": "Clara marks every safe exit on a store plan"
+      },
+      {
+        "shot_key": "CH12_B07",
+        "cue": "No one tries to run a fuel generator inside"
+      },
+      {
+        "shot_key": "CH12_B08",
+        "cue": "At sunset the building shakes under a deep impact"
+      },
+      {
+        "shot_key": "CH12_B09",
+        "cue": "A floating shipping container has struck the loading dock"
+      }
+    ],
+    "13": [
+      {
+        "shot_key": "CH13_B01",
+        "cue": "The lower wall begins to leak"
+      },
+      {
+        "shot_key": "CH13_B02",
+        "cue": "Just a thin line of water spreading beneath the pallets"
+      },
+      {
+        "shot_key": "CH13_B03",
+        "cue": "The supermarket is no longer a place you can trust without checking"
+      },
+      {
+        "shot_key": "CH13_B04",
+        "cue": "The group moves essentials upstairs"
+      },
+      {
+        "shot_key": "CH13_B05",
+        "cue": "They build a small organized shelter on the upper level"
+      },
+      {
+        "shot_key": "CH13_B06",
+        "cue": "You paint HELP 11 PEOPLE onto a large sheet"
+      },
+      {
+        "shot_key": "CH13_B07",
+        "cue": "Days pass"
+      },
+      {
+        "shot_key": "CH13_B08",
+        "cue": "Then Jonah sees movement on the distant ridge"
+      },
+      {
+        "shot_key": "CH13_B09",
+        "cue": "The crowd stops at the flooded access road and turns toward the supermarket"
+      }
+    ],
+    "14": [
+      {
+        "shot_key": "CH14_B01",
+        "cue": "You use the next twelve days to prepare"
+      },
+      {
+        "shot_key": "CH14_B02",
+        "cue": "The upper staff entrance connects to a raised walkway"
+      },
+      {
+        "shot_key": "CH14_B03",
+        "cue": "You paint huge arrows on a sheet"
+      },
+      {
+        "shot_key": "CH14_B04",
+        "cue": "You hang it where the crowd can see"
+      },
+      {
+        "shot_key": "CH14_B05",
+        "cue": "You mark the broken dock with a red cross"
+      },
+      {
+        "shot_key": "CH14_B06",
+        "cue": "You have room upstairs but supplies will be tight"
+      },
+      {
+        "shot_key": "CH14_B07",
+        "cue": "On day ninety six the distant group disappears behind the trees"
+      },
+      {
+        "shot_key": "CH14_B08",
+        "cue": "On day ninety nine you hear a signal horn near the ridge"
+      },
+      {
+        "shot_key": "CH14_B09",
+        "cue": "At dawn on day one hundred nineteen people appear at the bottom of the loading dock"
+      }
+    ],
+    "15": [
+      {
+        "shot_key": "CH15_B01",
+        "cue": "Nineteen people outside Eleven inside"
+      },
+      {
+        "shot_key": "CH15_B02",
+        "cue": "You take it away"
+      },
+      {
+        "shot_key": "CH15_B03",
+        "cue": "You run upstairs"
+      },
+      {
+        "shot_key": "CH15_B04",
+        "cue": "Clara grabs a bright orange sheet"
+      },
+      {
+        "shot_key": "CH15_B05",
+        "cue": "Jonah spots the higher walkway"
+      },
+      {
+        "shot_key": "CH15_B06",
+        "cue": "Together you signal the strangers toward the upper entrance"
+      },
+      {
+        "shot_key": "CH15_B07",
+        "cue": "One by one they climb"
+      },
+      {
+        "shot_key": "CH15_B08",
+        "cue": "You count again Thirty people"
+      },
+      {
+        "shot_key": "CH15_B09",
+        "cue": "A newcomer puts a working radio on the table"
+      }
+    ]
+  }
+}
