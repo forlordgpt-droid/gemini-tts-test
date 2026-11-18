@@ -1,0 +1,38 @@
+name: Market Six Full 15m - Original Scene-Matched Web Audio OfflineAudioContext Atmosphere
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full-15m-webaudio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  create-original-15-chapter-sfx:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify unchanged original V3 engine and mandatory browser audio stack
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Generate every actual scene sound with original browser Web Audio OfflineAudioContext - no credits or substitutions
+        run: |
+          set -euo pipefail
+          node film/market-six-v3/full-film/export_original_sfx.cjs
+          test "$(find sfx_full -name '*.wav' | wc -l)" -eq 15
+          test -s sfx_full/ORIGINAL_15_CHAPTER_OFFLINE_AUDIO_QA.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15M_ORIGINAL_WEBAUDIO_15_CHAPTER_SFX_30TO900
+          path: sfx_full/
+          retention-days: 60
+          compression-level: 0
+          if-no-files-found: error
