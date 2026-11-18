@@ -1,0 +1,144 @@
+{
+  "provider": "SnapGen",
+  "model": "gpt-image-2.5-lower",
+  "batch": 1,
+  "submit_count": 19,
+  "expected_count": 20,
+  "paid_gen_ids": [
+    {
+      "key": "CH03_B05",
+      "uuid": "0ad72346-e333-11f1-9db9-8e843779d8f0",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH03_B04",
+      "uuid": "09cf3150-e333-11f1-b8f1-7ee52e45ccfc",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH03_B03",
+      "uuid": "08a902a6-e333-11f1-956e-c69d76bf5062",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH03_B02",
+      "uuid": "074bbcbe-e333-11f1-bd0d-1203d9481d48",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH03_B01",
+      "uuid": "061df956-e333-11f1-9dc5-b68318e4f420",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B09",
+      "uuid": "05129bac-e333-11f1-9e6c-a2476f796584",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B08",
+      "uuid": "04075716-e333-11f1-bd4d-ce2f4e6d487d",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B07",
+      "uuid": "02fc815c-e333-11f1-b7dd-a2fc97eee3ca",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B06",
+      "uuid": "0193bc04-e333-11f1-b7dd-a2fc97eee3ca",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B05",
+      "uuid": "006ba92c-e333-11f1-aefb-0a1877198177",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B04",
+      "uuid": "fea13148-e332-11f1-a313-3280448bd45a",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B03",
+      "uuid": "fb5d24ec-e332-11f1-909e-3a2b39fe1441",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B02",
+      "uuid": "fa27cff0-e332-11f1-9938-12a198fe4f4c",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH02_B01",
+      "uuid": "f8dbeabe-e332-11f1-87a3-32bcf30a2274",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH01_B05",
+      "uuid": "f7d48f72-e332-11f1-9487-1acc0cfac806",
+      "model": "gpt-image-2.5-lower",
+      "status": "completed",
+      "credits_used": 1
+    },
+    {
+      "key": "CH01_B04",
+      "uuid": "f69a1e4c-e332-11f1-b5e0-1ae366748e7d",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH01_B03",
+      "uuid": "f5447ede-e332-11f1-9e7f-6238facd5dfa",
+      "model": "gpt-image-2.5-lower",
+      "status": "processing",
+      "credits_used": 0
+    },
+    {
+      "key": "CH01_B02",
+      "uuid": "f3d02ea4-e332-11f1-829f-ca505ada3fcc",
+      "model": "gpt-image-2.5-lower",
+      "status": "completed",
+      "credits_used": 1
+    },
+    {
+      "key": "CH01_B01",
+      "uuid": "f182a280-e332-11f1-9e1c-6ebc1d51eb4a",
+      "model": "gpt-image-2.5-lower",
+      "status": "completed",
+      "credits_used": 1
+    }
+  ],
+  "source": "SnapGen canonical account history recovery after internal multi-tool invocation limit; no duplicate jobs submitted",
+  "errors": []
+}
