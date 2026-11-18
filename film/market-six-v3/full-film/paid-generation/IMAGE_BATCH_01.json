@@ -2,7 +2,7 @@
   "provider": "SnapGen",
   "model": "gpt-image-2.5-lower",
   "batch": 1,
-  "submit_count": 19,
+  "submit_count": 20,
   "expected_count": 20,
   "paid_gen_ids": [
     {
@@ -137,6 +137,13 @@
       "model": "gpt-image-2.5-lower",
       "status": "completed",
       "credits_used": 1
+    },
+    {
+      "key": "CH03_B06",
+      "uuid": "21b0bb18-e333-11f1-94b5-82e7861ea8f9",
+      "model": "gpt-image-2.5-lower",
+      "status": "submitted",
+      "credits_used": 0
     }
   ],
   "source": "SnapGen canonical account history recovery after internal multi-tool invocation limit; no duplicate jobs submitted",
