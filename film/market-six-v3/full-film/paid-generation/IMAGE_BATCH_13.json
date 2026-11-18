@@ -1,0 +1,16 @@
+{
+  "batch": 13,
+  "start_index": 130,
+  "end_index": 131,
+  "exact_model": "gpt-image-2.5-lower",
+  "submitted": 1,
+  "jobs": [
+    {
+      "key": "CH15_B09",
+      "uuid": "e2d64bb8-e334-11f1-bb51-5e626749fe95",
+      "model": "gpt-image-2.5-lower",
+      "estimated_credit": 1
+    }
+  ],
+  "errors": []
+}
