@@ -1,5 +1,8 @@
 name: Market Six Full 15m FINAL Assemble Approved 30s and 87 Original 2.5D Shards
 on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full-15m-final-assemble.yml']
   workflow_dispatch:
 permissions:
   contents: read
