@@ -1,0 +1,61 @@
+name: Market Six Full 15m - 15 ORIGINAL Gemini 3.8 FLASH chapter speech tasks
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full-15m-chapter-voice.yml']
+  workflow_dispatch:
+concurrency:
+  group: market-six-full15m-15-single-paid-tts-no-rerun
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  generate-one-original-chapter:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 38
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        chapter: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original untouched Hunyuan V3 references and locked software
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Verify no storyteller text changes and no wrong paid model
+        env:
+          CHAPTER: ${{ matrix.chapter }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          m=json.loads(Path('film/market-six-v3/full-film/ORIGINAL_STORY_SPOKEN_TURNS.json').read_text())
+          c=int(os.environ['CHAPTER'])
+          assert len(m['chapters'])==15 and m['exact_model']=='google/gemini-3-8-flash-tts'
+          assert m['chapters'][c-1]['chapter']==c
+          assert m['chapters'][c-1]['provider']=='kie.ai' and m['chapters'][c-1]['model']=='google/gemini-3-8-flash-tts'
+          assert m['chapters'][c-1]['total_source_words']>30
+          print('Verified original author script, exact model, no nonconsensual substitutions',c)
+          PY
+      - name: ONE user-authorized exact Kie Gemini 3.8 Flash generation for current chapter
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+          CHAPTER: ${{ matrix.chapter }}
+        run: |
+          set -euo pipefail
+          python3 film/market-six-v3/full-film/generate_kie_chapter.py --chapter "$CHAPTER"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MARKET_SIX_FULL_15M_EXACT_KIE_FLASH_VOICE_CH${{ matrix.chapter }}
+          path: voice/
+          if-no-files-found: warn
+          retention-days: 60
