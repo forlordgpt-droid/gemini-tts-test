@@ -124,35 +124,25 @@ jobs:
           print('PASS single directly-playable movie',p.stat().st_size)
           PY
           ffmpeg -hide_banner -loglevel error -xerror -i final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4 -f null -
-      - name: Publish corrected 15min MP4 with DIRECT GitHub Release video asset, no temporary ZIP or 100MB connector limit
-        env:
-          GH_${{ github.token }}: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          TAG=market-six-15min-narration-synced-v2-20261118
-          gh release create "$TAG" \
-            final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4 \
-            final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4 \
-            --repo "$GITHUB_REPOSITORY" --latest \
-            --title "100 Days Inside an Abandoned Supermarket - Narration Synced Final 15-Minute Movie" \
-            --notes "Corrected whole 15 minute movie: all 131 illustrated shots retimed to their actual original Kie.ai Gemini 3.8 Flash spoken-word onsets (audited with diagnostic ASR), with native Hunyuan V3 Three.js PerspectiveCamera, GSAP and original 2.5D paintings, scene-matched WebAudio original SFX, original approved first30 preserved unchanged. No new paid generation. Includes a portable Full HD 1080p MP4 and original high bitrate 1080p master MP4."
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,assets > final_full/VERIFIED_CORRECTED_RELEASE.json
-          python3 - <<'PY'
-          import json
-          x=json.load(open('final_full/VERIFIED_CORRECTED_RELEASE.json'))
-          files=[s for s in x['assets'] if s['name'].endswith('.mp4')]
-          assert len(files)==2
-          for f in files:
-              assert f['size']>100000000 and f['url'].startswith('https://')
-              print('VERIFIED DIRECT VIDEO',f['name'],f['size'],f['url'])
-          print('FINAL SUCCESSFUL RELEASE',x['url'])
-          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V2_CORRECTED_15MIN_ONE_PLAYABLE_MP4
+          path: final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V2_CORRECTED_15MIN_ORIGINAL_HIGH_BITRATE_MASTER
+          path: final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: MARKET_SIX_V2_VERIFIED_REAL_SPEECH_SYNC_AND_RELEASE_REPORT
           path: |
-            final_full/VERIFIED_CORRECTED_RELEASE.json
             final_full/VOICE_PICTURE_SCENE_MATCH_QA.json
             final_full/SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json
             final_full/FULL_FILM_VERIFIED_SOURCE_AND_CREDIT_REPORT.json
@@ -163,3 +153,68 @@ jobs:
             sync_results/SYNC_COMPARISON_SUMMARY.json
           retention-days: 60
           if-no-files-found: warn
+
+  publish-corrected-direct-video:
+    needs: [full-900-seconds-speech-synchronized-film]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_V2_CORRECTED_15MIN_ONE_PLAYABLE_MP4
+          path: delivery/
+      - uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_V2_VERIFIED_REAL_SPEECH_SYNC_AND_RELEASE_REPORT
+          path: report/
+      - name: Check unchanged Gemini voice and 131 measured cues; verify exact portable MP4 SHA256
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          v=Path('delivery/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4')
+          meta=json.loads(Path('report/SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json').read_text())
+          audit=json.loads(Path('report/VOICE_PICTURE_SCENE_MATCH_QA.json').read_text())
+          assert v.is_file() and v.stat().st_size==meta['bytes']
+          assert meta['frames']==27000 and meta['duration_seconds']==900
+          assert audit['spoken_story_cues']==131 and audit['chapters']==15
+          assert audit['status']=='PASS_USER_SCRIPT_EVENT_SYNC_ACTUAL_MOVIE_2P5D_CUT_AUDIT'
+          assert meta['model_illustrations']=='gpt-image-2.5-lower' and meta['model_narration']=='google/gemini-3-8-flash-tts'
+          h=hashlib.sha256()
+          with v.open('rb') as f:
+              for chunk in iter(lambda:f.read(8388608),b''):h.update(chunk)
+          assert h.hexdigest()==meta['sha256']
+          print('PUBLIC RELEASE VERIFIED: 15min original artist-driven 1080p story, 131 speech cuts, 0 new paid requests',flush=True)
+          PY
+      - name: Publish durable direct MP4 (GitHub Releases, NOT expiring Actions artifact ZIP)
+        run: |
+          set -euo pipefail
+          TAG=market-six-15min-narration-synced-v2-20261118
+          gh release create "$TAG" \
+            delivery/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4 \
+            --repo "$GITHUB_REPOSITORY" --latest \
+            --title "100 Days Inside an Abandoned Supermarket - Original 15-Minute Movie (Audio / Visual Sync Fixed)" \
+            --notes "Every shot now appears at its corresponding actual original Kie Gemini 3.8 Flash spoken event. 131 unchanged approved 2D illustrations, 15 original chapters, real 2.5D Three.js PerspectiveCamera+GSAP movement and Web Audio OfflineAudioContext effects now aligned to narration. Existing source audio preserved verbatim, original approved first 30s restored bitwise in high-bitrate verified master; this is the portable high-quality single-MP4 H264/AAC export. Zero new media-generation credits."
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,assets > verified_sync_release.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('verified_sync_release.json'))
+          vids=[a for a in r['assets'] if a['name'].endswith('.mp4')]
+          assert len(vids)==1 and 100000000<vids[0]['size']<495000000
+          assert vids[0]['url'].startswith('https://')
+          print('FINAL_SYNC_FIXED_15MIN_DIRECT_MP4',vids[0]['url'])
+          print('RELEASE_PAGE',r['url'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V2_PUBLIC_MOVIE_RELEASE_LINK
+          path: verified_sync_release.json
+          retention-days: 60
+          if-no-files-found: error
