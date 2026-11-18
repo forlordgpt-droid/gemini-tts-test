@@ -1,0 +1,29 @@
+{
+  "batch": 6,
+  "range": [
+    40,
+    43
+  ],
+  "model": "gpt-image-2.5-lower",
+  "jobs": [
+    {
+      "key": "CH06_B05",
+      "uuid": "b65192f6-e338-11f1-8617-36c4d2f2d053",
+      "model": "gpt-image-2.5-lower",
+      "estimated_credit": 1
+    },
+    {
+      "key": "CH06_B06",
+      "uuid": "b79267e4-e338-11f1-bc9f-3a767211f88d",
+      "model": "gpt-image-2.5-lower",
+      "estimated_credit": 1
+    },
+    {
+      "key": "CH06_B07",
+      "uuid": "b8f2d876-e338-11f1-8e3a-9618d75e600b",
+      "model": "gpt-image-2.5-lower",
+      "estimated_credit": 1
+    }
+  ],
+  "errors": []
+}
