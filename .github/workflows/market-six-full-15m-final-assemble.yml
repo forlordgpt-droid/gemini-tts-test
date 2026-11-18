@@ -1,4 +1,4 @@
-name: Market Six Full 15m FINAL Assemble Approved 30s and 87 Original 2.5D Shards
+name: Market Six Full 15m FINAL Lossless PTS corrected assembly of 87 verified original 2.5D shards
 on:
   push:
     branches: [market-six-full-film-20261118]
@@ -69,6 +69,9 @@ jobs:
           test -s approved_first30/MARKET_SIX_DAY100_COMPLETE_FIRST30_1080P.mp4
           test -s narration/MARKET_SIX_KIE_FLASH_VERBATIM_CONTINUATION_30TO900.wav
           test "$(find sfx_full -name 'MARKET_SIX_ORIGINAL_WEBAUDIO_CH*.wav' | wc -l)" -eq 15
+          # The video script now losslessly normalizes all individual WebCodecs 1/30 shard
+          # track scales to the preserved approved first30 H264 1/15360 track scale.
+          # This changes timestamps ONLY, never decodes/reencodes approved movie frames.
           python3 film/market-six-v3/full-film/assemble_original_15min.py
           test -s final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4
       - name: Full-video ACTUAL 27,000 decoded-frame and non-frozen visible motion QA using exact OpenCV FFmpeg FFprobe Pillow
