@@ -1,0 +1,45 @@
+name: MARKET SIX V2 - Speech-accurate narration locked Web Audio effects in all chapters
+on:
+  push:
+    branches: [market-six-speech-locked-sync-v2-20261118]
+    paths: ['.github/workflows/market-six-sync-chapter-sfx.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  create-original-15-chapter-sfx:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify unchanged original V3 engine and mandatory browser audio stack
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Retrieve real Gemini Flash measured spoken-word event timestamps
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_V2_MEASURED_131_NARRATION_ANCHORED_SHOT_CUTS
+          run-id: 44325720320
+          github-token: ${{ github.token }}
+          path: sync_results/
+      - name: Generate every scene sound aligned to actual narration, original Web Audio OfflineAudioContext
+        run: |
+          set -euo pipefail
+          node film/market-six-v3/full-film/sync/export_narration_locked_sfx.cjs
+          test "$(find sfx_full -name '*.wav' | wc -l)" -eq 15
+          test -s sfx_sync/ORIGINAL_15_CHAPTER_OFFLINE_AUDIO_QA.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V2_NARRATION_SYNCHRONIZED_15_CHAPTER_WEBAUDIO_SFX
+          path: sfx_sync/
+          retention-days: 60
+          compression-level: 0
+          if-no-files-found: error
