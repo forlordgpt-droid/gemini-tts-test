@@ -46,9 +46,9 @@ jobs:
             if out.get('code')!=200:raise RuntimeError(str(out.get('code'))+' '+str(out.get('msg')))
             return out['data']
           def do_scene(idx,turns):
-            speakers=[{'speaker_id':'AVA','voice_name':'Leda'},{'speaker_id':'PIX','voice_name':'Puck'}]
+            speakers=[{'speaker_id':'Speaker 1','voice_name':'Leda'},{'speaker_id':'Speaker 2','voice_name':'Puck'}]
             st={'AVA':'Young inventive woman. Urgent, vividly expressive, articulate, natural English, cinematic comedy acting, quick but intelligible, vary intonation.', 'PIX':'Lovable cheeky optimistic robot. Light youthful male voice, dry humor and comic timing, friendly and slightly mischievous, natural English.'}
-            ins={'temperature':0.85,'speakers':speakers,'dialogue_turns':[{'speaker_id':sp,'style':st[sp],'text':line} for sp,line in turns]}
+            ins={'temperature':0.85,'speakers':speakers,'dialogue_turns':[{'speaker_id':'Speaker 1' if sp=='AVA' else 'Speaker 2','style':st[sp],'text':line} for sp,line in turns]}
             data=req('/createTask',{'model':'google/gemini-3-8-flash-lite-tts','input':ins})
             task=data.get('taskId')
             if not task:raise RuntimeError('No task ID for scene '+str(idx))
