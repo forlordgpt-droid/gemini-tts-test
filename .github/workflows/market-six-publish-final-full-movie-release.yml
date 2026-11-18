@@ -1,0 +1,88 @@
+name: Market Six - Publish One Direct 15-Minute MP4 GitHub Release
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-publish-final-full-movie-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: market-six-final-single-file-verified-release
+  cancel-in-progress: false
+jobs:
+  publish-direct-mp4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified, directly playable 15-minute 1080p MP4
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_ONE_PLAYABLE_15MIN_1080P_MP4
+          run-id: 44310796239
+          github-token: ${{ github.token }}
+          path: delivery/
+      - name: Retrieve video provenance, SHA256 and 27k-frame QC
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_ONE_PLAYABLE_15MIN_1080P_QA
+          run-id: 44310796239
+          github-token: ${{ github.token }}
+          path: qa/
+      - name: Verify all media metadata and SHA256 BEFORE public release
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path('delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4')
+          q=json.loads(Path('qa/SINGLE_FILE_QA.json').read_text())
+          assert p.exists() and p.stat().st_size==q['file_size']
+          assert q['status']=='PASS_ONE_PLAYABLE_FILE'
+          assert q['duration_seconds']==900 and q['frames']==27000
+          assert (q['width'],q['height'])==(1920,1080)
+          assert q['video']=='h264' and q['audio']=='aac'
+          assert q['no_new_paid_generation'] is True
+          h=hashlib.sha256()
+          with p.open('rb') as stream:
+              for block in iter(lambda:stream.read(8388608),b''):h.update(block)
+          assert h.hexdigest()==q['deliverable_sha256']
+          print('VERIFIED FINAL DIRECT DOWNLOAD: 15min, 1920x1080, 27000 frames, SHA256',h.hexdigest(),'bytes',p.stat().st_size)
+          PY
+      - name: Publish complete movie as a permanent direct download asset (not GitHub Actions ZIP)
+        run: |
+          set -euo pipefail
+          tag=market-six-full-15min-1080p-final-20261118
+          gh release create "$tag" \
+            delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4 \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "100 Days Inside an Abandoned Supermarket - Complete 15-Minute 1080p Movie" \
+            --notes "The complete 15-minute illustrated cinematic film. Single directly playable 1080p H.264/AAC MP4, 30 fps, 27,000 frames. Generated images: SnapGen gpt-image-2.5-lower. Speech: Kie.ai google/gemini-3-8-flash-tts. This portable single-file copy is a high-quality delivery transcode of the previously verified 956 MB master, not a scene regeneration. No paid calls during delivery." \
+            --latest
+      - name: Verify published downloadable MP4 asset size and URL
+        run: |
+          set -euo pipefail
+          gh release view market-six-full-15min-1080p-final-20261118 \
+            --repo "$GITHUB_REPOSITORY" --json url,assets > verified_release.json
+          python3 - <<'PY'
+          import json,os
+          o=json.load(open('verified_release.json'))
+          a=o['assets']
+          assert len(a)>=1
+          m=next(x for x in a if x['name']=='100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4')
+          assert m['size']>200000000 and m['size']<500000000
+          assert m['url'].startswith('https://')
+          print('SUCCESS_FULL_MOVIE_RELEASE_URL',m['url'])
+          print('SUCCESS_RELEASE_PAGE',o['url'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_VERIFIED_ONE_FILE_GITHUB_RELEASE_URL
+          path: verified_release.json
+          retention-days: 60
