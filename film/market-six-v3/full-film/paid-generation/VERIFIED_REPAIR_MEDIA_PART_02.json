@@ -1,0 +1,62 @@
+{
+  "part": 2,
+  "verified": [
+    {
+      "key": "CH02_B09",
+      "uuid": "6f0a54b4-e338-11f1-8e94-9e2fa2905aa4",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/6f0a54b4-e338-11f1-8e94-9e2fa2905aa4/20261118_101222_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101559Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=384607d43d5782ed2e9027c0e58272119c468fe4eccbe6a1e2b927c8b0628665"
+    },
+    {
+      "key": "CH03_B01",
+      "uuid": "70b9632c-e338-11f1-ba81-3a2705cdbdea",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/70b9632c-e338-11f1-ba81-3a2705cdbdea/20261118_101229_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101600Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=fa154451f2d33e088a316655d72b0af303fb342b910989c8a3a1554f794acb2f"
+    },
+    {
+      "key": "CH03_B02",
+      "uuid": "720b1428-e338-11f1-95f0-764ba00f132f",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/720b1428-e338-11f1-95f0-764ba00f132f/20261118_101339_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101603Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=9d869f8003e9111deabe01de34be545da2d1fdbfb6df1b650ff01326d8305f8d"
+    },
+    {
+      "key": "CH03_B03",
+      "uuid": "73885fcc-e338-11f1-b15c-92d72c3bb96f",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/73885fcc-e338-11f1-b15c-92d72c3bb96f/20261118_101228_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101604Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=546e6c37d2294bbf3af63be51651b38a857d7ea81b7a3628a5292ea51e4bfddd"
+    },
+    {
+      "key": "CH03_B04",
+      "uuid": "74ba349c-e338-11f1-b1ec-c6e76e68f79d",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/74ba349c-e338-11f1-b1ec-c6e76e68f79d/20261118_101344_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101606Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dc9e13242027e73fd91c85c71b836ce63bb87e8e74b96d28b5c2906ff298a286"
+    },
+    {
+      "key": "CH03_B05",
+      "uuid": "7667ae50-e338-11f1-a135-6a292de34384",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/7667ae50-e338-11f1-a135-6a292de34384/20261118_101401_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101608Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7775e8fbcea599d945c077bc4e85eb9f01cdc08d57cb6a24041414733f166fea"
+    },
+    {
+      "key": "CH03_B06",
+      "uuid": "776a4574-e338-11f1-a16f-5ae7cce85481",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/776a4574-e338-11f1-a16f-5ae7cce85481/20261118_101232_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4ebda5bb35a137f9a49cb525c96f0d3d9cfaddf41cc073460360e30867702d13"
+    },
+    {
+      "key": "CH03_B07",
+      "uuid": "78d2f10e-e338-11f1-ad36-e24c454cf169",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/78d2f10e-e338-11f1-ad36-e24c454cf169/20261118_101241_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T101611Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=56ae7286ad1fbd3f27f9d819e1b52a9e4183e18bfb7800d18139eceb29e65a73"
+    }
+  ],
+  "errors": []
+}
