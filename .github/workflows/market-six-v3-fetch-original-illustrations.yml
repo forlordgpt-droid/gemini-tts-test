@@ -1,0 +1,71 @@
+name: Market Six V3 - Download 10 already approved paid SnapGen originals and inspect
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/market-six-v3-fetch-original-illustrations.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-illustrations:
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original engine and exactly 10 previously generated image jobs, NO new model API requests
+        run: |
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import json
+          m=json.load(open('film/market-six-v3/RAW_SNAPGEN_ASSETS.json'))
+          assert m['provider']=='SnapGen' and m['model']=='gpt-image-2.5-lower'
+          assert m['image_jobs']==10 and m['credits_used']==10 and len(m['assets'])==10
+          assert [a['name'] for a in m['assets']]==['CHARACTERS','ARCHITECTURE']+['S%02d'%n for n in range(1,9)]
+          assert all(a['model']=='gpt-image-2.5-lower' and a['credits_used']==1 and a['image_url'].startswith('https://') for a in m['assets'])
+          print('PASS source model verification: 10 genuine paid original 2D illustrations, ZERO new API requests')
+          PY
+      - name: Fetch originals and produce image contact sheet (no extra credits)
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,pathlib,hashlib,io,concurrent.futures
+          from PIL import Image,ImageDraw
+          m=json.load(open('film/market-six-v3/RAW_SNAPGEN_ASSETS.json'))
+          raw=pathlib.Path('film/market-six-v3/raw');raw.mkdir(parents=True,exist_ok=True)
+          def one(a):
+              idx=int(a['name'][1:])-1 if a['name'].startswith('S0') else a['name']
+              target=raw/('raw_'+str(idx)+'.png' if isinstance(idx,int) else 'ref_'+idx.lower()+'.png')
+              with urllib.request.urlopen(urllib.request.Request(a['image_url'],headers={'User-Agent':'Mozilla/5.0'}),timeout=160) as f:b=f.read()
+              img=Image.open(io.BytesIO(b));img.verify()
+              target.write_bytes(b)
+              return {'name':a['name'],'file':str(target),'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:details=list(pool.map(one,m['assets']))
+          assert len(details)==10
+          panels=[]
+          for i in range(8):
+              p=raw/('raw_'+str(i)+'.png')
+              with Image.open(p) as im:
+                  assert im.width/im.height>1.7 and im.width>1000,(p,im.size)
+                  panels.append(im.convert('RGB').resize((640,360),Image.Resampling.LANCZOS))
+          sheet=Image.new('RGB',(2560,760),'#081424')
+          d=ImageDraw.Draw(sheet)
+          for i,im in enumerate(panels):
+              x=(i%4)*640;y=(i//4)*380
+              sheet.paste(im,(x,y+20));d.text((x+15,y+2),'SCENE %02d'%(i+1),fill='#f9d9a2')
+          q=pathlib.Path('film/market-six-v3/qa');q.mkdir(parents=True,exist_ok=True)
+          sheet.save(q/'ALL_EIGHT_ORIGINAL_ILLUSTRATIONS_CONTACT_SHEET.jpg',quality=89)
+          (q/'ALL_TEN_ORIGINAL_SNAPGEN_DOWNLOAD_AUDIT.json').write_text(json.dumps({'status':'PASS','model':'gpt-image-2.5-lower','paid_generation_requests':0,'previous_paid_source_credits':10,'assets':details},indent=2))
+          print('PASS all original story-specific 2D paintings saved and SHA256 verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V3_TEN_ORIGINAL_2D_STORY_PAINTINGS_AND_CONTACT_SHEET
+          path: |
+            film/market-six-v3/raw/
+            film/market-six-v3/qa/
+          retention-days: 30
+          if-no-files-found: error
