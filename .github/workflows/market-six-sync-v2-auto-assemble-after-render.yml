@@ -1,0 +1,41 @@
+name: Market Six V2 - AUTO Finalize Corrected 15min Video AFTER All 87 Verified CPU Shards
+on:
+  workflow_run:
+    workflows:
+      - MARKET SIX V2 - 87 speech-synchronized 2.5D story shards no paid assets
+    types: [completed]
+    branches: [market-six-speech-locked-sync-v2-20261118]
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: market-six-v2-autofinalize-only-after-all-87-complete
+  cancel-in-progress: false
+jobs:
+  dispatch-synchronized-film-assembly:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Prove original no-paid narration synchronized render completed with SUCCESS
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ github.event.workflow_run.id }}
+          SOURCE_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SOURCE_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          test "$SOURCE_RUN" = "44326114522"
+          test "$SOURCE_BRANCH" = "market-six-speech-locked-sync-v2-20261118"
+          test "$SOURCE_CONCLUSION" = "success"
+          COUNT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/44326114522/artifacts?per_page=100" --jq '.artifacts | [.[] | select(.name | startswith("MARKET_SIX_SYNC_CH"))] | length')
+          test "$COUNT" -eq 87
+          echo "PASS exactly 87 original paid-image-reusing 1080p 2.5D film video shards are complete"
+      - name: Trigger complete corrected 15-minute original movie and direct video release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run market-six-sync-v2-final-assembly-and-release.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref market-six-speech-locked-sync-v2-20261118
+          echo "Dispatched 900-second word-aligned movie QA and direct GitHub release, zero additional paid media generation"
