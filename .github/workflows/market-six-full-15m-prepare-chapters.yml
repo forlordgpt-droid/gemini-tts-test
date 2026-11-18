@@ -1,0 +1,93 @@
+name: Market Six Full 15m - Original 15 Chapter 2.5D Multilayer Art and Render Smoke
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full-15m-prepare-chapters.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  prepare-original-illustrated-story:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        chapter: ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15"]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact immutable original Hunyuan reference, native character art and tool locks
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Restore already paid original SnapGen GPT Image 2.5 Lower illustrations for chapter
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15M_ORIGINAL_PAINTED_IMAGES_CH${{ matrix.chapter }}
+          run-id: 44280960882
+          github-token: ${{ github.token }}
+          path: film/market-six-v3/full-film/chapter-projects/ch${{ matrix.chapter }}/
+      - name: Build exact original 2D rig plus chapter-specific authored 2.5D camera scene
+        env:
+          CHAPTER: ${{ matrix.chapter }}
+        run: |
+          set -euo pipefail
+          python3 film/market-six-v3/full-film/build_chapter_project.py --chapter "$CHAPTER"
+      - name: Separate 3 ACTUAL beautiful painted planes per image and inpaint background with Pillow OpenCV
+        env:
+          CHAPTER: ${{ matrix.chapter }}
+        run: |
+          set -euo pipefail
+          PROJECT="film/market-six-v3/full-film/chapter-projects/ch$CHAPTER"
+          python3 film/market-six-v3/full-film/prepare_story_layers.py --project "$PROJECT"
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json,os
+          ch=os.environ['CHAPTER']
+          p=Path('film/market-six-v3/full-film/chapter-projects')/('ch'+ch)
+          qa=json.loads((p/'qc/LAYER_MASKS_AND_ARTWORK_QA.json').read_text())
+          n=5 if ch=='01' else 9
+          assert qa['images']==n and qa['genuine_separate_planes']==n*3
+          for i in range(n):
+            for role,ext in [('far','jpg'),('mid','webp'),('front','webp')]:
+              f=p/'assets'/f'{role}_{i}.{ext}'
+              assert f.is_file() and f.stat().st_size>9000,f
+              with Image.open(f) as im:assert im.size==(1920,1080)
+          print('PASS original artist paintings decomposed into actual 2.5D planes',ch)
+          PY
+      - name: Test ACTUAL 1920x1080 Three.js GSAP Camera and WebCodecs moving images, 8 frames
+        env:
+          CHAPTER: ${{ matrix.chapter }}
+        run: |
+          set -euo pipefail
+          PROJECT="film/market-six-v3/full-film/chapter-projects/ch$CHAPTER"
+          ln -s /opt/cinematic/node_modules "$PROJECT/node_modules"
+          INDEX=$((10#$CHAPTER))
+          if [ "$INDEX" -eq 1 ]; then FRAME=900; else FRAME=$(((INDEX-1)*1800)); fi
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "$PROJECT" --start-frame "$FRAME" --frame-count 8 --out "smoke/ch$CHAPTER"
+          test "$(find "smoke/ch$CHAPTER" -name 'part_*_8.mp4' | wc -l)" -eq 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15M_APPROVED_2P5D_PREPARED_CH${{ matrix.chapter }}
+          path: film/market-six-v3/full-film/chapter-projects/ch${{ matrix.chapter }}/
+          retention-days: 60
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MARKET_SIX_FULL15M_8FRAME_SMOKE_CH${{ matrix.chapter }}
+          path: smoke/ch${{ matrix.chapter }}/
+          retention-days: 60
+          compression-level: 0
+          if-no-files-found: warn
