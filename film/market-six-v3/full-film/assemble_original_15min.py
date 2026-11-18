@@ -48,15 +48,35 @@ assert len(shards)==87 and len(set(x['start_frame'] for x in ledger))==87
 print('PASS all 87 original 1080p premium 2.5D WebCodecs sections, exactly 26,100 new independent frames',flush=True)
 pilot_vid=OUT/'APPROVED_0_TO_30_VIDEO_PACKETS.mp4'
 cmd('ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(approved),'-map','0:v:0','-an','-c:v','copy',str(pilot_vid))
+# LOSSLESS stream-copy timebase normalization. Original approved 900 frame MP4 uses
+# 1/15360; each independent WebCodecs shard uses 1/30. FFmpeg concat demuxer expects
+# identical stream timebases; otherwise it squeezes correct 27000 frames into ~30 seconds.
+# A codec-copy remux changes only MP4 PTS scale, never pixels or H264 packets.
+original_timebase=next(s for s in ffprobe(pilot_vid)['streams'] if s['codec_type']=='video')['time_base']
+assert original_timebase=='1/15360',original_timebase
+normalized_dir=OUT/'normalized_h264_timebase';normalized_dir.mkdir(exist_ok=True)
+fixed=[]
+for i,shard in enumerate(shards):
+    target=normalized_dir/f'part_{i:03d}_normalized_15360.mp4'
+    cmd('ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(shard),
+        '-map','0:v:0','-an','-c:v','copy','-video_track_timescale','15360',
+        '-movflags','+faststart',str(target))
+    data=ffprobe(target)
+    video=next(x for x in data['streams'] if x['codec_type']=='video')
+    assert video['time_base']=='1/15360' and video['codec_name']=='h264' and int(video['nb_frames'])==300,(target,video)
+    assert abs(float(data['format']['duration'])-10)<.04,target
+    fixed.append(target)
+assert len(fixed)==87
+print('PASS lossless PTS remux normalized all 87 existing H264 shards to 1/15360; no re-encoding or paid generation',flush=True)
 conc=OUT/'cinema_27000_frames.concat.txt'
-allfiles=[pilot_vid]+shards
+allfiles=[pilot_vid]+fixed
 conc.write_text(''.join("file '"+str(p.resolve())+"'\n" for p in allfiles))
 picture=OUT/'MARKET_SIX_FULL15M_VIDEO_ONLY_27000FRAMES.mp4'
 cmd('ffmpeg','-hide_banner','-loglevel','error','-y','-f','concat','-safe','0','-i',str(conc),
     '-map','0:v:0','-an','-c:v','copy','-movflags','+faststart',str(picture))
 info=ffprobe(picture);pv=next(s for s in info['streams'] if s['codec_type']=='video')
 assert (pv['codec_name'],pv['width'],pv['height'],pv['r_frame_rate'],int(pv['nb_frames']))==('h264',1920,1080,'30/1',27000)
-assert abs(float(info['format']['duration'])-900)<.2
+assert abs(float(info['format']['duration'])-900)<.2,('Full story timeline duration',info['format']['duration'])
 # Conserve the approved first 900 decoded frames BITWISE.
 original_video_hash=cmd('ffmpeg','-hide_banner','-loglevel','error','-i',str(approved),'-map','0:v:0','-frames:v','900','-f','hash','-hash','sha256','-')
 new_video_hash=cmd('ffmpeg','-hide_banner','-loglevel','error','-i',str(picture),'-map','0:v:0','-frames:v','900','-f','hash','-hash','sha256','-')
