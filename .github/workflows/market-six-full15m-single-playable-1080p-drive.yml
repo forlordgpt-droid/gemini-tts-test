@@ -10,6 +10,9 @@ permissions:
 concurrency:
   group: market-six-1080p-one-file-delivery-only
   cancel-in-progress: false
+defaults:
+  run:
+    shell: bash
 jobs:
   delivery-video:
     runs-on: ubuntu-24.04
