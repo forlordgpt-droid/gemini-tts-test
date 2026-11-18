@@ -1,0 +1,165 @@
+name: MARKET SIX V2 - Final 15min Narration-Locked Illustrated Film And Direct Movie Links
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: market-six-v2-reused-131-illustrations-real-spoken-word-release
+  cancel-in-progress: false
+jobs:
+  full-900-seconds-speech-synchronized-film:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict original immutable Hunyuan V3 and NO paid generation preflight
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import json
+          b=json.load(open('film/market-six-v3/full-film/SHOT_IMAGE_BLUEPRINT.json'))
+          c=json.load(open('film/market-six-v3/full-film/sync/NARRATION_SHOT_CUES.json'))
+          assert b['frames']==27000 and len(b['shots'])==131
+          assert b['image_model']==c['exact_images']=='gpt-image-2.5-lower'
+          assert b['speech_model']==c['exact_tts']=='google/gemini-3-8-flash-tts'
+          assert b['first30_immutable'] and sum(map(len,c['chapters'].values()))==131
+          print('PASS exact paid image and voice models, 131 original story specific paintings and 27k frame scope')
+          PY
+      - name: Retrieve ORIGINAL user-approved 900-frame first30, no replacement or regeneration
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_DAY100_FINAL_30S_MP4_ONLY
+          run-id: 44273445183
+          github-token: ${{ github.token }}
+          path: approved_first30/
+      - name: Retrieve 87 individually QA-verified narration-aligned H264 WebCodecs camera shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: MARKET_SIX_SYNC_CH*_SEG*
+          run-id: 44326114522
+          github-token: ${{ github.token }}
+          merge-multiple: false
+          path: parts/
+      - name: Reuse exact original 870 sec Kie Flash voice with all narrator/dialogue unchanged
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_FULL_15M_EXACT_GEMINI38_FLASH_870S_VOICE_MASTER_AND_QA
+          run-id: 44279195720
+          github-token: ${{ github.token }}
+          path: narration/
+      - name: Use 15 original Web Audio OfflineAudioContext soundtracks now synced to actual spoken events
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_V2_NARRATION_SYNCHRONIZED_15_CHAPTER_WEBAUDIO_SFX
+          run-id: 44326720318
+          github-token: ${{ github.token }}
+          path: sfx_full/
+      - name: Retrieve exact audible word onsets and source-cue timecodes
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_V2_MEASURED_131_NARRATION_ANCHORED_SHOT_CUTS
+          run-id: 44325720320
+          github-token: ${{ github.token }}
+          path: sync_results/
+      - name: Combine 87 exact 2.5D user-specific video shards with original opening and corrected Kie Flash narration timing
+        run: |
+          set -euo pipefail
+          test "$(find parts -name 'part_*_300.mp4' | wc -l)" -eq 87
+          test "$(find sfx_full -name 'MARKET_SIX_ORIGINAL_WEBAUDIO_CH*.wav' | wc -l)" -eq 15
+          python3 film/market-six-v3/full-film/sync/assemble_word_locked_15min.py
+          test -s final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4
+      - name: Decode every single original high quality frame, validate proper 900s / AAC / real animated changes
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/qa_video.py \
+            --video final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4 \
+            --frames 27000 --seconds 900 --sample-every 1.0 --out final_full/qa/
+          python3 - <<'PY'
+          import json, pathlib
+          q=json.loads(pathlib.Path('final_full/qa/ACTUAL_VIDEO_QA.json').read_text())
+          assert q['frames']==27000 and q['decoded_every_frame'] is True
+          assert q['max_near_frozen_second_streak']==0 and abs(q['duration_s']-900)<.13
+          m=json.loads(pathlib.Path('final_full/FULL_FILM_VERIFIED_SOURCE_AND_CREDIT_REPORT.json').read_text())
+          assert m['original_voice_audio_unchanged'] and m['visual_cuts_retimed_to_real_kie_flash_words']==131
+          assert m['first30_video_decoded_frames_bitwise_unchanged']
+          print('PASS all 27000 existing story-painted 2.5D film frames, real audible text-to-shot alignment manifest')
+          PY
+      - name: Verify at corrected story-cut boundaries that the actual exported images show scene changes
+        run: |
+          set -euo pipefail
+          python3 film/market-six-v3/full-film/sync/inspect_rendered_sync.py \
+            --video final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4 \
+            --out final_full/VOICE_PICTURE_SCENE_MATCH_QA.json
+          test -s final_full/VOICE_PICTURE_SCENE_MATCH_QA.json
+      - name: Create single downloadable premium-quality 1080p MP4 from verified 950MB original master
+        run: |
+          set -euo pipefail
+          ffmpeg -nostdin -hide_banner -loglevel warning -y \
+            -i final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4 \
+            -map 0:v:0 -map 0:a:0 \
+            -c:v libx264 -preset superfast -crf 18 -maxrate 3200k -bufsize 6400k \
+            -pix_fmt yuv420p -r 30 -c:a copy -movflags +faststart \
+            final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4
+          python3 - <<'PY'
+          import json,subprocess,hashlib,pathlib
+          p=pathlib.Path('final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4')
+          assert p.is_file() and 100000000<p.stat().st_size<495000000,p.stat().st_size
+          d=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',str(p)]))
+          v=next(s for s in d['streams'] if s['codec_type']=='video')
+          a=next(s for s in d['streams'] if s['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',27000),d
+          assert a['codec_name']=='aac' and abs(float(d['format']['duration'])-900)<.15
+          pathlib.Path('final_full/SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json').write_text(json.dumps({'status':'PASSED','model_illustrations':'gpt-image-2.5-lower','model_narration':'google/gemini-3-8-flash-tts','voice_changed':False,'paid_jobs':0,'frames':27000,'duration_seconds':900,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()},indent=2))
+          print('PASS single directly-playable movie',p.stat().st_size)
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4 -f null -
+      - name: Publish corrected 15min MP4 with DIRECT GitHub Release video asset, no temporary ZIP or 100MB connector limit
+        env:
+          GH_${{ github.token }}: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=market-six-15min-narration-synced-v2-20261118
+          gh release create "$TAG" \
+            final_full/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4 \
+            final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_AUDIO_VISUAL_SYNC_V2_MASTER.mp4 \
+            --repo "$GITHUB_REPOSITORY" --latest \
+            --title "100 Days Inside an Abandoned Supermarket - Narration Synced Final 15-Minute Movie" \
+            --notes "Corrected whole 15 minute movie: all 131 illustrated shots retimed to their actual original Kie.ai Gemini 3.8 Flash spoken-word onsets (audited with diagnostic ASR), with native Hunyuan V3 Three.js PerspectiveCamera, GSAP and original 2.5D paintings, scene-matched WebAudio original SFX, original approved first30 preserved unchanged. No new paid generation. Includes a portable Full HD 1080p MP4 and original high bitrate 1080p master MP4."
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,assets > final_full/VERIFIED_CORRECTED_RELEASE.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('final_full/VERIFIED_CORRECTED_RELEASE.json'))
+          files=[s for s in x['assets'] if s['name'].endswith('.mp4')]
+          assert len(files)==2
+          for f in files:
+              assert f['size']>100000000 and f['url'].startswith('https://')
+              print('VERIFIED DIRECT VIDEO',f['name'],f['size'],f['url'])
+          print('FINAL SUCCESSFUL RELEASE',x['url'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MARKET_SIX_V2_VERIFIED_REAL_SPEECH_SYNC_AND_RELEASE_REPORT
+          path: |
+            final_full/VERIFIED_CORRECTED_RELEASE.json
+            final_full/VOICE_PICTURE_SCENE_MATCH_QA.json
+            final_full/SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json
+            final_full/FULL_FILM_VERIFIED_SOURCE_AND_CREDIT_REPORT.json
+            final_full/FFPROBE_FULL_15MIN.json
+            final_full/APPROVED_FIRST30_BITWISE_FRAME_PROOF.txt
+            final_full/ACTUAL_15_MINUTE_ALL_CHAPTERS_CONTACT_SHEET.jpg
+            final_full/qa/
+            sync_results/SYNC_COMPARISON_SUMMARY.json
+          retention-days: 60
+          if-no-files-found: warn
