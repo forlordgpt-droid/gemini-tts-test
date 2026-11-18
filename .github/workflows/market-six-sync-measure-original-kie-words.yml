@@ -1,0 +1,68 @@
+name: Market Six - Synchronize 131 Illustration Cuts With Real Kie Flash Spoken Word Onsets
+on:
+  push:
+    branches: [market-six-speech-locked-sync-v2-20261118]
+    paths: ['.github/workflows/market-six-sync-measure-original-kie-words.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: market-six-speech-timecode-measure-original-only-v2
+  cancel-in-progress: false
+jobs:
+  diagnostic-word-alignment-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable Hunyuan V3 original visual/audio toolchain
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import json
+          p='film/market-six-v3/full-film/sync/NARRATION_SHOT_CUES.json'
+          a=json.load(open(p))
+          assert sum(map(len,a['chapters'].values()))==131
+          assert a['exact_tts']=='google/gemini-3-8-flash-tts'
+          assert a['exact_images']=='gpt-image-2.5-lower'
+          print('The diagnostic ASR may analyze but NEVER synthesize paid voice or image')
+          PY
+      - name: Fetch exactly the already-approved 870-second original voice master
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_FULL_15M_EXACT_GEMINI38_FLASH_870S_VOICE_MASTER_AND_QA
+          run-id: 44279195720
+          github-token: ${{ github.token }}
+          path: narration/
+      - name: Install diagnostic-only ASR into separate throwaway venv, never replace pinned V3 stack
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m venv /tmp/diagnostic-asr
+          /tmp/diagnostic-asr/bin/python -m pip install --disable-pip-version-check --no-cache-dir --quiet 'faster-whisper==1.2.1' 'numpy==1.26.4'
+          /tmp/diagnostic-asr/bin/python -c 'from faster_whisper import WhisperModel; print("PASS diagnostic-only offline transcription library; Hunyuan engine unchanged")'
+      - name: Match actual spoken Gemini Flash words against all 131 original user-script shot cues, measure absolute time at 30 fps
+        env:
+          HF_HUB_DISABLE_TELEMETRY: "1"
+          TOKENIZERS_PARALLELISM: "false"
+        run: |
+          set -euo pipefail
+          /tmp/diagnostic-asr/bin/python film/market-six-v3/full-film/sync/measure_spoken_cues.py
+          test -s sync_results/MEASURED_NARRATION_TO_SHOT_CUTS.json
+          test -s sync_results/SYNC_COMPARISON_SUMMARY.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_V2_MEASURED_131_NARRATION_ANCHORED_SHOT_CUTS
+          path: sync_results/
+          retention-days: 60
+          if-no-files-found: error
