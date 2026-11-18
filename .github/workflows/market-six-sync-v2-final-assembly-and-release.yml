@@ -180,8 +180,8 @@ jobs:
           from pathlib import Path
           import json,hashlib
           v=Path('delivery/100_DAYS_ABANDONED_SUPERMARKET_AUDIO_VISUAL_SYNC_FIXED_15MIN_1080P.mp4')
-          meta=json.loads(Path('report/SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json').read_text())
-          audit=json.loads(Path('report/VOICE_PICTURE_SCENE_MATCH_QA.json').read_text())
+          meta=json.loads(next(Path('report').rglob('SPEECH_SYNC_PORTABLE_DELIVERY_METADATA.json')).read_text())
+          audit=json.loads(next(Path('report').rglob('VOICE_PICTURE_SCENE_MATCH_QA.json')).read_text())
           assert v.is_file() and v.stat().st_size==meta['bytes']
           assert meta['frames']==27000 and meta['duration_seconds']==900
           assert audit['spoken_story_cues']==131 and audit['chapters']==15
