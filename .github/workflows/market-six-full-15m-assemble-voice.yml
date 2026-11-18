@@ -1,0 +1,48 @@
+name: Market Six Full 15m - Preserve and align all 15 ORIGINAL Kie Flash speeches
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full-15m-assemble-voice.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  assemble-original-paid-speech:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original unchanged V3 reference and Kie Flash provider audit
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: MARKET_SIX_FULL_15M_EXACT_KIE_FLASH_VOICE_CH*
+          run-id: 44277385565
+          github-token: ${{ github.token }}
+          path: voice/
+          merge-multiple: true
+      - name: Validate 15 original Kie WAVs and create exact 870s synchronized narration with FFmpeg and FFprobe
+        run: |
+          set -euo pipefail
+          find voice -maxdepth 2 -name 'CHAPTER_TTS_QA_AND_CREDITS.json' -print | sort
+          test "$(find voice -name 'CHAPTER_TTS_QA_AND_CREDITS.json' | wc -l)" -eq 15
+          python3 film/market-six-v3/full-film/prepare_chapter_voice.py
+          test -s narration/MARKET_SIX_KIE_FLASH_VERBATIM_CONTINUATION_30TO900.wav
+          ffprobe -v error -show_entries stream=codec_name,sample_rate,channels:format=duration -of json narration/MARKET_SIX_KIE_FLASH_VERBATIM_CONTINUATION_30TO900.wav
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL_15M_EXACT_GEMINI38_FLASH_870S_VOICE_MASTER_AND_QA
+          path: narration/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 60
