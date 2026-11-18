@@ -72,7 +72,7 @@ jobs:
           from PIL import Image
           import json
           p=Path('film/market-six-v3')
-          report=json.loads((p/'qa/FULL_EIGHT_2P5D_MASK_QA.json').read_text())
+          report=json.loads((p/'qc/FULL_EIGHT_2P5D_MASK_QA.json').read_text())
           assert report['total_separate_depth_planes']==24 and len(report['scenes'])==8
           for i in range(8):
             for stem,ext in [('far','jpg'),('mid','webp'),('front','webp')]:
@@ -101,6 +101,7 @@ jobs:
             film/market-six-v3/rig/
             film/market-six-v3/voice/
             film/market-six-v3/qa/
+            film/market-six-v3/qc/
             sfx/
             smoke/
           retention-days: 30
