@@ -13,7 +13,7 @@ def cmd(*a):
     return subprocess.run(a,check=True,capture_output=True,text=True).stdout
 def ffprobe(file):
     return json.loads(cmd('ffprobe','-v','error','-show_entries',
-      'stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate,channels:format=duration',
+      'stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate,channels,time_base:format=duration',
       '-of','json',str(file)))
 def sha(f):
     h=hashlib.sha256()
