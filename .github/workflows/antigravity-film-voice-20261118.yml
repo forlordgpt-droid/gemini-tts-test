@@ -1,0 +1,86 @@
+name: Antigravity 60s Film - Gemini Flash Lite Dialogue
+on:
+  push:
+    paths:
+      - '.github/workflows/antigravity-film-voice-20261118.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  voices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Generate four multi-speaker scenes with Kie.ai Gemini 3.8 Flash-Lite
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$KIE_API_KEY" || { echo 'KIE_API_KEY secret missing' >&2; exit 1; }
+          mkdir -p voices
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.parse,urllib.error,time,concurrent.futures,wave
+          API='https://api.kie.ai/api/v1/jobs'
+          key=os.environ['KIE_API_KEY']
+          scenes={
+          1:[('AVA',"Pix... why is my coffee floating toward the ceiling?"),('PIX',"Great news! I've invented anti-gravity. Isn't it magnificent?"),('AVA',"And the bad news?"),('PIX',"I may have misplaced the off switch.")],
+          2:[('AVA',"That skyscraper is drifting past our window!"),('PIX',"On the bright side, for once, the rent is actually falling."),('AVA',"Pix! We're going to reach orbit!"),('PIX',"Only if the atmosphere remembers to come with us.")],
+          3:[('AVA',"Tell me you have a backup plan."),('PIX',"Of course. I built an emergency gravity reset. One hundred percent effective."),('AVA',"Where is it?"),('PIX',"Under the big red button. The one with the skull.")],
+          4:[('AVA',"The button that says DO NOT PRESS?"),('PIX',"Technically, that's a suggestion."),('AVA',"Fine. Three... two... one!"),('PIX',"Gravity restored! You're welcome."),('AVA',"Then why is the ground above us?"),('PIX',"Tiny detail. I reversed the planet.")]
+          }
+          def req(path,payload=None):
+            dat=json.dumps(payload).encode() if payload is not None else None
+            h={'Authorization':'Bearer '+key,'Accept':'application/json'}
+            if dat:h['Content-Type']='application/json'
+            r=urllib.request.Request(API+path,data=dat,headers=h,method='POST' if dat else 'GET')
+            for n in range(4):
+              try:
+                with urllib.request.urlopen(r,timeout=55) as res: out=json.load(res)
+                break
+              except Exception:
+                if n==3:raise
+                time.sleep(2**n)
+            if out.get('code')!=200:raise RuntimeError(str(out.get('code'))+' '+str(out.get('msg')))
+            return out['data']
+          def do_scene(idx,turns):
+            speakers=[{'speaker_id':'AVA','voice_name':'Leda'},{'speaker_id':'PIX','voice_name':'Puck'}]
+            st={'AVA':'Young inventive woman. Urgent, vividly expressive, articulate, natural English, cinematic comedy acting, quick but intelligible, vary intonation.', 'PIX':'Lovable cheeky optimistic robot. Light youthful male voice, dry humor and comic timing, friendly and slightly mischievous, natural English.'}
+            ins={'temperature':0.85,'speakers':speakers,'dialogue_turns':[{'speaker_id':sp,'style':st[sp],'text':line} for sp,line in turns]}
+            data=req('/createTask',{'model':'google/gemini-3-8-flash-lite-tts','input':ins})
+            task=data.get('taskId')
+            if not task:raise RuntimeError('No task ID for scene '+str(idx))
+            print('Created scene',idx,'task',task,flush=True)
+            for n in range(130):
+              info=req('/recordInfo?'+urllib.parse.urlencode({'taskId':task}))
+              status=info.get('state','')
+              if status=='fail':raise RuntimeError('Kie scene '+str(idx)+' failed '+str(info.get('failMsg')))
+              if status=='success':
+                result=info.get('response') or info.get('resultJson') or {}
+                if isinstance(result,str):result=json.loads(result)
+                urls=result.get('resultUrls') or []
+                if not urls:raise RuntimeError('No WAV URL scene '+str(idx))
+                with urllib.request.urlopen(urls[0],timeout=100) as r: sound=r.read()
+                if not(sound[:4]==b'RIFF' and sound[8:12]==b'WAVE'):raise RuntimeError('Bad WAV scene '+str(idx))
+                dest=f'voices/scene_{idx}.wav'
+                with open(dest,'wb') as f:f.write(sound)
+                with wave.open(dest,'rb') as f:duration=f.getnframes()/f.getframerate()
+                print('SUCCESS scene',idx,'duration',duration,'bytes',len(sound),flush=True)
+                return {'scene':idx,'task_id':task,'duration':duration,'turns':[{'speaker':sp,'text':line} for sp,line in turns]}
+              time.sleep(5)
+            raise RuntimeError('Timed out scene '+str(idx))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            fut=[pool.submit(do_scene,idx,turns) for idx,turns in scenes.items()]
+            manifest=sorted([x.result() for x in fut],key=lambda x:x['scene'])
+          with open('voices/manifest.json','w') as f:json.dump({'model':'google/gemini-3-8-flash-lite-tts','scenes':manifest},f,indent=2)
+          print('All generated by Kie Gemini 3.8 Flash-Lite.',flush=True)
+          PY
+      - name: Upload scene voices
+        uses: actions/upload-artifact@v4
+        with:
+          name: antigravity-film-kie-voices
+          path: voices/
+          if-no-files-found: error
+          retention-days: 7
