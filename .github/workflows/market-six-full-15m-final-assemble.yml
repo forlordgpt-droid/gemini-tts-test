@@ -1,0 +1,299 @@
+name: Market Six Full 15m FINAL Assemble Approved 30s and 87 Original 2.5D Shards
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  assemble-entire-original-15-minute-cinematic-movie:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original immutable reference, chosen exact libraries and models before combining
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import json
+          m=json.load(open('film/market-six-v3/full-film/SHOT_IMAGE_BLUEPRINT.json'))
+          assert m['source_duration_seconds']==900 and m['frames']==27000 and len(m['shots'])==131
+          assert (m['image_model'],m['speech_model'])==('gpt-image-2.5-lower','google/gemini-3-8-flash-tts')
+          print('PASS original 15 minute author story and locked image / TTS models')
+          PY
+      - name: Fetch EXACT original 900-frame previously user-approved opening (never regenerate or modify)
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_DAY100_FINAL_30S_MP4_ONLY
+          run-id: 44273445183
+          github-token: ${{ github.token }}
+          path: approved_first30/
+      - name: Retrieve all 87 separately verified H264 1080p 10-second shards from public CPU render run
+        uses: actions/download-artifact@v4
+        with:
+          pattern: MARKET_SIX_FULL_CH*_SEG*
+          run-id: 44282134461
+          github-token: ${{ github.token }}
+          merge-multiple: false
+          path: parts/
+      - name: Original already-paid Kie Gemini 3.8 Flash 870-second narration master
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_FULL_15M_EXACT_GEMINI38_FLASH_870S_VOICE_MASTER_AND_QA
+          run-id: 44279195720
+          github-token: ${{ github.token }}
+          path: narration/
+      - name: Original 15 chapter sound effects from required Web Audio OfflineAudioContext
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15M_ORIGINAL_WEBAUDIO_15_CHAPTER_SFX_30TO900
+          run-id: 44279659553
+          github-token: ${{ github.token }}
+          path: sfx_full/
+      - name: Verify original opening image hash and 87 exact 10s shard timestamps; assemble 27000 video frames and complete 900s narration
+        run: |
+          set -euo pipefail
+          test "$(find parts -name 'part_*_300.mp4' | wc -l)" -eq 87
+          test -s approved_first30/MARKET_SIX_DAY100_COMPLETE_FIRST30_1080P.mp4
+          test -s narration/MARKET_SIX_KIE_FLASH_VERBATIM_CONTINUATION_30TO900.wav
+          test "$(find sfx_full -name 'MARKET_SIX_ORIGINAL_WEBAUDIO_CH*.wav' | wc -l)" -eq 15
+          python3 film/market-six-v3/full-film/assemble_original_15min.py
+          test -s final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4
+      - name: Full-video ACTUAL 27,000 decoded-frame and non-frozen visible motion QA using exact OpenCV FFmpeg FFprobe Pillow
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/qa_video.py --video final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4 --frames 27000 --seconds 900 --sample-every 1.0 --out final_full/qa/
+          test -s final_full/qa/ACTUAL_VIDEO_QA.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('final_full')
+          a=json.loads((p/'qa/ACTUAL_VIDEO_QA.json').read_text())
+          assert a['frames']==27000 and abs(a['duration_s']-900)<.13
+          assert a['decoded_every_frame'] and a['max_near_frozen_second_streak']==0
+          print('PASS all 27000 original H264 movie frames, normal-speed render QA required for release')
+          PY
+      - name: Preserve full source, original script, master scene design and final movie QA (Python stdlib archive only, never change animation stack)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          dst=Path('final_full/MARKET_SIX_FULL15M_REUSABLE_SCRIPT_SHOT_SOURCE_AND_QA.zip')
+          paths=[Path('film/market-six-v3/full-film'),Path('film/market-six-v3/main.js'),Path('film/market-six-v3/prepare_layers.py')]
+          with ZipFile(dst,'w',compression=ZIP_DEFLATED,compresslevel=6) as f:
+            for p in paths:
+              if p.is_file():f.write(p,p.as_posix())
+              elif p.is_dir():
+                for q in p.rglob('*'):
+                  if not q.is_file():continue
+                  if 'node_modules' in q.parts or q.suffix in ('.png','.jpg','.webp','.mp4','.wav','.bin'):continue
+                  f.write(q,q.as_posix())
+            for q in Path('final_full').glob('*.json'):f.write(q,q.as_posix())
+            for q in Path('final_full/qa').rglob('*'):
+              if q.is_file():f.write(q,q.as_posix())
+          assert dst.is_file() and dst.stat().st_size>3000
+          print('PASS original full story / V3 scene scripts / paid source task manifest / QA project archive')
+          PY
+          python3 film/market-six-v3/full-film/split_video_for_drive.py --video final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4 --chunk-mib 80
+          test -s final_full/video_parts/TRANSFER_MANIFEST.json
+          sha256sum final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4 > final_full/FINAL_MASTER_SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_COMPLETE_15_MINUTE_1080P_MP4_ONLY
+          path: final_full/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FINAL_15M_ORIGINAL_SOURCE_AND_RENDER_QA
+          path: |
+            final_full/MARKET_SIX_FULL15M_REUSABLE_SCRIPT_SHOT_SOURCE_AND_QA.zip
+            final_full/FFPROBE_FULL_15MIN.json
+            final_full/FULL_FILM_VERIFIED_SOURCE_AND_CREDIT_REPORT.json
+            final_full/APPROVED_FIRST30_BITWISE_FRAME_PROOF.txt
+            final_full/ACTUAL_15_MINUTE_ALL_CHAPTERS_CONTACT_SHEET.jpg
+            final_full/FINAL_MASTER_SHA256.txt
+            final_full/qa/
+            final_full/video_parts/TRANSFER_MANIFEST.json
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_00
+          path: final_full/video_parts/PART_00.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_01
+          path: final_full/video_parts/PART_01.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_02
+          path: final_full/video_parts/PART_02.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_03
+          path: final_full/video_parts/PART_03.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_04
+          path: final_full/video_parts/PART_04.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_05
+          path: final_full/video_parts/PART_05.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_06
+          path: final_full/video_parts/PART_06.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_07
+          path: final_full/video_parts/PART_07.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_08
+          path: final_full/video_parts/PART_08.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_09
+          path: final_full/video_parts/PART_09.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_10
+          path: final_full/video_parts/PART_10.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_11
+          path: final_full/video_parts/PART_11.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_12
+          path: final_full/video_parts/PART_12.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_13
+          path: final_full/video_parts/PART_13.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_14
+          path: final_full/video_parts/PART_14.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_15
+          path: final_full/video_parts/PART_15.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_16
+          path: final_full/video_parts/PART_16.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_17
+          path: final_full/video_parts/PART_17.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_18
+          path: final_full/video_parts/PART_18.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_19
+          path: final_full/video_parts/PART_19.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_20
+          path: final_full/video_parts/PART_20.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_21
+          path: final_full/video_parts/PART_21.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_22
+          path: final_full/video_parts/PART_22.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_FULL15MIN_VIDEO_TRANSFER_PART_23
+          path: final_full/video_parts/PART_23.bin
+          compression-level: 0
+          retention-days: 60
+          if-no-files-found: ignore
