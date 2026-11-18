@@ -1,0 +1,92 @@
+name: Market Six Full15m - ONE Playable 1080p MP4 For Google Drive
+on:
+  push:
+    branches: [market-six-full-film-20261118]
+    paths: ['.github/workflows/market-six-full15m-single-playable-1080p-drive.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: market-six-1080p-one-file-delivery-only
+  cancel-in-progress: false
+jobs:
+  delivery-video:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify untouched premium 2D original and exact locked model tooling
+        run: |
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import json
+          a=json.load(open('film/market-six-v3/full-film/SHOT_IMAGE_BLUEPRINT.json'))
+          assert a['image_model']=='gpt-image-2.5-lower'
+          assert a['speech_model']=='google/gemini-3-8-flash-tts'
+          assert a['frames']==27000 and a['source_duration_seconds']==900
+          print('Only transcoding existing completed master - no new paid generation or rerenders')
+          PY
+      - name: Retrieve the existing 900-second verified original 956 MB master, no new paid calls
+        uses: actions/download-artifact@v4
+        with:
+          name: MARKET_SIX_COMPLETE_15_MINUTE_1080P_MP4_ONLY
+          run-id: 44304686080
+          github-token: ${{ github.token }}
+          path: original/
+      - name: Compress to one high-quality 1080p H264 file under connector limits
+        run: |
+          set -euo pipefail
+          mkdir -p delivery/
+          python3 - <<'PY'
+          import json,subprocess,hashlib,pathlib
+          source=pathlib.Path('original/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4')
+          assert source.exists() and source.stat().st_size==956324268
+          SHA='18c9a08b8b0d43dea010cc2983159f24d31f817298fdb7d8f48d111ffe836e20'
+          h=hashlib.sha256()
+          with source.open('rb') as f:
+              for chunk in iter(lambda:f.read(8388608),b''):h.update(chunk)
+          assert h.hexdigest()==SHA,'original master integrity: STOP'
+          print('Original source bitwise verified before playable delivery encode')
+          PY
+          ffmpeg -nostdin -hide_banner -loglevel warning -y \
+            -i original/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15_MINUTE_FILM.mp4 \
+            -map 0:v:0 -map 0:a:0 -c:v libx264 -preset superfast -crf 18 \
+            -maxrate 3200k -bufsize 6400k -pix_fmt yuv420p -r 30 \
+            -c:a copy -movflags +faststart \
+            delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4
+      - name: Verify 27k frames 900s AAC and one-file size
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib,subprocess,json,hashlib
+          p=pathlib.Path('delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4')
+          assert p.exists() and p.stat().st_size<495000000,('File too large for portable transport',p.stat().st_size)
+          f=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',str(p)]))
+          v=next(x for x in f['streams'] if x['codec_type']=='video');a=next(x for x in f['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',27000),v
+          assert a['codec_name']=='aac' and abs(float(f['format']['duration'])-900)<.15,f
+          qa={'status':'PASS_ONE_PLAYABLE_FILE','original_master_sha256':'18c9a08b8b0d43dea010cc2983159f24d31f817298fdb7d8f48d111ffe836e20','deliverable_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'file_size':p.stat().st_size,'duration_seconds':900,'width':1920,'height':1080,'frames':27000,'video':'h264','audio':'aac','no_new_paid_generation':True,'note':'High quality single file delivery transcode, original 956MB master unchanged'}
+          pathlib.Path('delivery/SINGLE_FILE_QA.json').write_text(json.dumps(qa,indent=2))
+          print('PASS single-file MP4',qa)
+          PY
+          ffmpeg -hide_banner -loglevel error -xerror -i delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4 -f null -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_ONE_PLAYABLE_15MIN_1080P_MP4
+          path: delivery/100_DAYS_ABANDONED_SUPERMARKET_COMPLETE_15MIN_ONE_FILE_1080P.mp4
+          if-no-files-found: error
+          retention-days: 60
+          compression-level: 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MARKET_SIX_ONE_PLAYABLE_15MIN_1080P_QA
+          path: delivery/SINGLE_FILE_QA.json
+          if-no-files-found: error
+          retention-days: 60
