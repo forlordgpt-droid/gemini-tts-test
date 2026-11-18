@@ -1,0 +1,15 @@
+{
+  "batch": 13,
+  "count": 1,
+  "model": "gpt-image-2.5-lower",
+  "images": [
+    {
+      "key": "CH15_B09",
+      "uuid": "e2d64bb8-e334-11f1-bb51-5e626749fe95",
+      "model": "gpt-image-2.5-lower",
+      "credits_used": 1,
+      "url": "https://7a4964de26acd06ff740870066a92ff8.r2.cloudflarestorage.com/geminigen-prd-upload-bucket/4899352/generated_result/image/e2d64bb8-e334-11f1-bb51-5e626749fe95/20261118_094711_0_UTC_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ac21101432ac699ee432dddd257a928b%2F20261118%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261118T095645Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=6ed0bd192e869e1455c77631155595489c4865c56fc83e825884b2b23d11c546"
+    }
+  ],
+  "errors": []
+}
