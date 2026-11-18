@@ -1,0 +1,83 @@
+name: Market Six V3 - ONE Gemini 3.8 Flash TTS
+on:
+  push:
+    branches: [hunyuan-cinematic-engine-v3-20261117]
+    paths: ['.github/workflows/market-six-v3-one-kie-tts.yml']
+  workflow_dispatch:
+concurrency:
+  group: market-six-tts-single-paid-job
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  one-flash-narration:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exactly one authorized Kie Gemini 3.8 Flash generation
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request,urllib.parse,pathlib,wave,hashlib
+          MODEL="google/gemini-3-8-flash-tts"
+          text=("Day one hundred. You are standing inside a supermarket that should have saved your life. "
+          "Now, nineteen people are pounding on the loading-bay shutter. Water is rising behind them. "
+          "Inside, eleven survivors are waiting for you to decide. Pull the red latch, and the shutter opens. "
+          "So does the flood. Keep it locked, and the people outside may not last another ten minutes.")
+          assert len(text.split())==63
+          assert os.getenv("GITHUB_RUN_NUMBER")=="1" and os.getenv("GITHUB_RUN_ATTEMPT")=="1"
+          key=os.environ.get("KIE_API_KEY","").strip()
+          if len(key)<16:raise RuntimeError("KIE_API_KEY unavailable; stop, no model change")
+          out=pathlib.Path("market_six_voice");out.mkdir(exist_ok=True)
+          def api(path,payload=None):
+              data=json.dumps(payload).encode() if payload is not None else None
+              h={"Authorization":"Bearer "+key,"Accept":"application/json"}
+              if data is not None:h["Content-Type"]="application/json"
+              r=urllib.request.Request("https://api.kie.ai"+path,data=data,headers=h,method="POST" if data is not None else "GET")
+              with urllib.request.urlopen(r,timeout=60) as f:j=json.load(f)
+              if j.get("code")!=200:raise RuntimeError("KIE error "+str(j.get("code"))+" "+str(j.get("msg")))
+              return j["data"]
+          before=float(api("/api/v1/chat/credit"))
+          payload={"model":MODEL,"input":{"temperature":1,"speakers":[{"speaker_id":"Speaker 1","voice_name":"Charon"}],"dialogue_turns":[{"speaker_id":"Speaker 1","style":"American cinematic survival mystery narrator. Intimate deep voice and restrained tension, articulate, 150 to 160 words per minute, very brief dramatic pauses between sentences, text exactly once, no invented words.","text":text}]}}
+          (out/"NARRATION_TEXT.txt").write_text(text)
+          (out/"REQUEST.json").write_text(json.dumps(payload,indent=2))
+          print("PREPAID_CHECK",MODEL,"credits_before",before,flush=True)
+          job=api("/api/v1/jobs/createTask",payload)
+          tid=job.get("taskId")
+          if not tid:raise RuntimeError("Missing paid task id, do not repeat")
+          (out/"ONE_PAID_TASK.json").write_text(json.dumps({"task_id":tid,"model":MODEL,"jobs":1},indent=2))
+          print("TASK_ID",tid,flush=True)
+          for i in range(170):
+              j=api("/api/v1/jobs/recordInfo?"+urllib.parse.urlencode({"taskId":tid}))
+              s=j.get("state")
+              if i%6==0:print("KIE_STATE",i,s,flush=True)
+              if s=="success":break
+              if s=="fail":raise RuntimeError("KIE failed: "+str(j.get("failMsg") or j.get("failCode"))+"; no blind retry")
+              if s not in ("waiting","queuing","generating"):raise RuntimeError("Unexpected Kie status "+str(s))
+              time.sleep(5)
+          else:raise RuntimeError("Still pending; poll same task id, never regenerate")
+          data=j.get("resultJson") or j.get("response") or {}
+          if isinstance(data,str):data=json.loads(data)
+          urls=data.get("resultUrls") or []
+          if not urls:raise RuntimeError("No audio URL")
+          with urllib.request.urlopen(urls[0],timeout=120) as f:wav=f.read()
+          if wav[:4]!=b"RIFF" or wav[8:12]!=b"WAVE":raise RuntimeError("Not Kie WAV")
+          p=out/"MARKET_SIX_30S_KIE_GEMINI38_FLASH.wav";p.write_bytes(wav)
+          with wave.open(str(p)) as w:dur=w.getnframes()/w.getframerate();sr=w.getframerate()
+          after=float(api("/api/v1/chat/credit"))
+          aud={"provider":"kie.ai","model":MODEL,"jobs_created":1,"task_id":tid,"duration_seconds":dur,"sample_rate":sr,"credits_before":before,"credits_after":after,"credits_used":round(before-after,4),"sha256":hashlib.sha256(wav).hexdigest(),"words":63}
+          (out/"COST_AND_AUDIO_QA.json").write_text(json.dumps(aud,indent=2))
+          print("KIE_SUCCESS",json.dumps(aud),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MARKET_SIX_V3_ONE_EXACT_KIE_FLASH_VOICE
+          path: market_six_voice/
+          retention-days: 30
+          if-no-files-found: warn
