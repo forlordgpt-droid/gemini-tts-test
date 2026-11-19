@@ -8,6 +8,9 @@ on:
       - film/rain-v4-first10/render_sfx.cjs
       - film/rain-v4-first10/preview_manifest.json
   workflow_dispatch:
+defaults:
+  run:
+    shell: bash
 permissions:
   contents: read
   actions: read
