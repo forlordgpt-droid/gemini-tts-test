@@ -1,0 +1,22 @@
+{
+  "approved": true,
+  "approval_scope": "rain-v4-first10:one-narration-task",
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-tts",
+  "jobs_authorized": 1,
+  "provider_hard_cap": false,
+  "authorization_source": "current_conversation",
+  "request_sha256": "596de982a6815a33e601c7adb88aeceab3c2fa878f419ac07cbad6bc31cc7717",
+  "max_total_credits": 1,
+  "user_approval_evidence": "Current user said \"go ahead\" after status identified narration generation and first preview rendering as the next work. Existing current-project instructions lock Kie google/gemini-3-8-flash-tts. One-task/one-credit local limit is a conservative execution limit; user did not explicitly state a numerical budget or provider-enforced cap.",
+  "estimated_unit_credits_range": [
+    0.32,
+    0.5
+  ],
+  "expected_total_credits_range": [
+    0.32,
+    0.5
+  ],
+  "max_jobs_this_stage": 1,
+  "additional_generations_authorized": false
+}

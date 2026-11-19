@@ -1,0 +1,33 @@
+name: Ten Years of Rain V4 - One Authorized Kie Flash Narration
+on:
+  push:
+    branches: [rain-v4-first10-20261119]
+    paths: ['.github/workflows/rain-v4-one-kie-narration.yml']
+  workflow_dispatch:
+concurrency:
+  group: rain-v4-first10-one-narration-task
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  one-flash-narration:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submit exactly one authorized opening narration task
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first10/generate_narration.py --request film/rain-v4-first10/tts_request.json --authorization film/rain-v4-first10/narration_authorization.json --output-dir rain-narration --poll-timeout 600
+      - name: Preserve task receipt even if polling or download fails
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST10_ONE_EXACT_KIE_FLASH_NARRATION
+          path: rain-narration/
+          retention-days: 30
+          if-no-files-found: warn

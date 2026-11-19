@@ -1,0 +1,17 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {"speaker_id": "Speaker 1", "voice_name": "Fola"}
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Read verbatim once at 175 words/minute; calm, tense cinematic narrator. Brief pauses, clear diction; no filler or added words.",
+        "text": "On the first day of the rain, you think the water is the danger. You're wrong. Water is the one thing you will never run out of again."
+      }
+    ]
+  }
+}
