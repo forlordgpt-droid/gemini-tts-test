@@ -1,0 +1,23 @@
+{
+  "approved": true,
+  "approval_scope": "rain-v4-first30:one-continuation-narration-task",
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-tts",
+  "jobs_authorized": 1,
+  "provider_hard_cap": false,
+  "authorization_source": "current_conversation",
+  "request_sha256": "c52a718e6968153c67e9bede6346819fe8cd27c1e4235f5a1fbd9b69a4445085",
+  "max_total_credits": 1,
+  "user_approval_evidence": "User directed 'continue the 30 seconds' immediately after completed 10-second narration/video, inheriting same exact approved Kie model and Fola voice for one continuation task only. Conservative local one-credit estimate; provider does not enforce hard per-call cap.",
+  "estimated_unit_credits_range": [
+    0.35,
+    0.9
+  ],
+  "expected_total_credits_range": [
+    0.35,
+    0.9
+  ],
+  "max_jobs_this_stage": 1,
+  "automatic_paid_retries": false,
+  "approval_scope_note": "Only one 10-to-30-second narration task; no new art or alternate TTS."
+}

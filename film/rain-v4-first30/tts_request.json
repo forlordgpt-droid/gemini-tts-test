@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Read verbatim once at about 195 words per minute, tense, intimate cinematic narration with crisp cadence, brief natural commas and no long pauses. Complete every word; no filler, no additions.",
+        "text": "It rains for ten years. Not on and off, every single day. The flood almost kills you in the first month. The cold, the hunger, the sea, and the building you live in, they take their time. And in year six, you'll cut the rope that kept you alive for five years with your own knife on purpose."
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+name: Rain V4 First30 - One Authorized Kie Flash Continuation Narration
+on:
+  push:
+    branches: [rain-v4-first30-20261119]
+    paths: ['.github/workflows/rain-v4-first30-tts.yml']
+  workflow_dispatch:
+concurrency:
+  group: rain-v4-first30-one-continuation-narration
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  one-flash-continuation:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate exact locked model, request and one-task budget before paid call
+        run: |
+          python3 film/rain-v4-first30/generate_narration_10to30.py --request film/rain-v4-first30/tts_request.json --authorization film/rain-v4-first30/narration_authorization.json --validate-only
+      - name: Create exactly ONE authorized Kie Flash TTS task, no retries or substitutions
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first30/generate_narration_10to30.py --request film/rain-v4-first30/tts_request.json --authorization film/rain-v4-first30/narration_authorization.json --output-dir rain-continuation-voice --poll-timeout 800
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST30_ONE_KIE_FLASH_CONTINUATION
+          path: rain-continuation-voice/
+          retention-days: 30
+          if-no-files-found: warn
