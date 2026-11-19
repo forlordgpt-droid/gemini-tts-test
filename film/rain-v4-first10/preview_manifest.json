@@ -1,0 +1,19 @@
+{
+  "title": "What If It Never Stopped Raining for 10 Years",
+  "stage": "V4 first 10 seconds - uncorrected first candidate for visual approval",
+  "format": {"width":1920,"height":1080,"fps":30,"frames":300,"video_codec":"H264","audio_codec":"AAC"},
+  "story_sha256": "0746367323a5b1704984db5ece04b3a85eb8d0e84d6bfe5f25c14e7f5b19bef9",
+  "directive_sha256": "42bc84acd21e8aa032b651caf66c971042556320954b5175a0fbc54cde92a98b",
+  "source_image_pack_sha256": "43b1b846b903e69a7955e5436c8586126701df06bee3d4e18dd10824ee417d2c",
+  "source_artwork": "Existing 62 ChatGPT-generated original illustration sources. No additional images purchased or generated.",
+  "engine_image": "ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7",
+  "speech": {"provider":"kie.ai","model":"google/gemini-3-8-flash-tts","file":"RAIN_V4_FIRST10_KIE_GEMINI38_FLASH_RAW.wav","duration_seconds":9.04,"sha256":"3452446cf95e8da4e5b01b30cb8efa077b6411ad376aa1040f090676eef7694e","credits_consumed":0.29,"existing_run_id":44611887861},
+  "shots": [
+    {"id":"S01_HARBOR","start_frame":0,"end_frame_exclusive":101,"purpose":"First-day ordinary rainy walkable city; establishing depth","visual":"three independent painted planes, parallax, drifting rain","camera":"lateral truck and push","still_character":true},
+    {"id":"S02_APARTMENT","start_frame":101,"end_frame_exclusive":200,"purpose":"The danger seems obvious, but the narrator challenges it","visual":"warm apartment, completely still protagonist, practical light shift and graphic reveal","camera":"opposing dolly and reframe","still_character":true},
+    {"id":"S03_STORM","start_frame":200,"end_frame_exclusive":300,"purpose":"Reveal unending atmospheric water source","visual":"three independent storm-coast planes, rain moving with wind and water glints","camera":"accelerating push and lateral track","still_character":true}
+  ],
+  "visual_evidence": "Not yet validated by video normal-speed playback, first candidate only",
+  "paid_generations_for_this_render": 0,
+  "additional_credits_for_this_render": 0
+}
