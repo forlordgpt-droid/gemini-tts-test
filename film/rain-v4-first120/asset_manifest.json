@@ -1,0 +1,225 @@
+{
+  "stage": "30-120s",
+  "original_image_zip_sha256": "43b1b846b903e69a7955e5436c8586126701df06bee3d4e18dd10824ee417d2c",
+  "approved_art_reuse": true,
+  "paid_art_generation": 0,
+  "assets": [
+    {
+      "filename": "apartment_far.webp",
+      "sha256": "3fcc47e7eb0746e0c2e15d4f678ed174d7cc29443b57e957fa0a58f66e735dfb",
+      "bytes": 381780,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "apartment_front.webp",
+      "sha256": "55cfc3d292b7f813e29e03bb520e76f2933b36d01e3e00cfba9f1d525a87399c",
+      "bytes": 66856,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "apartment_mid.webp",
+      "sha256": "d066db46cb58861c395fa27b869b2fa6c02075262d3f71968dd32d4eef78976e",
+      "bytes": 108046,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "atmos_far.webp",
+      "sha256": "8add0137d23b3b6c53f0c1c0620e299a647e363b042c862c79f84028f5226720",
+      "bytes": 197988,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "atmos_front.webp",
+      "sha256": "ddb3a1717dfa0468c793d8a1a776037a127cc913e0cc1bd8517c23601a2d0235",
+      "bytes": 97214,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "atmos_mid.webp",
+      "sha256": "6c96f306c6dd3d521e052e863e79197cf6c663a64805fad0cd82cf6131e7a340",
+      "bytes": 73480,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "harbor_far.webp",
+      "sha256": "96f5ca94702781a288e8167b3dd360aa67fd1ebe1b08f466a1344b6ceeadc8f9",
+      "bytes": 403268,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "harbor_front.webp",
+      "sha256": "813f16a44944e5ec51b73f9b2d8051d221e6c0168dfce9a89d131c06c96003d1",
+      "bytes": 41740,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "harbor_mid.webp",
+      "sha256": "4292de9dcf56a6943110a0809e0925be7cf06220e61749fb4cd9709b2f3e1fc2",
+      "bytes": 312458,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "historic_far.webp",
+      "sha256": "86fb13fd4394cd0156982f43cc0a66cf33f97a103f5cf5db19daa94a8f3ba44d",
+      "bytes": 326170,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "historic_front.webp",
+      "sha256": "268773fba79b0a39b15d1c34f694690d19e04dc3c1a2fb5a83d2e935be0012c8",
+      "bytes": 71528,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "historic_mid.webp",
+      "sha256": "eebeda46b698acae2139e876a6f01eb253f7f17508e133b22e057bcef6f78919",
+      "bytes": 195404,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "office_far.webp",
+      "sha256": "6452e08d92ac650b6b42afe73f9ff5e7d8e838762a15a4cbf4f1b829e8cc486a",
+      "bytes": 209944,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "office_front.webp",
+      "sha256": "5f6c931f10472d871df9152cc28c57fa5499e49a5975a00e3778a3e53c3cc24d",
+      "bytes": 58774,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "office_mid.webp",
+      "sha256": "fd6c0caeaac828094a408cc94f665c93fd1af45f8533e43cf4dd03c8cb90817a",
+      "bytes": 134126,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "prop_clock.webp",
+      "sha256": "3b72d5356d8b9a7e558c65648f16cf7b4bcd532f6d53b77d99942b3a0be38737",
+      "bytes": 50852,
+      "size": [
+        433,
+        513
+      ]
+    },
+    {
+      "filename": "prop_laptop.webp",
+      "sha256": "bae676e1593330426bdb831743c33e7bb379651c43384f247cfc5ba921c26021",
+      "bytes": 50108,
+      "size": [
+        594,
+        466
+      ]
+    },
+    {
+      "filename": "prop_mug.webp",
+      "sha256": "12385824f23853efb8438c338ff99b595d2fce62f9d8b09c044353dd7da0435c",
+      "bytes": 38406,
+      "size": [
+        353,
+        341
+      ]
+    },
+    {
+      "filename": "prop_phone.webp",
+      "sha256": "ae4838aef3d42df496b317ba7c9583dad1ab12b19ad3ab09c273fb9b33874f79",
+      "bytes": 11250,
+      "size": [
+        222,
+        400
+      ]
+    },
+    {
+      "filename": "prop_radio.webp",
+      "sha256": "143f2511ee2016861158cf57f8f0dc4ac231300440c7525c605acc6575a2e1a0",
+      "bytes": 62440,
+      "size": [
+        440,
+        402
+      ]
+    },
+    {
+      "filename": "protagonist_day1_still.webp",
+      "sha256": "29e7b8f191740447d9176a40df8902307de314036b5a5694d357d9119eb4e78f",
+      "bytes": 80574,
+      "size": [
+        237,
+        498
+      ]
+    },
+    {
+      "filename": "street_far.webp",
+      "sha256": "7ef324b7ecd94648ef08d90f3acb3e5009a9366b9b64e65baf851a781b763872",
+      "bytes": 336964,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "street_front.webp",
+      "sha256": "99a12b372f6e18e484df53db5dfc2379c019f6dc243f4bf539a96c39e46aeb8f",
+      "bytes": 120462,
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "filename": "street_mid.webp",
+      "sha256": "81aeaa0d59e954a381a1e6372c5e22fb9af43786f5b569c43a1f5ab6c88f952e",
+      "bytes": 134754,
+      "size": [
+        1672,
+        941
+      ]
+    }
+  ],
+  "notes": "First-30 art retained byte-identically for scene continuity. Two additional plates and five native prop crops derive from 62 approved PNGs. Character animation excluded."
+}

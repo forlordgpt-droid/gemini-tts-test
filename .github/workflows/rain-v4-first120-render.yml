@@ -1,0 +1,145 @@
+name: Rain V4 First120 - 18 Verified Five-Second Cinematic Shards and Full MP4
+on:
+  push:
+    branches: [rain-v4-first120-20261119]
+    paths: [.github/workflows/rain-v4-first120-render.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  packages: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  smoke:
+    name: Verify difficult forecast shot in exact pinned CPU browser before production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable V3 engine, V4 stage-specific profile and source integrity
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 film/rain-v4-first120/restore_assets.py
+      - name: Render representative animated weather forecast in actual CPU WebGL/WebCodecs
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "${GITHUB_WORKSPACE}/film/rain-v4-first120/scenes" --start-frame 2280 --frame-count 30 --out "${GITHUB_WORKSPACE}/smoke"
+          test -s smoke/part_2280_30.mp4
+          python3 - <<'PY'
+          import subprocess,json
+          p='smoke/part_2280_30.mp4'
+          o=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,width,height,r_frame_rate,nb_frames','-of','json',p]))
+          x=o['streams'][0]
+          assert (x['codec_name'],x['width'],x['height'],x['r_frame_rate'],int(x['nb_frames']))==('h264',1920,1080,'30/1',30),x
+          print('V4 first-120s difficult-shot preflight PASS: 30 actual encoded forecast frames')
+          PY
+  render:
+    name: Rain cinematic 150 frames starting at ${{ matrix.start }}
+    needs: [smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        start: [900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000, 3150, 3300, 3450]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify approved pinned V4 profile and exact independently authored source layers
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 film/rain-v4-first120/restore_assets.py
+      - name: Render 150 deterministic absolute story frames with Three.js GSAP WebCodecs Mediabunny
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs \
+            --project "${GITHUB_WORKSPACE}/film/rain-v4-first120/scenes" \
+            --start-frame ${{ matrix.start }} --frame-count 150 \
+            --out "${GITHUB_WORKSPACE}/output"
+      - name: Generate 90-second original rain and story events with required OfflineAudioContext
+        if: matrix.start == 900
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node film/rain-v4-first120/render_sfx_90.cjs \
+            "${GITHUB_WORKSPACE}/film/rain-v4-first120/scenes" \
+            "${GITHUB_WORKSPACE}/output/RAIN_V4_30TO120_ORIGINAL_SFX.wav"
+          python3 - <<'PY'
+          import wave
+          with wave.open('output/RAIN_V4_30TO120_ORIGINAL_SFX.wav','rb') as wav:
+            assert (wav.getframerate(),wav.getnchannels(),wav.getnframes(),wav.getsampwidth())==(24000,1,2160000,2)
+          print('PASS original 90.0-second location-aware environmental WAV')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST120_SHARD_${{ matrix.start }}
+          path: output/
+          retention-days: 30
+          if-no-files-found: warn
+  assemble:
+    name: Assemble preserved first30 + 18 new shards + five original Fola speech clips
+    needs: [render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore 18 new CPU video shards and original 90sec WebAudio
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST120_SHARD_*
+          path: parts
+      - name: Restore approved prior 30sec final movie, never regenerate its images or voice
+        uses: actions/download-artifact@v4
+        with:
+          name: RAIN_V4_FIRST30_VERIFIED_MASTER_MP4_AND_QA
+          run-id: 44625976951
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: first30
+      - name: Restore five approved existing Kie Flash Fola WAV files (zero paid calls)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_30TO120_FOLA_*
+          run-id: 44628685482
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: voices
+      - name: Source verification, canonical 3600-frame reencode, unique AAC mix, 25-point QA
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first120/assemble120.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST120_COMPLETE_MP4_SOURCE_TIMELINE_CONTACT_QA
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: warn

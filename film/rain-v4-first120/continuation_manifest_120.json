@@ -1,0 +1,477 @@
+{
+  "project": "What If It Never Stopped Raining for 10 Years",
+  "scope": "Approved 0\u201330s reused, new 30\u2013120s; total exactly 120s, 3600 frames",
+  "story_source_sha256": "0746367323a5b1704984db5ece04b3a85eb8d0e84d6bfe5f25c14e7f5b19bef9",
+  "active_directive": "HUNYUAN_CINEMATIC_MASTER_INSTRUCTION_V4",
+  "directive_sha256": "42bc84acd21e8aa032b651caf66c971042556320954b5175a0fbc54cde92a98b",
+  "source_art_image_pack_sha256": "43b1b846b903e69a7955e5436c8586126701df06bee3d4e18dd10824ee417d2c",
+  "approved_first30_sha256": "540c06627dd805f7840dc8a8e3c60823805882444129021c295e60ae621e1863",
+  "approved_first30_run": 44625976951,
+  "renderer": "ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 3600,
+    "container": "MP4",
+    "video_codec": "H264",
+    "audio_codec": "AAC",
+    "duration_seconds": 120
+  },
+  "tts": {
+    "provider": "kie.ai",
+    "model": "google/gemini-3-8-flash-tts",
+    "voice": "Fola",
+    "run_id": 44628685482,
+    "artifacts": [
+      "RAIN_V4_30TO120_FOLA_S0",
+      "RAIN_V4_30TO120_FOLA_S1",
+      "RAIN_V4_30TO120_FOLA_S2",
+      "RAIN_V4_30TO120_FOLA_S3",
+      "RAIN_V4_30TO120_FOLA_S4"
+    ],
+    "segments": [
+      {
+        "id": "S0",
+        "filename": "RAIN_V4_30TO120_S0_KIE_GEMINI38_FLASH_RAW.wav",
+        "sha256": "10d22e9ff704dc8c4fc3c218b80f585b03be823f26eb023a49e0ed99f0558267",
+        "duration_seconds": 15.12,
+        "global_onset_seconds": 30.18,
+        "global_end_seconds": 45.3,
+        "credits_consumed": 0.48,
+        "word_count_source_request": "49",
+        "provider_task_id": "7a3e58e133516775ee435f060506d6e4",
+        "new_generation": true
+      },
+      {
+        "id": "S1",
+        "filename": "RAIN_V4_30TO120_S1_KIE_GEMINI38_FLASH_RAW.wav",
+        "sha256": "2bcbcfeb91565c97a8dc6b402a087c783c2eb726ffe102d52539833cbc313b44",
+        "duration_seconds": 17.2,
+        "global_onset_seconds": 45.42,
+        "global_end_seconds": 62.62,
+        "credits_consumed": 0.55,
+        "word_count_source_request": "47",
+        "provider_task_id": "d86bba53f4418c0836aa931d90c7b800",
+        "new_generation": true
+      },
+      {
+        "id": "S2",
+        "filename": "RAIN_V4_30TO120_S2_KIE_GEMINI38_FLASH_RAW.wav",
+        "sha256": "8e39ebc2e1f48f108eb6ef78f289dcab26cef2c7ab195234bc46f88899017737",
+        "duration_seconds": 19.64,
+        "global_onset_seconds": 62.74,
+        "global_end_seconds": 82.38,
+        "credits_consumed": 0.62,
+        "word_count_source_request": "41",
+        "provider_task_id": "9c4f41f4dbaaee82ef803ff822d66aa1",
+        "new_generation": true
+      },
+      {
+        "id": "S3",
+        "filename": "RAIN_V4_30TO120_S3_KIE_GEMINI38_FLASH_RAW.wav",
+        "sha256": "90b568ba21bb5c4dc27248ee87b55ab15d41184774f12caa2ffc0b19b2b7da22",
+        "duration_seconds": 17.24,
+        "global_onset_seconds": 82.5,
+        "global_end_seconds": 99.74,
+        "credits_consumed": 0.55,
+        "word_count_source_request": "44",
+        "provider_task_id": "3b450b18a87050f93ffeb37e07f83158",
+        "new_generation": true
+      },
+      {
+        "id": "S4",
+        "filename": "RAIN_V4_30TO120_S4_KIE_GEMINI38_FLASH_RAW.wav",
+        "sha256": "69f6b5af36c24e27d7ec54f6894a0e0b047e2f6858eb2dfed50a042b85228c56",
+        "duration_seconds": 18.52,
+        "global_onset_seconds": 99.86,
+        "global_end_seconds": 118.38,
+        "credits_consumed": 0.59,
+        "word_count_source_request": "54",
+        "provider_task_id": "a594d38a44591119bc0b37f56e73bd23",
+        "new_generation": true
+      }
+    ]
+  },
+  "spending": {
+    "preexisting_0to30_credits": 0.85,
+    "new_tts_credits": 2.79,
+    "new_image_generation_credits": 0,
+    "new_tts_retries": 0
+  },
+  "shard_plan": {
+    "start_frames": [
+      900,
+      1050,
+      1200,
+      1350,
+      1500,
+      1650,
+      1800,
+      1950,
+      2100,
+      2250,
+      2400,
+      2550,
+      2700,
+      2850,
+      3000,
+      3150,
+      3300,
+      3450
+    ],
+    "frame_count_each": 150,
+    "parallel_limit": 8
+  },
+  "continuity": {
+    "apartment": "Meridian 24th floor of 30-story building",
+    "harbor": "Two blocks from bay",
+    "office_tower": "Lel, across Harbor Avenue",
+    "tuesday": "Day one calm; ordinary apartment and harbor remain walkable",
+    "day_two": "flood watch is dismissed, NOT ignored before it appears",
+    "day_three": "muddy river; schools closed",
+    "day_four": "forecast first ten rainy days and next ten rainy days",
+    "atmospheric_river": "warm ocean feeds stationary coastal atmospheric river",
+    "historic": "California winter of 1861, 43 days; 10 ft Sacramento and Central Valley inland sea (script assertion)"
+  },
+  "shots": [
+    {
+      "id": "R01_TUESDAY",
+      "start_frame": 900,
+      "end_frame_exclusive": 1014,
+      "start_second": 30.0,
+      "end_second": 33.8,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R02_24TH_FLOOR",
+      "start_frame": 1014,
+      "end_frame_exclusive": 1128,
+      "start_second": 33.8,
+      "end_second": 37.6,
+      "art": "harbor",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "blue"
+    },
+    {
+      "id": "R03_TWO_BLOCKS",
+      "start_frame": 1128,
+      "end_frame_exclusive": 1251,
+      "start_second": 37.6,
+      "end_second": 41.7,
+      "art": "harbor",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "blue"
+    },
+    {
+      "id": "R04_HARBOR_VIEW",
+      "start_frame": 1251,
+      "end_frame_exclusive": 1356,
+      "start_second": 41.7,
+      "end_second": 45.2,
+      "art": "office",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "cool"
+    },
+    {
+      "id": "R05_LEL_OFFICE",
+      "start_frame": 1356,
+      "end_frame_exclusive": 1440,
+      "start_second": 45.2,
+      "end_second": 48.0,
+      "art": "harbor",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "blue"
+    },
+    {
+      "id": "R06_WORK_FROM_HOME",
+      "start_frame": 1440,
+      "end_frame_exclusive": 1548,
+      "start_second": 48.0,
+      "end_second": 51.6,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R07_COFFEE",
+      "start_frame": 1548,
+      "end_frame_exclusive": 1650,
+      "start_second": 51.6,
+      "end_second": 55.0,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R08_CLOSE_WINDOW",
+      "start_frame": 1650,
+      "end_frame_exclusive": 1755,
+      "start_second": 55.0,
+      "end_second": 58.5,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R09_DAY_TWO",
+      "start_frame": 1755,
+      "end_frame_exclusive": 1830,
+      "start_second": 58.5,
+      "end_second": 61.0,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R10_PHONE_WARNING",
+      "start_frame": 1830,
+      "end_frame_exclusive": 1929,
+      "start_second": 61.0,
+      "end_second": 64.3,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "alert"
+    },
+    {
+      "id": "R11_MUDDY_RIVER",
+      "start_frame": 1929,
+      "end_frame_exclusive": 2028,
+      "start_second": 64.3,
+      "end_second": 67.6,
+      "art": "street",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "mud"
+    },
+    {
+      "id": "R12_SCHOOLS_CLOSE",
+      "start_frame": 2028,
+      "end_frame_exclusive": 2124,
+      "start_second": 67.6,
+      "end_second": 70.8,
+      "art": "street",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "mud"
+    },
+    {
+      "id": "R13_LONG_WEEKEND",
+      "start_frame": 2124,
+      "end_frame_exclusive": 2217,
+      "start_second": 70.8,
+      "end_second": 73.9,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R14_FIRST_TEN_FORECAST",
+      "start_frame": 2217,
+      "end_frame_exclusive": 2319,
+      "start_second": 73.9,
+      "end_second": 77.3,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "cool"
+    },
+    {
+      "id": "R15_NEXT_TEN_FORECAST",
+      "start_frame": 2319,
+      "end_frame_exclusive": 2442,
+      "start_second": 77.3,
+      "end_second": 81.4,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "cool"
+    },
+    {
+      "id": "R16_RADIO",
+      "start_frame": 2442,
+      "end_frame_exclusive": 2550,
+      "start_second": 81.4,
+      "end_second": 85.0,
+      "art": "apartment",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "warm"
+    },
+    {
+      "id": "R17_ATMOS_RIVER",
+      "start_frame": 2550,
+      "end_frame_exclusive": 2700,
+      "start_second": 85.0,
+      "end_second": 90.0,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    },
+    {
+      "id": "R18_WATER_VAPOR",
+      "start_frame": 2700,
+      "end_frame_exclusive": 2835,
+      "start_second": 90.0,
+      "end_second": 94.5,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    },
+    {
+      "id": "R19_CALIFORNIA_1861",
+      "start_frame": 2835,
+      "end_frame_exclusive": 2991,
+      "start_second": 94.5,
+      "end_second": 99.7,
+      "art": "historic",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "historic"
+    },
+    {
+      "id": "R20_SACRAMENTO_10FT",
+      "start_frame": 2991,
+      "end_frame_exclusive": 3126,
+      "start_second": 99.7,
+      "end_second": 104.2,
+      "art": "historic",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "historic"
+    },
+    {
+      "id": "R21_INLAND_SEA",
+      "start_frame": 3126,
+      "end_frame_exclusive": 3219,
+      "start_second": 104.2,
+      "end_second": 107.3,
+      "art": "historic",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "historic"
+    },
+    {
+      "id": "R22_NORMAL_RIVERS",
+      "start_frame": 3219,
+      "end_frame_exclusive": 3330,
+      "start_second": 107.3,
+      "end_second": 111.0,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    },
+    {
+      "id": "R23_THIS_ONE_STOPS",
+      "start_frame": 3330,
+      "end_frame_exclusive": 3420,
+      "start_second": 111.0,
+      "end_second": 114.0,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    },
+    {
+      "id": "R24_OCEAN_FEEDS",
+      "start_frame": 3420,
+      "end_frame_exclusive": 3540,
+      "start_second": 114.0,
+      "end_second": 118.0,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    },
+    {
+      "id": "R25_WHAT_IF",
+      "start_frame": 3540,
+      "end_frame_exclusive": 3600,
+      "start_second": 118.0,
+      "end_second": 120.0,
+      "art": "atmos",
+      "camera": "Three.js PerspectiveCamera position and look-at controlled by GSAP timeline; independent 3-layer meshes",
+      "still_character": true,
+      "scenic_depth_layers": 3,
+      "mood": "storm"
+    }
+  ],
+  "story_event_cues": [
+    {
+      "event": "DAY_TWO_PHONE_ALERT",
+      "frame": 1840,
+      "source_phrase": "your phone buzzes with a flood watch",
+      "object": "phone static artwork; screen warning animated",
+      "sound": "two synthesized phone tones"
+    },
+    {
+      "event": "FORECAST_FIRST_10",
+      "frame": 2260,
+      "source_phrase": "10-day forecast. 10 little rainclouds",
+      "visual": "ten rainy-day cards"
+    },
+    {
+      "event": "FORECAST_NEXT_10",
+      "frame": 2379,
+      "source_phrase": "you scroll to the next 10. same",
+      "visual": "second set of ten rainy-day cards, no animated hand"
+    },
+    {
+      "event": "RADIO_EXPLAINS",
+      "frame": 2487,
+      "source_phrase": "when the radio explains it",
+      "visual": "approved radio prop; independently pulsing graphic"
+    },
+    {
+      "event": "HISTORICAL_43_DAYS",
+      "frame": 2895,
+      "source_phrase": "1861 ... rained for 43 days",
+      "visual": "historical approved 1861 flood illustration with accurate 43 days graphic"
+    }
+  ],
+  "limitations": [
+    "Narration segment timings are from actual source WAV durations. Precise word-boundary alignment has not been independently transcribed.",
+    "This is the first 2-minute technical candidate, subject to normal-speed creative review.",
+    "Still actors and object-only actions follow active V4; original approved 0-30 footage is preserved visually, reencoded only for canonical timestamps."
+  ]
+}
