@@ -1,0 +1,56 @@
+name: Rain V4 - Corrected First Five Minutes - One Authorized Fola TTS per Segment
+on:
+  push:
+    branches: [rain-v4-character-fix-first5-20261120]
+    paths: ['.github/workflows/rain-v4-first300-tts.yml']
+  workflow_dispatch:
+concurrency:
+  group: rain-v4-first300-twelve-unique-fola-tasks
+  cancel-in-progress: false
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  synthesize:
+    if: github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        segment: [s00, s01, s02, s03, s04, s05, s06, s07, s08, s09, s10, s11]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack the one-version hash-bound script and narration requests
+        run: |
+          python3 - <<'PY'
+          import zipfile,pathlib
+          p=pathlib.Path('film/rain-v4-first300/voice_jobs.zip')
+          with zipfile.ZipFile(p) as z:
+            assert z.testzip() is None
+            dest=pathlib.Path('film/rain-v4-first300/voice')
+            dest.mkdir(parents=True,exist_ok=True)
+            for item in z.infolist():
+              rel=pathlib.PurePosixPath(item.filename)
+              assert not rel.is_absolute() and '..' not in rel.parts
+              z.extract(item,dest)
+          PY
+      - name: Zero-cost preflight for exact Fola and one-task authorization
+        run: python3 film/rain-v4-first300/voice/generate_one.py --segment ${{ matrix.segment }} --validate-only
+      - name: Create exactly one paid Kie Flash TTS task for this segment; no retry
+        env:
+          KIE_API_KEY: ${{ secrets.KIE_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first300/voice/generate_one.py --segment ${{ matrix.segment }} --out "voice-output/${{ matrix.segment }}"
+      - name: Save immutable narration WAV, task receipt and audit
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_FOLA_${{ matrix.segment }}
+          path: voice-output/${{ matrix.segment }}/
+          retention-days: 30
+          if-no-files-found: warn
