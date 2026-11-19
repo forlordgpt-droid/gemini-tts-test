@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Continue with exactly the same cinematic narrator Fola as the approved first 30 seconds. Verbatim speech at roughly 165 words per minute, controlled and intimate, vivid clear natural pauses. No added words, filler, or trailing silence.",
+        "text": "an atmospheric river. It's a real thing. A long narrow band of water vapor flowing through the sky from the warm ocean like a river nobody can see. In the winter of 1861, one of them parked over California and rained for 43 days."
+      }
+    ]
+  }
+}

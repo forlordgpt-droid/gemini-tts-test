@@ -1,0 +1,18 @@
+{
+  "approved": true,
+  "approval_scope": "rain-v4-first120:one-continuation-narration-task-s1",
+  "provider": "kie.ai",
+  "model": "google/gemini-3-8-flash-tts",
+  "jobs_authorized": 1,
+  "provider_hard_cap": false,
+  "authorization_source": "current_conversation",
+  "request_sha256": "84ff74454ecda477c502fcd828a9a41120c2796c3513dca87ce1850d05ed46b3",
+  "max_total_credits": 1,
+  "user_approval_evidence": "On November 19 2026 the user said 'good, do it up to 2 minutes' after approving the completed 30s film. Inherits exact Kie Gemini 3.8 Flash TTS model and Fola. Five separately bounded continuation segments only, each submitted once. One credit is a local conservative estimate, not an enforced provider hard cap; user did not state a numeric maximum.",
+  "estimated_unit_credits_range": [
+    0.3,
+    0.9
+  ],
+  "max_jobs_this_stage": 1,
+  "additional_generations_authorized": false
+}

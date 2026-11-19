@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Continue with exactly the same cinematic narrator Fola as the approved first 30 seconds. Verbatim speech at roughly 165 words per minute, controlled and intimate, vivid clear natural pauses. No added words, filler, or trailing silence.",
+        "text": "color of chocolate milk and the schools close. You think, \"Great, long weekend for somebody.\" On day four, you open the 10-day forecast. 10 little rainclouds. You scroll to the next 10. same. That's when the radio explains it. It's called"
+      }
+    ]
+  }
+}

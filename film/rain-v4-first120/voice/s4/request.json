@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Continue with exactly the same cinematic narrator Fola as the approved first 30 seconds. Verbatim speech at roughly 165 words per minute, controlled and intimate, vivid clear natural pauses. No added words, filler, or trailing silence.",
+        "text": "Sacramento ended up under 10 ft of water and the central valley turned into an inland sea. Normally, these sky rivers move on in a few days. This one doesn't. It stops right over your coast and the ocean keeps feeding it. That part, the part where it never moves, is the what if."
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "project": "What If It Never Stopped Raining for 10 Years",
+  "narrative_range": [
+    30,
+    120
+  ],
+  "model": "google/gemini-3-8-flash-tts",
+  "voice": "Fola",
+  "jobs": 5,
+  "no_retry": true,
+  "approved_first30_sha256": "540c06627dd805f7840dc8a8e3c60823805882444129021c295e60ae621e1863",
+  "segments": [
+    {
+      "i": 0,
+      "words": 49,
+      "chars": 259,
+      "sha256": "97f67c1fbc4d86a15ab0a62c051c608819409e2e332f36bc3d91fe42e9d0ad7a",
+      "artifact": "RAIN_V4_30TO120_FOLA_S0",
+      "filename": "RAIN_V4_30TO120_S0_KIE_GEMINI38_FLASH_RAW.wav"
+    },
+    {
+      "i": 1,
+      "words": 47,
+      "chars": 238,
+      "sha256": "84ff74454ecda477c502fcd828a9a41120c2796c3513dca87ce1850d05ed46b3",
+      "artifact": "RAIN_V4_30TO120_FOLA_S1",
+      "filename": "RAIN_V4_30TO120_S1_KIE_GEMINI38_FLASH_RAW.wav"
+    },
+    {
+      "i": 2,
+      "words": 41,
+      "chars": 238,
+      "sha256": "83e55a1e1660bd81f7d34c5fc48f1b254130fe2244fdd59c4fdd3749eaa8539a",
+      "artifact": "RAIN_V4_30TO120_FOLA_S2",
+      "filename": "RAIN_V4_30TO120_S2_KIE_GEMINI38_FLASH_RAW.wav"
+    },
+    {
+      "i": 3,
+      "words": 44,
+      "chars": 229,
+      "sha256": "6a75e958c3549527199ed9c1f21631c61eaa0003ceecca70be52e2524f272dda",
+      "artifact": "RAIN_V4_30TO120_FOLA_S3",
+      "filename": "RAIN_V4_30TO120_S3_KIE_GEMINI38_FLASH_RAW.wav"
+    },
+    {
+      "i": 4,
+      "words": 54,
+      "chars": 279,
+      "sha256": "97cf9d8594349d26767ca62f47fc7c368ffaf2a5d9064f5b67c83245a413381f",
+      "artifact": "RAIN_V4_30TO120_FOLA_S4",
+      "filename": "RAIN_V4_30TO120_S4_KIE_GEMINI38_FLASH_RAW.wav"
+    }
+  ],
+  "known_prior_spent_credits": 0.85,
+  "new_estimate_credits": [
+    1.5,
+    4.5
+  ],
+  "total_local_credit_ceiling": 5,
+  "provider_hard_cap": false
+}

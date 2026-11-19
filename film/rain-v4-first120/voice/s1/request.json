@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Continue with exactly the same cinematic narrator Fola as the approved first 30 seconds. Verbatim speech at roughly 165 words per minute, controlled and intimate, vivid clear natural pauses. No added words, filler, or trailing silence.",
+        "text": "called the Lel. You work from home. The rain is a nice sound behind your laptop. You make coffee. You close the window. That's day one. On day two, your phone buzzes with a flood watch. You swipe it away. On day three, the river turns the"
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "model": "google/gemini-3-8-flash-tts",
+  "input": {
+    "temperature": 1,
+    "filler_words": false,
+    "speakers": [
+      {
+        "speaker_id": "Speaker 1",
+        "voice_name": "Fola"
+      }
+    ],
+    "dialogue_turns": [
+      {
+        "speaker_id": "Speaker 1",
+        "style": "Continue with exactly the same cinematic narrator Fola as the approved first 30 seconds. Verbatim speech at roughly 165 words per minute, controlled and intimate, vivid clear natural pauses. No added words, filler, or trailing silence.",
+        "text": "It starts on a Tuesday, and it starts boring. You live on the 24th floor of the Meridian, a 30story apartment tower two blocks from the bay. From your window, you can see the harbor, the mouth of the river, and right across Harbor Avenue, a glass office tower"
+      }
+    ]
+  }
+}
