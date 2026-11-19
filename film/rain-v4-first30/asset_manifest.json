@@ -1,0 +1,92 @@
+{
+  "origin_sha256": "43b1b846b903e69a7955e5436c8586126701df06bee3d4e18dd10824ee417d2c",
+  "generation_model_calls": 0,
+  "assets": [
+    {
+      "name": "street",
+      "source": "scenes/E03_muddy_river_and_early_flooding_street.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "atmos",
+      "source": "scenes/E04_storm_ocean_and_atmospheric_river_landscape.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "flood",
+      "source": "scenes/E23_drowned_avenue_at_water_level.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "cold",
+      "source": "scenes/E15_historical_summer_snow_landscape.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "hunger",
+      "source": "scenes/E06_panic_supermarket_clean_setting.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "tower",
+      "source": "scenes/E10_city_blackout_and_fourth_floor_flood_state.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "rope",
+      "source": "scenes/E32_rope_siege_at_night_clean_plate.png",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "name": "rope_intact.webp",
+      "source": "props/P05_rope_exchange_mechanism_and_cargo.png",
+      "crop_px": [
+        22,
+        452,
+        1640,
+        516
+      ]
+    },
+    {
+      "name": "rope_broken.webp",
+      "source": "props/P05_rope_exchange_mechanism_and_cargo.png",
+      "crop_px": [
+        22,
+        559,
+        1642,
+        646
+      ]
+    },
+    {
+      "name": "knife.webp",
+      "source": "props/P10_emotional_close_up_props.png",
+      "crop_px": [
+        0,
+        5,
+        584,
+        251
+      ]
+    }
+  ]
+}

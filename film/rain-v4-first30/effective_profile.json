@@ -1,0 +1,19 @@
+{
+  "active_profile": "V4_STILL_ACTORS",
+  "base_engine": "V3 immutable",
+  "supersessions": [
+    "no animated human parts/rig required in new footage",
+    "allow non-character / infographic / environment shots",
+    "require genuine perspective depth where scenic",
+    "preserve authored action of independently moving rope/knife",
+    "check intentional holds by shot; no blanket optical flow threshold"
+  ],
+  "source_originals_unchanged": true,
+  "new_paid_models": {
+    "speech": "google/gemini-3-8-flash-tts",
+    "illustration": "none"
+  },
+  "runtime_code": "/opt/cinematic/engine/scripts/render_shard.cjs",
+  "runtime_qa": "V3 technical + this stage-specific V4 event/shot QA",
+  "env_sha256_digest": "4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7"
+}

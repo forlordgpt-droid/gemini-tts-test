@@ -1,0 +1,191 @@
+{
+  "project": "What If It Never Stopped Raining for 10 Years",
+  "stage": "First continuous 30 seconds preview",
+  "status": "NEW_20S_SHOTS_PENDING_EXPORT",
+  "active_profile": "HUNYUAN_V4_STILL_CHARACTERS_AND_INDEPENDENT_ENVIRONMENT_OBJECTS",
+  "source_narration": "What If It Never Stopped Raining for 10 Years.txt",
+  "story_sha256": "0746367323a5b1704984db5ece04b3a85eb8d0e84d6bfe5f25c14e7f5b19bef9",
+  "directive_sha256": "42bc84acd21e8aa032b651caf66c971042556320954b5175a0fbc54cde92a98b",
+  "source_art_archive_sha256": "43b1b846b903e69a7955e5436c8586126701df06bee3d4e18dd10824ee417d2c",
+  "reference_first10": {
+    "file": "RAIN_V4_FIRST10_UNCORRECTED.mp4",
+    "sha256": "9fe4d27f710c0cefc674094d018c0a0efd50fbabdfaa5859eee378812b364100",
+    "source_run": 44620161500,
+    "frames": 300,
+    "seconds": 10,
+    "unchanged": true
+  },
+  "continuation_voice": {
+    "model": "google/gemini-3-8-flash-tts",
+    "provider": "kie.ai",
+    "voice": "Fola",
+    "run_id": 44621797160,
+    "task_id": "2d8e74d7f9c4fc2ab07ecd66ee1f03be",
+    "file": "RAIN_V4_10TO30_KIE_GEMINI38_FLASH_RAW.wav",
+    "sha256": "5bb60d92b087b3984602130c7b1222eaa723017690c820ab4150dede1200dfec",
+    "duration_seconds": 17.6,
+    "global_onset_seconds": 10.18,
+    "global_end_seconds": 27.78,
+    "original_words": 58,
+    "credits_consumed": 0.56,
+    "additional_paid_retries": 0
+  },
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 900,
+    "video_codec": "H264",
+    "audio_codec": "AAC",
+    "engine": "ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7",
+    "render_shard_script": "/opt/cinematic/engine/scripts/render_shard.cjs",
+    "tool_locks": [
+      "Three.js 0.187.0",
+      "GSAP 3.15.1",
+      "Mediabunny 1.66.0",
+      "Playwright 1.65.1",
+      "Web Audio OfflineAudioContext",
+      "FFmpeg/FFprobe"
+    ],
+    "continuation_shards": [
+      300,
+      450,
+      600,
+      750
+    ]
+  },
+  "shots": [
+    {
+      "id": "S04_STREET_YEARS",
+      "first_frame": 300,
+      "end_frame_exclusive": 363,
+      "start_second": 10.0,
+      "end_second": 12.1,
+      "narrative_purpose": "The rain lasts ten years",
+      "art_set": "street",
+      "camera_and_events": "dolly forward and lateral truck",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S05_ATMOS_EVERY_DAY",
+      "first_frame": 363,
+      "end_frame_exclusive": 435,
+      "start_second": 12.1,
+      "end_second": 14.5,
+      "narrative_purpose": "Not on and off; every single day",
+      "art_set": "atmos",
+      "camera_and_events": "counter-track, 10 year rhythm strip",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S06_FLOOD_MONTH_ONE",
+      "first_frame": 435,
+      "end_frame_exclusive": 527,
+      "start_second": 14.5,
+      "end_second": 17.566667,
+      "narrative_purpose": "First-month flood nearly kills survivor",
+      "art_set": "flood",
+      "camera_and_events": "downward crane; independent water overlay rises",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S07_COLD",
+      "first_frame": 527,
+      "end_frame_exclusive": 567,
+      "start_second": 17.566667,
+      "end_second": 18.9,
+      "narrative_purpose": "Long-term cold",
+      "art_set": "cold",
+      "camera_and_events": "still winter painted farm, snow drifts",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S08_HUNGER",
+      "first_frame": 567,
+      "end_frame_exclusive": 606,
+      "start_second": 18.9,
+      "end_second": 20.2,
+      "narrative_purpose": "Long-term hunger",
+      "art_set": "hunger",
+      "camera_and_events": "empty store shelves, dry interior",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S09_SEA",
+      "first_frame": 606,
+      "end_frame_exclusive": 646,
+      "start_second": 20.2,
+      "end_second": 21.533333,
+      "narrative_purpose": "Sea remains dangerous",
+      "art_set": "atmos",
+      "camera_and_events": "fast coastal insert with storm rain",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S10_TOWER",
+      "first_frame": 646,
+      "end_frame_exclusive": 716,
+      "start_second": 21.533333,
+      "end_second": 23.866667,
+      "narrative_purpose": "The building deteriorates with time",
+      "art_set": "tower",
+      "camera_and_events": "standing tower, motivated cool lighting",
+      "still_character": true,
+      "unverified_until_export": true
+    },
+    {
+      "id": "S11_ROPE_YEAR_SIX",
+      "first_frame": 716,
+      "end_frame_exclusive": 900,
+      "start_second": 23.866667,
+      "end_second": 30.0,
+      "narrative_purpose": "In year six rope used for five years is cut on purpose",
+      "art_set": "rope",
+      "camera_and_events": "tension, offscreen-operated knife enters, rope fibers separate and recoil",
+      "still_character": true,
+      "unverified_until_export": true
+    }
+  ],
+  "independent_action": {
+    "id": "ROPE_01",
+    "shot": "S11_ROPE_YEAR_SIX",
+    "initial_state": "taut five-year rope between towers",
+    "cause": "knife applied by unseen actor from outside frame",
+    "visible_action": "knife enters from offscreen right; rope image changes to two frayed ends and recoils",
+    "result_state": "two severed rope ends",
+    "global_onset_second": 26.0,
+    "global_contact_second": 27.6,
+    "global_result_second": 28.08,
+    "cue_type": "timed_silent_beat_then_impact_sound",
+    "source_sprite": "P05 rope exchange mechanism atlas and P10 knife atlas",
+    "qa": "UNVERIFIED until normal-speed review"
+  },
+  "graphics": {
+    "exact_story_labels": [
+      "10 YEARS",
+      "NO BREAKS.  NO DRY DAYS.",
+      "MONTH ONE  /  THE FLOOD",
+      "THE COLD",
+      "THE HUNGER",
+      "THE SEA",
+      "AND THE BUILDING...",
+      "YEAR SIX  /  FLASH FORWARD",
+      "FIVE YEARS OF SURVIVAL",
+      "ON PURPOSE."
+    ],
+    "false_precision_avoided": true
+  },
+  "spending": {
+    "existing_opening_credits": 0.29,
+    "new_continuation_voice_credits": 0.56,
+    "additional_image_generations": 0,
+    "total_project_tts_credits": 0.85
+  },
+  "qa_acceptance": "TECHNICAL_PASS_VISUAL_REVIEW_REQUIRED on successful render; user visual approval required"
+}

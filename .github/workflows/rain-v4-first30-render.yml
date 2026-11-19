@@ -1,0 +1,205 @@
+name: Rain V4 First30 - Four Parallel Existing-Art Shards and Full MP4
+on:
+  push:
+    branches: [rain-v4-first30-20261119]
+    paths:
+      - .github/workflows/rain-v4-first30-render.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  render:
+    name: Pinned 150-frame render from global frame ${{ matrix.start }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        start: [300, 450, 600, 750]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify pinned reference originals and exact installed pipeline
+        run: python3 /opt/cinematic/engine/scripts/doctor.py --check
+      - name: Reassemble source art deterministically and verify SHA256 before extraction
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,io,zipfile,pathlib
+          r=pathlib.Path('film/rain-v4-first30')
+          m=json.loads((r/'asset_chunks.json').read_text())
+          assert len(m['parts'])==11
+          data=b''
+          for p in m['parts']:
+            f=r/'asset_parts'/p['name']
+            assert f.is_file(),f
+            b=f.read_bytes()
+            assert len(b)==p['bytes'] and hashlib.sha256(b).hexdigest()==p['sha256'],f
+            data+=b
+          assert len(data)==m['total_bytes'] and hashlib.sha256(data).hexdigest()==m['zip_sha256']
+          z=zipfile.ZipFile(io.BytesIO(data));assert z.testzip() is None
+          names=z.namelist();assert len(names)==24 and all(x.endswith('.webp') for x in names),names
+          folder=r/'scenes'/'assets';folder.mkdir(parents=True,exist_ok=True)
+          z.extractall(folder)
+          assert len(list(folder.glob('*.webp')))==24
+          print('Verified 24 approved prepared assets from 62 original ChatGPT paintings, ZERO image generation')
+          PY
+      - name: Render assigned global 150 frames with exact Three.js GSAP WebCodecs and Mediabunny
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs \
+            --project "${GITHUB_WORKSPACE}/film/rain-v4-first30/scenes" \
+            --start-frame ${{ matrix.start }} --frame-count 150 \
+            --out "${GITHUB_WORKSPACE}/output"
+      - name: Generate 20-second original rain/rope sound design in Web Audio OfflineAudioContext
+        if: matrix.start == 300
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node film/rain-v4-first30/render_sfx_20.cjs \
+            "${GITHUB_WORKSPACE}/film/rain-v4-first30/scenes" "${GITHUB_WORKSPACE}/output/RAIN_V4_10TO30_ORIGINAL_SFX.wav"
+          python3 - <<'PY'
+          import wave
+          with wave.open('output/RAIN_V4_10TO30_ORIGINAL_SFX.wav') as f:
+            assert f.getnchannels()==1 and f.getframerate()==24000 and f.getnframes()==480000
+          print('Verified exact 20-second PCM rain and object SFX')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST30_SHARD_${{ matrix.start }}
+          path: output/
+          retention-days: 30
+          if-no-files-found: warn
+  assemble:
+    name: Reuse approved 0-10s, mix 10-30s, verify exact 900 frames
+    needs: [render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve four successful unchanged video shards and 20-second synthesized SFX
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST30_SHARD_*
+          path: parts
+      - name: Retrieve immutable first-ten-second complete preview from approved prior run
+        uses: actions/download-artifact@v4
+        with:
+          name: RAIN_V4_FIRST10_UNCORRECTED_MP4_AND_QA
+          run-id: 44620161500
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: first10
+      - name: Retrieve already-generated original Fola continuation speech; NO new task
+        uses: actions/download-artifact@v4
+        with:
+          name: RAIN_V4_FIRST30_ONE_KIE_FLASH_CONTINUATION
+          run-id: 44621797160
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: voice
+      - name: Preserve verified assets and video/audio source hashes
+        run: |
+          set -euo pipefail
+          test -s first10/RAIN_V4_FIRST10_UNCORRECTED.mp4
+          test -s voice/RAIN_V4_10TO30_KIE_GEMINI38_FLASH_RAW.wav
+          test -s parts/RAIN_V4_FIRST30_SHARD_300/RAIN_V4_10TO30_ORIGINAL_SFX.wav
+          echo '9fe4d27f710c0cefc674094d018c0a0efd50fbabdfaa5859eee378812b364100  first10/RAIN_V4_FIRST10_UNCORRECTED.mp4' | sha256sum -c -
+          echo '5bb60d92b087b3984602130c7b1222eaa723017690c820ab4150dede1200dfec  voice/RAIN_V4_10TO30_KIE_GEMINI38_FLASH_RAW.wav' | sha256sum -c -
+          python3 - <<'PY'
+          import json,subprocess,pathlib
+          order=[300,450,600,750]
+          for start in order:
+            path=pathlib.Path('parts')/f'RAIN_V4_FIRST30_SHARD_{start}'/f'part_{start}_150.mp4'
+            assert path.is_file() and path.stat().st_size>100000,path
+            q=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,width,height,r_frame_rate,nb_frames:format=duration','-of','json',str(path)]))
+            v=q['streams'][0]
+            assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',150),v
+            assert abs(float(q['format']['duration'])-5)<.1
+          path='first10/RAIN_V4_FIRST10_UNCORRECTED.mp4'
+          q=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames:format=duration','-of','json',path]))
+          v=next(x for x in q['streams'] if x['codec_type']=='video')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',300)
+          assert abs(float(q['format']['duration'])-10)<.1
+          import wave
+          with wave.open('voice/RAIN_V4_10TO30_KIE_GEMINI38_FLASH_RAW.wav') as w:
+            assert w.getframerate()==24000 and w.getnchannels()==1 and w.getnframes()==422400
+          print('PASS approved first10 hash, exact Fola narration, and new 600 video frames')
+          PY
+      - name: Assemble one canonical 900-frame H264/AAC MP4 without rerendering first10
+        run: |
+          set -euo pipefail
+          mkdir -p delivery
+          ffmpeg -hide_banner -loglevel error -y \
+            -i first10/RAIN_V4_FIRST10_UNCORRECTED.mp4 -map 0:v:0 -an -c:v copy first10_video_only.mp4
+          python3 - <<'PY'
+          from pathlib import Path
+          paths=[Path('first10_video_only.mp4').resolve()]
+          paths += [(Path('parts')/f'RAIN_V4_FIRST30_SHARD_{i}'/f'part_{i}_150.mp4').resolve() for i in (300,450,600,750)]
+          Path('join_video.txt').write_text(''.join("file '"+str(x)+"'\n" for x in paths))
+          PY
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i join_video.txt -an -c:v copy delivery/RAIN_V4_FIRST30_VIDEO_ONLY.mp4
+          ffmpeg -hide_banner -loglevel error -y \
+            -i delivery/RAIN_V4_FIRST30_VIDEO_ONLY.mp4 \
+            -i first10/RAIN_V4_FIRST10_UNCORRECTED.mp4 \
+            -i voice/RAIN_V4_10TO30_KIE_GEMINI38_FLASH_RAW.wav \
+            -i parts/RAIN_V4_FIRST30_SHARD_300/RAIN_V4_10TO30_ORIGINAL_SFX.wav \
+            -filter_complex '[1:a]aresample=48000,atrim=0:10,asetpts=PTS-STARTPTS[old];[2:a]aresample=48000,volume=1.00,adelay=10180:all=1[new];[3:a]aresample=48000,volume=0.32,afade=t=in:st=0:d=0.2,afade=t=out:st=19.5:d=0.5,adelay=10000:all=1[sfx];[old][new][sfx]amix=inputs=3:duration=longest:dropout_transition=0,alimiter=limit=0.93,atrim=0:30,asetpts=N/SR/TB[a]' \
+            -map 0:v:0 -map '[a]' -c:v copy -c:a aac -b:a 192k -t 30 -movflags +faststart \
+            delivery/RAIN_V4_FIRST30_COMPLETE.mp4
+      - name: Final decode, timing, audio and SHA256 review evidence
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib,subprocess,pathlib
+          path=pathlib.Path('delivery/RAIN_V4_FIRST30_COMPLETE.mp4')
+          q=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type,width,height,r_frame_rate,nb_frames,sample_rate:format=duration','-of','json',str(path)]))
+          v=next(x for x in q['streams'] if x['codec_type']=='video');a=next(x for x in q['streams'] if x['codec_type']=='audio')
+          assert (v['codec_name'],v['width'],v['height'],v['r_frame_rate'],int(v['nb_frames']))==('h264',1920,1080,'30/1',900),v
+          assert a['codec_name']=='aac' and 29.91<float(q['format']['duration'])<30.09,(a,q['format'])
+          subprocess.check_call(['ffmpeg','-hide_banner','-loglevel','error','-i',str(path),'-f','null','-'])
+          report={'status':'TECHNICAL_PASS_VISUAL_REVIEW_REQUIRED','title':'What If It Never Stopped Raining for 10 Years','frames':900,'fps':30,'resolution':'1920x1080','duration_seconds':float(q['format']['duration']),'video_codec':'h264','audio_codec':'aac','sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'preserved_first_10_seconds':True,'new_visual_frames':600,'new_paid_speech_jobs':1,'new_speech_credits':0.56,'first10_speech_credits':0.29,'total_known_credits':0.85,'new_image_generation_credits':0,'new_tts_run':44621797160,'new_artwork':'derived from previously generated 62 source PNGs','narration_alignment':'fixed 10.18s global onset; detailed word cue QA unverified','rope_visual_cut_frame':828,'rope_SFX_cut_frame':828,'character_animation':False,'subjective_visual_and_audio_review':'USER_APPROVAL_REQUIRED'}
+          pathlib.Path('delivery/RAIN_V4_FIRST30_QA.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+          python3 - <<'PY'
+          from PIL import Image,ImageOps,ImageDraw
+          import subprocess,io
+          timestamps=[.8,3.9,7.5,10.7,12.5,14.9,16.7,18.4,20.8,23.1,27.1,29.2]
+          out=Image.new('RGB',(1920,4*390),'#0f2134');d=ImageDraw.Draw(out)
+          for i,t in enumerate(timestamps):
+            b=subprocess.check_output(['ffmpeg','-hide_banner','-loglevel','error','-ss',str(t),'-i','delivery/RAIN_V4_FIRST30_COMPLETE.mp4','-vframes','1','-f','image2pipe','-vcodec','mjpeg','-'])
+            im=ImageOps.fit(Image.open(io.BytesIO(b)).convert('RGB'),(640,360))
+            x=(i%3)*640;y=(i//3)*390;out.paste(im,(x,y+25));d.text((x+13,y+4),f'{t:.1f} seconds',fill='white')
+          out.save('delivery/RAIN_V4_FIRST30_CONTACT_SHEET.jpg',quality=89)
+          PY
+          cp film/rain-v4-first30/continuation_manifest.json delivery/
+          cp film/rain-v4-first30/effective_profile.json delivery/
+          cp voice/NARRATION_AUDIT.json delivery/VOICE_10TO30_PROVIDER_AUDIT.json
+          for i in 300 450 600 750; do cp "parts/RAIN_V4_FIRST30_SHARD_${i}/shard_qc.json" "delivery/SHARD_${i}_QA.json"; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST30_COMPLETE_MP4_CONTACT_QA
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: warn
