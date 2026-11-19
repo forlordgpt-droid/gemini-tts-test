@@ -1,0 +1,56 @@
+name: Ten Years of Rain V4 — Pinned Runtime Preflight (No Paid Calls)
+on:
+  push:
+    branches: [rain-v4-first10-20261119]
+    paths: ['.github/workflows/rain-v4-preflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable references and actual preinstalled runtime
+        run: |
+          set -euo pipefail
+          mkdir -p rain-preflight
+          python3 /opt/cinematic/engine/scripts/doctor.py --check | tee rain-preflight/doctor.txt
+          python3 - <<'PY'
+          import importlib.metadata as m, json, pathlib, subprocess, hashlib
+          expected={'Pillow':'12.0.0','opencv-python-headless':'4.12.0.88','numpy':'2.2.6'}
+          found={k:m.version(k) for k in expected}
+          assert found==expected,(found,expected)
+          root=pathlib.Path('/opt/cinematic')
+          js={}
+          for k,v in {'three':'0.187.0','gsap':'3.15.1','mediabunny':'1.66.0','playwright':'1.65.1','esbuild':'0.25.12'}.items():
+              js[k]=json.loads((root/'node_modules'/k/'package.json').read_text())['version']
+              assert js[k]==v,(k,js[k],v)
+          files={}
+          for p in [root/'engine/scripts/render_shard.cjs',root/'engine/scripts/temporal_export.bundle.js',root/'package-lock.json']:
+              if p.is_file(): files[str(p)]=hashlib.sha256(p.read_bytes()).hexdigest()
+          report={'status':'PINNED_ENVIRONMENT_VERIFIED','python_packages':found,'node_packages':js,'node':subprocess.check_output(['node','--version'],text=True).strip(),'files_sha256':files,'paid_calls':0,'snapgen_calls':0,'original_references_preserved':True,'production_profile':'V4 still-character overlay required before new story render'}
+          pathlib.Path('rain-preflight/runtime.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Verify browser and export APIs with unchanged historical reference
+        env:
+          ENGINE_SMOKE_OUTPUT: ${{ github.workspace }}/rain-preflight/browser
+        run: node /opt/cinematic/engine/scripts/browser_smoke.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_PINNED_ENVIRONMENT_PREFLIGHT
+          path: rain-preflight/
+          retention-days: 30
