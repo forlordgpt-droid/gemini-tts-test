@@ -1,0 +1,174 @@
+name: Rain V4 - Character Corrected First Five Minutes - Pinned 60 Shards
+on:
+  push:
+    branches: [rain-v4-character-fix-first5-20261120]
+    paths: ['.github/workflows/rain-v4-first300-render.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  packages: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  smoke:
+    name: Prove protagonist and Walt scene rendering before sixty CPU shards
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact original pinned runtime, package, all 77 art layers and five-minute screenplay
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,json
+          root=Path('film/rain-v4-first300')
+          with zipfile.ZipFile(root/'project_code.zip') as z:
+            assert z.testzip() is None
+            z.extractall(root)
+          shots=json.loads((root/'shot_manifest_5min.json').read_text())['shots']
+          assert len(shots)==83 and abs(shots[-1]['end']-300)<1e-6
+          assert all(abs(b['start']-a['end'])<.002 for a,b in zip(shots,shots[1:]))
+          print('PASS 83 canonical shots with corrected character staging')
+          PY
+          python3 film/rain-v4-first300/restore_assets.py
+      - name: Smoke render main protagonist 0s and Walt 3m30s in exact locked browser engine
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "${GITHUB_WORKSPACE}/film/rain-v4-first300/scenes" --start-frame 0 --frame-count 30 --out "${GITHUB_WORKSPACE}/smoke"
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "${GITHUB_WORKSPACE}/film/rain-v4-first300/scenes" --start-frame 6300 --frame-count 30 --out "${GITHUB_WORKSPACE}/smoke"
+          python3 - <<'PY'
+          import subprocess,json
+          for n in [0,6300]:
+            p=f'smoke/part_{n}_30.mp4'
+            o=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_entries','stream=codec_name,width,height,r_frame_rate,nb_frames','-of','json',p]))
+            s=o['streams'][0]
+            assert (s['codec_name'],s['width'],s['height'],s['r_frame_rate'],int(s['nb_frames']))==('h264',1920,1080,'30/1',30),s
+          print('PASS protagonist and Walt scene encoding with pinned Three.js/GSAP/Mediabunny')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_CHARACTER_SMOKE_QA
+          path: smoke/
+          retention-days: 30
+          if-no-files-found: warn
+  render:
+    name: Corrected V4 character-led shard from frame ${{ matrix.start }}
+    needs: [smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 48
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        start: [0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000, 3150, 3300, 3450, 3600, 3750, 3900, 4050, 4200, 4350, 4500, 4650, 4800, 4950, 5100, 5250, 5400, 5550, 5700, 5850, 6000, 6150, 6300, 6450, 6600, 6750, 6900, 7050, 7200, 7350, 7500, 7650, 7800, 7950, 8100, 8250, 8400, 8550, 8700, 8850]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore source and validate complete exact 77-asset pack
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          root=Path('film/rain-v4-first300')
+          with zipfile.ZipFile(root/'project_code.zip') as z:
+            assert z.testzip() is None
+            z.extractall(root)
+          PY
+          python3 film/rain-v4-first300/restore_assets.py
+      - name: Render independent 150 canonical story frames on locked WebGL + WebCodecs/Mediabunny
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "${GITHUB_WORKSPACE}/film/rain-v4-first300/scenes" --start-frame ${{ matrix.start }} --frame-count 150 --out "${GITHUB_WORKSPACE}/output"
+      - name: Synthesize original rain/audio cue bed from offline Web Audio only
+        if: matrix.start == 3600
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node film/rain-v4-first300/render_sfx_180.cjs "${GITHUB_WORKSPACE}/film/rain-v4-first300/scenes" "${GITHUB_WORKSPACE}/output/RAIN_V4_120TO300_ORIGINAL_SFX.wav"
+          ffprobe -v error -show_entries format=duration -of default=nw=1 output/RAIN_V4_120TO300_ORIGINAL_SFX.wav
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_SHARD_${{ matrix.start }}
+          path: output/
+          retention-days: 30
+          if-no-files-found: warn
+  assemble:
+    name: Source-verified canonical 9000-frame five-minute narrated master and QA
+    needs: [render]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 105
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore original-authoritative assembly source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          root=Path('film/rain-v4-first300')
+          with zipfile.ZipFile(root/'project_code.zip') as z:
+            assert z.testzip() is None
+            z.extractall(root)
+          PY
+      - name: Restore all sixty existing paid-free render shards and 180s environmental sound
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST300_SHARD_*
+          path: parts
+      - name: Recover original approved 120-second audio without new paid calls
+        uses: actions/download-artifact@v4
+        with:
+          name: RAIN_V4_FIRST120_COMPLETE_MP4_SOURCE_TIMELINE_CONTACT_QA
+          run-id: 44631881419
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: first120
+      - name: Recover twelve exact Fola Gemini 3.8 Flash existing narration WAVs, zero paid calls
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST300_FOLA_s*
+          run-id: 44638837331
+          github-token: ${{ github.token }}
+          repository: forlordgpt-droid/gemini-tts-test
+          path: voices
+      - name: Assemble and technically verify 5 min MP4, monotonic timestamps, and 48-frame creative review contact
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first300/assemble300.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_CHARACTER_CORRECTED_MP4_QA_SOURCE
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: warn
