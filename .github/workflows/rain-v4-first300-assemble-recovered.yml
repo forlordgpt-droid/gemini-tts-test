@@ -1,0 +1,99 @@
+name: Rain V4 Five-Minute Character-Corrected Final Assembly After Recovery
+on:
+  push:
+    branches: [rain-v4-character-fix-first5-20261120]
+    paths: ['.github/workflows/rain-v4-first300-assemble-recovered.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  packages: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  assemble:
+    name: Reassemble original 57 plus 3 repaired into 9000-frame 5-minute master
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original pinned cinematic runtime, unpack original assembly without substitutions
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('film/rain-v4-first300/project_code.zip') as z:
+            assert z.testzip() is None
+            z.extractall('film/rain-v4-first300')
+          PY
+      - name: Restore successful original first300 video shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST300_SHARD_*
+          run-id: 44677681357
+          repository: forlordgpt-droid/gemini-tts-test
+          github-token: ${{ github.token }}
+          path: parts
+      - name: Restore the three newly recovered first300 video shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST300_RECOVERED_SHARD_*
+          run-id: 44680438622
+          repository: forlordgpt-droid/gemini-tts-test
+          github-token: ${{ github.token }}
+          path: repaired
+      - name: Verify all 60 sources and overlay only repaired frames 900, 6600 and 6750
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil,json,hashlib
+          for n in [900,6600,6750]:
+            src=Path('repaired')/f'RAIN_V4_FIRST300_RECOVERED_SHARD_{n}'
+            video=src/f'part_{n}_150.mp4'
+            evidence=src/'shard_qc.json'
+            assert video.exists() and evidence.exists(),(video,evidence)
+            report=json.loads(evidence.read_text())
+            assert report['pass'] and report['start_frame']==n and report['frame_count']==150,report
+            assert hashlib.sha256(video.read_bytes()).hexdigest()==report['sha256'],n
+            dest=Path('parts')/f'RAIN_V4_FIRST300_SHARD_{n}'
+            if dest.exists():shutil.rmtree(dest)
+            shutil.copytree(src,dest)
+          assert all((Path('parts')/f'RAIN_V4_FIRST300_SHARD_{n}'/f'part_{n}_150.mp4').exists() for n in range(0,9000,150))
+          print('PASS 57 original + 3 recovered = all 60 canonical five-second shards',flush=True)
+          PY
+      - name: Restore original approved two-minute movie for exact existing speech
+        uses: actions/download-artifact@v4
+        with:
+          name: RAIN_V4_FIRST120_COMPLETE_MP4_SOURCE_TIMELINE_CONTACT_QA
+          run-id: 44631881419
+          repository: forlordgpt-droid/gemini-tts-test
+          github-token: ${{ github.token }}
+          path: first120
+      - name: Restore all twelve exact original Kie Gemini 3.8 Flash Fola audio segments
+        uses: actions/download-artifact@v4
+        with:
+          pattern: RAIN_V4_FIRST300_FOLA_s*
+          run-id: 44638837331
+          repository: forlordgpt-droid/gemini-tts-test
+          github-token: ${{ github.token }}
+          path: voices
+      - name: Canonically encode 9000 frames, mix original narration and run full PTS DTS visual QA
+        run: |
+          set -euo pipefail
+          python3 film/rain-v4-first300/assemble300.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_CHARACTER_CORRECTED_RECOVERED_MP4_QA
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: warn
