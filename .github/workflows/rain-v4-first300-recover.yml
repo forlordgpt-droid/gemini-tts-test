@@ -1,0 +1,58 @@
+name: Rain V4 Five-Minute Targeted Failed Shards Recovery
+on:
+  push:
+    branches: [rain-v4-character-fix-first5-20261120]
+    paths: ['.github/workflows/rain-v4-first300-recover.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  repair:
+    name: Recover exact frames from ${{ matrix.start }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      max-parallel: 3
+      fail-fast: false
+      matrix:
+        start: [900, 6600, 6750]
+    container:
+      image: ghcr.io/forlordgpt-droid/hunyuan-cinematic-engine@sha256:4026e6a686120cbed05b650bbecda54c377fcd91fbb56b844e9f87fdc6ef4df7
+      options: --ipc=host
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore immutable cinematic engine and original source image layers
+        run: |
+          set -euo pipefail
+          python3 /opt/cinematic/engine/scripts/doctor.py --check
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('film/rain-v4-first300/project_code.zip') as z:
+              assert z.testzip() is None
+              z.extractall('film/rain-v4-first300')
+          PY
+          python3 film/rain-v4-first300/restore_assets.py
+          python3 film/rain-v4-first300/fix_walt_dialogue.py
+          node --input-type=module --check < film/rain-v4-first300/scenes/main.js
+      - name: Render approved 150 frames in pinned Three.js GSAP Mediabunny runtime
+        env:
+          NODE_PATH: /opt/cinematic/node_modules
+        run: |
+          set -euo pipefail
+          node /opt/cinematic/engine/scripts/render_shard.cjs --project "${GITHUB_WORKSPACE}/film/rain-v4-first300/scenes" --start-frame ${{ matrix.start }} --frame-count 150 --out "${GITHUB_WORKSPACE}/output"
+          test -s "output/part_${{ matrix.start }}_150.mp4"
+          test -s output/shard_qc.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: RAIN_V4_FIRST300_RECOVERED_SHARD_${{ matrix.start }}
+          path: output/
+          retention-days: 30
+          if-no-files-found: warn
