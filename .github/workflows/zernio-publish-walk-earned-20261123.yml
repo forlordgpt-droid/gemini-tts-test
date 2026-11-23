@@ -66,3 +66,5 @@ jobs:
           path: publication_result.json
           if-no-files-found: ignore
           retention-days: 30
+
+# New workflow run after repository secret setup; verifies permission before any upload.
