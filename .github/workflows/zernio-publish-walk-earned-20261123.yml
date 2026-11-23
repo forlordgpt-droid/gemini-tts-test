@@ -68,3 +68,5 @@ jobs:
           retention-days: 30
 
 # New workflow run after repository secret setup; verifies permission before any upload.
+
+# Second publish attempt uses safe media upload fallback; first attempt created no posts.
