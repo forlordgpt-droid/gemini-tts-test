@@ -142,6 +142,66 @@ def existing_post(posts, platform, aid):
                 return x
     return None
 
+def https_field(value, field_names):
+    """Find an HTTPS URL with one of the requested field names; do not log signed URLs."""
+    if isinstance(value, dict):
+        for key in field_names:
+            field = value.get(key)
+            if isinstance(field, str) and field.startswith("https://"):
+                return field
+        for child in value.values():
+            if isinstance(child, (dict, list)):
+                got = https_field(child, field_names)
+                if got:
+                    return got
+    if isinstance(value, list):
+        for child in value:
+            got = https_field(child, field_names)
+            if got:
+                return got
+    return None
+
+
+def direct_upload(file: Path, platform: str):
+    """Authenticated multipart direct media upload for files below Zernio's 25 MB limit."""
+    if file.stat().st_size > 24_800_000:
+        raise RuntimeError("Direct media upload exceeds 25MB; presign required")
+    import uuid
+    boundary = "ChatGPTZernio" + uuid.uuid4().hex
+    filename = f"the-walk-he-earned-{platform}.mp4"
+    header = (
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'
+        "Content-Type: video/mp4\r\n\r\n"
+    ).encode("ascii")
+    closing = f"\r\n--{boundary}--\r\n".encode("ascii")
+    payload = header + file.read_bytes() + closing
+    req = urllib.request.Request(
+        BASE + "/media/upload-direct",
+        data=payload,
+        method="POST",
+        headers={
+            "Authorization": "Bearer " + KEY,
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data; boundary=" + boundary,
+            "User-Agent": "ChatGPT-WeddingShortPublisher/1.0",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=180) as response:
+            media = json.load(response)
+    except urllib.error.HTTPError as err:
+        print("DIRECT_MEDIA_HTTP_ERROR", platform, err.code, flush=True)
+        raise RuntimeError("Zernio direct video upload failed") from None
+    url = https_field(media, ("url", "fileUrl", "file_url", "publicUrl", "mediaUrl"))
+    if not url:
+        if isinstance(media, dict):
+            print("DIRECT_MEDIA_RESPONSE_KEYS", sorted(media.keys()), flush=True)
+        raise RuntimeError("Zernio returned no usable direct-upload video URL")
+    print("DIRECT_MEDIA_UPLOADED", platform, file.stat().st_size, flush=True)
+    return url
+
+
 def upload_video(file: Path, platform: str):
     if not file.is_file() or file.stat().st_size < 1_000_000:
         raise RuntimeError("Verified film was not downloaded")
@@ -149,26 +209,28 @@ def upload_video(file: Path, platform: str):
         "filename": f"the-walk-he-earned-{platform}.mp4",
         "contentType": "video/mp4",
     })
-    if isinstance(presigned, dict) and isinstance(presigned.get("data"), dict):
-        presigned = presigned["data"]
-    url = presigned.get("uploadUrl") or presigned.get("upload_url")
-    file_url = presigned.get("fileUrl") or presigned.get("file_url") or presigned.get("url")
-    if not url or not file_url or not str(url).startswith("https://") or not str(file_url).startswith("https://"):
-        raise RuntimeError("Zernio did not return usable presigned media URLs")
-    video = file.read_bytes()
-    request = urllib.request.Request(
-        url, data=video, method="PUT",
-        headers={"Content-Type": "video/mp4", "Content-Length": str(len(video))}
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=180) as resp:
-            if resp.status not in (200, 201, 204):
-                raise RuntimeError("Media upload unsuccessful")
-    except urllib.error.HTTPError as e:
-        print("MEDIA_UPLOAD_HTTP_ERROR", platform, e.code)
-        raise RuntimeError("Could not upload video to presigned storage") from None
-    print("MEDIA_UPLOADED", platform, len(video), flush=True)
-    return file_url
+    upload_url = https_field(presigned, ("uploadUrl", "upload_url", "signedUrl", "presignedUrl", "presigned_url"))
+    public_url = https_field(presigned, ("fileUrl", "file_url", "publicUrl", "public_url", "mediaUrl"))
+    if upload_url and public_url:
+        video = file.read_bytes()
+        request = urllib.request.Request(
+            upload_url, data=video, method="PUT",
+            headers={"Content-Type": "video/mp4", "Content-Length": str(len(video))}
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=180) as resp:
+                if resp.status not in (200, 201, 204):
+                    raise RuntimeError("Media upload unsuccessful")
+        except urllib.error.HTTPError as e:
+            print("PRESIGNED_MEDIA_HTTP_ERROR", platform, e.code, flush=True)
+            raise RuntimeError("Could not upload video to presigned storage") from None
+        print("MEDIA_UPLOADED", platform, len(video), flush=True)
+        return public_url
+    if isinstance(presigned, dict):
+        print("PRESIGN_RESPONSE_KEYS", sorted(presigned.keys()), flush=True)
+    print("PRESIGN_UNUSABLE_USING_DIRECT_UPLOAD", platform, flush=True)
+    return direct_upload(file, platform)
+
 
 def is_compatible_privacy(creator_info):
     txt = json.dumps(creator_info).upper()
