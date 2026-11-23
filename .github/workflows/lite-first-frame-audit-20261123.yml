@@ -1,0 +1,36 @@
+name: Fetch First GROK 1.5 Lite Clip for Visual Audit
+on:
+  push:
+    paths: ['.github/workflows/lite-first-frame-audit-20261123.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve existing completed clip by UUID only
+        env:
+          SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"film")
+          import download_snapgen_assets as d
+          d.MANIFEST=Path("lite_compare/first_manifest.json")
+          d.OUTPUT=Path("lite_compare/first")
+          sys.exit(d.main())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GROK_1_5_Lite_First_15s_Raw_Clip
+          path: lite_compare/first/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
