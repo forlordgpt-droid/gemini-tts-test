@@ -1,0 +1,68 @@
+name: Publish The Walk He Earned to TikTok and Facebook via Zernio
+
+on:
+  push:
+    paths:
+      - '.github/workflows/zernio-publish-walk-earned-20261123.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: zernio-publish-walk-earned-20261123
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ZERNIO_API_KEY: ${{ secrets.ZERNIO_API_KEY }}
+    steps:
+      - name: Verify Zernio key is securely configured
+        shell: bash
+        run: |
+          if [ -z "$ZERNIO_API_KEY" ]; then
+            echo "BLOCKED: add ZERNIO_API_KEY in Settings -> Secrets and variables -> Actions."
+            exit 2
+          fi
+
+      - name: Check out video production branch
+        uses: actions/checkout@v4
+
+      - name: Fetch previously completed 45-second captioned master
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 45216664491
+          name: The_Walk_He_Earned_45s_480p_Final
+          path: received
+
+      - name: Prepare Facebook Reel dimensions
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          test -s received/final/The_Walk_He_Earned_45s_480p_9x16.mp4
+          ffmpeg -y -hide_banner -loglevel error \
+            -i received/final/The_Walk_He_Earned_45s_480p_9x16.mp4 \
+            -vf scale=540:960:flags=lanczos,setsar=1 \
+            -c:v libx264 -preset medium -crf 19 -pix_fmt yuv420p \
+            -c:a aac -b:a 160k -ar 48000 \
+            -movflags +faststart -t 45 facebook_ready.mp4
+          ffprobe -v error -show_entries format=duration \
+            -of default=noprint_wrappers=1 facebook_ready.mp4
+
+      - name: Verify accounts and publish only once on each platform
+        run: python walk_earned/publish_zernio.py
+
+      - name: Save publication receipts even if a platform fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zernio_The_Walk_He_Earned_Publishing_Receipt
+          path: publication_result.json
+          if-no-files-found: ignore
+          retention-days: 30
