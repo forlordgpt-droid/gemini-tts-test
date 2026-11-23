@@ -1,0 +1,20 @@
+{
+  "project": "The Walk He Earned: Grok 1.5 Lite vs Grok Lower",
+  "assets": [
+    {
+      "id": "LITE_A",
+      "kind": "video",
+      "uuid": "9c810b02-e77c-11f1-bbdf-864df16d7c73"
+    },
+    {
+      "id": "LITE_B",
+      "kind": "video",
+      "uuid": "4fce2aa0-e77d-11f1-80f6-0e5c9cffef7c"
+    },
+    {
+      "id": "LITE_C",
+      "kind": "video",
+      "uuid": "510c89d4-e77d-11f1-a852-a67a558d0a8e"
+    }
+  ]
+}
