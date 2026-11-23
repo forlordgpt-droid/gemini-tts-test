@@ -1,0 +1,10 @@
+{
+  "project": "Lite first clip QA",
+  "assets": [
+    {
+      "id": "LITE_A",
+      "kind": "video",
+      "uuid": "9c810b02-e77c-11f1-bbdf-864df16d7c73"
+    }
+  ]
+}
