@@ -1,0 +1,25 @@
+{
+  "project": "the-walk-he-earned-45s",
+  "assets": [
+    {
+      "id": "A_SCENE",
+      "kind": "video",
+      "uuid": "63243f1e-e759-11f1-b045-de2ad4e2690c"
+    },
+    {
+      "id": "B_SCENE",
+      "kind": "video",
+      "uuid": "bcc96d1e-e759-11f1-9bd0-0a31a5bde6b4"
+    },
+    {
+      "id": "C_SCENE",
+      "kind": "video",
+      "uuid": "d25d2fb2-e759-11f1-80f6-0e5c9cffef7c"
+    },
+    {
+      "id": "CAST_REFERENCE",
+      "kind": "image",
+      "uuid": "01e44eec-e759-11f1-bc71-e6662a69bd87"
+    }
+  ]
+}
