@@ -1,0 +1,49 @@
+name: Fetch GROK 1.5 Lite Test Clips for Comparison
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walk-earned-lite-source-fetch-20261123.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grok-15-lite-fetch-wedding-20261123
+  cancel-in-progress: false
+
+jobs:
+  download-existing-lite-clips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out verified asset manifest
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Wait for existing completed Snapgen jobs and download exact clips (no paid generation)
+        env:
+          SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,"film")
+          import download_snapgen_assets as d
+          d.MANIFEST=Path("lite_compare/manifest.json")
+          d.OUTPUT=Path("lite_compare/source")
+          orig=d.wait_for_completion
+          d.wait_for_completion=lambda uuid: orig(uuid,max_wait_seconds=1700)
+          sys.exit(d.main())
+          PY
+      - name: Publish exact completed 15-second clip sources for side-by-side analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: Walk_Earned_GROK_1_5_Lite_Raw_3_Clips
+          path: lite_compare/source/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
