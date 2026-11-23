@@ -1,0 +1,53 @@
+name: The Walk He Earned - Fast Export
+
+on:
+  push:
+    paths:
+      - '.github/workflows/walk-earned-fast-20261123.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walk-earned-fast-20261123
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check preinstalled FFmpeg and fonts
+        run: |
+          command -v ffmpeg
+          command -v ffprobe
+          test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+      - name: Fetch only completed source clips, without new generation
+        env:
+          SNAPGEN_API_KEY: ${{ secrets.SNAPGEN_API_KEY }}
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, "film")
+          import download_snapgen_assets as a
+          a.MANIFEST = Path("walk_earned/manifest.json")
+          a.OUTPUT = Path("walk_earned/assets")
+          sys.exit(a.main())
+          PY
+      - name: Assemble vertical 45s film
+        run: python walk_earned/build.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: THE_WALK_HE_EARNED_45S_480P
+          path: |
+            walk_earned/final/
+            walk_earned/assets/download-report.json
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
