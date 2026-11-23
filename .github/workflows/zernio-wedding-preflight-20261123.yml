@@ -1,0 +1,54 @@
+name: Zernio Wedding Publishing Account Preflight
+on:
+  push:
+    paths:
+      - '.github/workflows/zernio-wedding-preflight-20261123.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ZERNIO_API_KEY: ${{ secrets.ZERNIO_API_KEY }}
+    steps:
+      - name: Confirm secure API key and connected target accounts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request,urllib.error,sys
+          key=os.environ.get("ZERNIO_API_KEY","").strip()
+          if not key:
+              print("NOT_CONNECTED: ZERNIO_API_KEY secret unavailable in GitHub")
+              sys.exit(2)
+          base="https://zernio.com/api/v1"
+          req=urllib.request.Request(base+"/accounts",headers={"Authorization":"Bearer "+key,"Accept":"application/json","User-Agent":"WalkHeEarned-Posting/1.0"})
+          try:
+              with urllib.request.urlopen(req,timeout=25) as r:
+                  payload=json.load(r)
+          except urllib.error.HTTPError as e:
+              print("ACCOUNT_HTTP_ERROR",e.code);sys.exit(3)
+          except Exception as e:
+              print("ACCOUNT_REQUEST_ERROR",type(e).__name__);sys.exit(4)
+          def find_accounts(x):
+              if isinstance(x,list):
+                  if any(isinstance(z,dict) and ("platform" in z or "platformType" in z) for z in x):
+                      return x
+                  for z in x:
+                      a=find_accounts(z)
+                      if a:return a
+              if isinstance(x,dict):
+                  for k in ("accounts","data","items","result"):
+                      if k in x:
+                          a=find_accounts(x[k])
+                          if a:return a
+              return []
+          accounts=find_accounts(payload)
+          print("ACCOUNT_COUNT",len(accounts))
+          for a in accounts:
+              keys=("platform","name","username","displayName","pageName","socialUsername","status","isConnected")
+              print("ACCOUNT_PUBLIC",json.dumps({k:a.get(k) for k in keys if a.get(k) is not None},ensure_ascii=False))
+          selected=[a for a in accounts if str(a.get("platform","")).lower() in ("tiktok","facebook")]
+          print("TARGET_PLATFORM_COUNTS",json.dumps({p:sum(str(x.get("platform","")).lower()==p for x in selected) for p in ("tiktok","facebook")}))
+          PY
