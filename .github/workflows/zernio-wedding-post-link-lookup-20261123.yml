@@ -1,0 +1,51 @@
+name: Read-Only Zernio Published Wedding Link Lookup
+on:
+  push:
+    paths:
+      - '.github/workflows/zernio-wedding-post-link-lookup-20261123.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ZERNIO_API_KEY: ${{ secrets.ZERNIO_API_KEY }}
+    steps:
+      - name: Retrieve public post links without exposing credentials
+        run: |
+          python - <<'PY'
+          import json, os, re, urllib.request, urllib.error
+          key=os.environ.get("ZERNIO_API_KEY","")
+          if not key:
+              raise SystemExit("Secret missing")
+          for platform,postid in [
+              ("tiktok","6b0486dd777305817639159e"),
+              ("facebook","6b0486f7777305817639161b")]:
+              for suffix in ("", "/logs"):
+                  url=f"https://zernio.com/api/v1/posts/{postid}{suffix}"
+                  req=urllib.request.Request(url,headers={"Authorization":"Bearer "+key,"Accept":"application/json"})
+                  try:
+                      with urllib.request.urlopen(req,timeout=25) as response:
+                          body=json.load(response)
+                  except urllib.error.HTTPError as e:
+                      print("POST_LOOKUP_HTTP",platform,"logs" if suffix else "post",e.code)
+                      continue
+                  print("LOOKUP",platform,"logs" if suffix else "post")
+                  def walk(value,branch="",depth=0):
+                      if depth>8: return
+                      if isinstance(value,dict):
+                          if depth <= 2:print("OBJECT_KEYS",branch,list(value.keys()))
+                          for k,v in value.items():
+                              walk(v,(branch+"."+str(k))[:110],depth+1)
+                      elif isinstance(value,list):
+                          for i,v in enumerate(value[:15]):
+                              walk(v,branch+"["+str(i)+"]",depth+1)
+                      elif isinstance(value,str):
+                          if re.match(r"^https?://(?:www\.)?(?:tiktok\.com|vm\.tiktok\.com|facebook\.com|fb\.watch)/",value):
+                              print("PUBLIC_POST_URL",platform,branch,value)
+                          elif any(z in branch.lower() for z in ("platformpostid","externalpostid","tiktokvideoid","platformvideoid","publishedvideoid")) and re.fullmatch(r"\d{15,25}",value):
+                              print("PUBLIC_PLATFORM_VIDEO_ID",platform,branch,value)
+                  walk(body)
+          PY
