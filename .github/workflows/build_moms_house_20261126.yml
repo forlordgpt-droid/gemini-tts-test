@@ -5,6 +5,8 @@ on:
       - 'productions/he_sold_moms_house_20261126/build.py'
       - '.github/workflows/build_moms_house_20261126.yml'
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   assemble:
     runs-on: ubuntu-latest
@@ -25,3 +27,9 @@ jobs:
             output/cover.jpg
             output/captions.ass
           retention-days: 30
+
+      - name: Publish direct-download release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view he-sold-moms-house-20261126 >/dev/null 2>&1 || gh release create he-sold-moms-house-20261126 output/He_Sold_Moms_House_45s_Captioned.mp4 output/He_Sold_Moms_House_45s_Clean.mp4 output/cover.jpg --title "He Sold Mom's House (45 sec)" --notes "Original fictional AI-generated emotional short film; 9:16 portrait; GROK 1.5 Lite 480p."
