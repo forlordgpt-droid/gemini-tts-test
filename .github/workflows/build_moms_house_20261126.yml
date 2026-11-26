@@ -1,0 +1,27 @@
+name: Build He Sold Mom's House Short
+on:
+  push:
+    paths:
+      - 'productions/he_sold_moms_house_20261126/build.py'
+      - '.github/workflows/build_moms_house_20261126.yml'
+  workflow_dispatch:
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Render film
+        run: python3 productions/he_sold_moms_house_20261126/build.py
+      - name: Export video artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: he-sold-moms-house-45s
+          path: |
+            output/He_Sold_Moms_House_45s_Captioned.mp4
+            output/He_Sold_Moms_House_45s_Clean.mp4
+            output/cover.jpg
+            output/captions.ass
+          retention-days: 30
